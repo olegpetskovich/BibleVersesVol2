@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.bible.knowbible.mvvm.view.theme_editor.MyNestedScrollViewLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="20dp">
+
+        <RelativeLayout
+            android:id="@+id/btnInterfaceLanguage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="16dp"
+            android:paddingLeft="16dp"
+            android:paddingTop="16dp"
+            tools:ignore="RtlSymmetry">
+
+            <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                android:id="@+id/ivLanguage"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_language" />
+
+            <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+                android:id="@+id/tvTranslateName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_toEndOf="@id/ivLanguage"
+                android:layout_toRightOf="@id/ivLanguage"
+                android:text="@string/tv_interface_language"
+                android:textSize="18sp" />
+
+            <com.android.bible.knowbible.mvvm.view.theme_editor.MyView
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_below="@id/tvTranslateName"
+                android:layout_alignStart="@id/tvTranslateName"
+                android:layout_alignLeft="@id/tvTranslateName"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="16dp"
+                android:paddingBottom="1dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/btnTheme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="14dp"
+            android:paddingLeft="14dp"
+            android:paddingTop="16dp"
+            tools:ignore="RtlSymmetry">
+
+            <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                android:id="@+id/ivTheme"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_theme" />
+
+            <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+                android:id="@+id/tvTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_marginLeft="14dp"
+                android:layout_toEndOf="@id/ivTheme"
+                android:layout_toRightOf="@id/ivTheme"
+                android:text="@string/tv_theme"
+                android:textAllCaps="false"
+                android:textSize="17sp" />
+
+<!--            <androidx.appcompat.widget.SwitchCompat-->
+<!--                android:id="@+id/switchDarkTheme"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentEnd="true"-->
+<!--                android:layout_alignParentRight="true"-->
+<!--                android:layout_centerVertical="true"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:layout_marginRight="8dp"-->
+<!--                app:thumbTint="@android:color/white" />-->
+
+            <com.android.bible.knowbible.mvvm.view.theme_editor.MyView
+                android:id="@+id/view1"
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_below="@id/tvTheme"
+                android:layout_alignStart="@id/tvTheme"
+                android:layout_alignLeft="@id/tvTheme"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="16dp"
+                android:paddingBottom="1dp" />
+        </RelativeLayout>
+    </LinearLayout>
+</com.android.bible.knowbible.mvvm.view.theme_editor.MyNestedScrollViewLayout>

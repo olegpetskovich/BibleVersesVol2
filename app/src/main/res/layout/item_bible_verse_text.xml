@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="2dp"
+    android:layout_marginStart="10dp"
+    android:layout_marginEnd="10dp">
+
+    <TextView
+        android:id="@+id/tvVerseNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/tvVerse"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/colorGray"
+        android:textSize="10sp"
+        tools:ignore="SmallSp"
+        tools:text="1" />
+
+    <TextView
+        android:id="@+id/tvVerse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:lineSpacingExtra="6dp"
+        android:textSize="18sp"
+        tools:text="В начале Бог сотворил небо и землю. Земля же была безвидна и пуста, и тьма над бездною." />
+</RelativeLayout>

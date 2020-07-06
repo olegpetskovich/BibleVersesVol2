@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?><!--По какой-то причине только на дефолтный LinearLayout получается установить атрибут background="?attr/selectableItemBackground". Если менять на кастомный, то не устанавливается-->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/themeCard"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="10dp"
+    app:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:id="@+id/layoutTheme"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/themeImage"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp"
+            tools:src="@drawable/day_theme" />
+
+        <!-- Эта ImageView необходимо для горихонтального положения экрана, чтобы при установке картинки, не возникала ошибка, для вертикального экрана это View не нужно, поэтому у него видимость gone-->
+        <ImageView
+            android:id="@+id/themeImage2"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp"
+            android:visibility="gone"
+            tools:src="@drawable/day_theme" />
+
+        <TextView
+            android:id="@+id/themeName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/themeImage"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:textSize="30sp"
+            tools:text="Светлая тема" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnApplyTheme"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/themeName"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:padding="12dp"
+            android:text="@string/btn_apply"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:cornerRadius="28dp" />
+
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>
+

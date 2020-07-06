@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#006EFF</color>
+    <color name="colorPrimaryDark">#0D47A1</color>
+    <color name="colorAccent">#96D6FF</color>
+
+    <!-- Status bar color -->
+    <color name="colorStatusBarLightTheme">#0D47A1</color>
+    <color name="colorStatusBarDarkTheme">#172029</color>
+    <color name="colorStatusBarBookTheme">#916C31</color>
+
+    <!-- Line separator color -->
+    <color name="colorLineLightTheme">#E2E2E2</color>
+    <color name="colorLineDarkTheme">#1A1D22</color>
+    <color name="colorLineBookTheme">#CEA761</color>
+
+    <color name="colorGray">#919191</color>
+    <color name="colorGrayBookTheme">#636363</color>
+
+    <!-- Text color -->
+    <color name="colorTextLightTheme">#222222</color>
+    <color name="colorTextDarkTheme">#C2C2C2</color>
+    <color name="colorTextBookTheme">#2C2A2A</color>
+
+    <!-- Icon color -->
+    <color name="colorIconLightTheme">#1d2731</color>
+    <color name="colorIconDarkTheme">#E2D8CE</color>
+    <color name="colorIconBookTheme">#1F190A</color>
+
+    <!-- Button color -->
+    <color name="colorButtonDarkTheme">#1d2731</color>
+    <color name="colorButtonLightTheme">#FFFFFF</color>
+    <color name="colorButtonBookTheme">#C59342</color>
+
+    <!-- Button ripple color -->
+    <color name="colorButtonRippleDarkTheme">#1a232c</color>
+    <color name="colorButtonRippleLightTheme">#F0EFEF</color>
+    <color name="colorButtonRippleBookTheme">#916C31</color>
+
+    <!-- Button stroke color -->
+    <color name="colorButtonStrokeDarkTheme">#1a232c</color>
+    <color name="colorButtonStrokeLightTheme">#FAFAFA</color>
+    <color name="colorButtonStrokeBookTheme">#A27938</color>
+
+    <!-- Button icon color -->
+    <color name="colorButtonIconDarkTheme">#006EFF</color>
+    <color name="colorButtonIconLightTheme">#006EFF</color>
+    <color name="colorButtonIconBookTheme">#181818</color>
+<!--    <color name="colorButtonIconBookTheme">#805C1E</color>-->
+
+    <!-- EditText cursor color -->
+    <color name="colorIconCursorDarkTheme">#006EFF</color>
+    <color name="colorIconCursorLightTheme">#006EFF</color>
+    <color name="colorIconCursorBookTheme">#181818</color>
+
+    <!-- Tab icon color -->
+    <color name="colorIconTabDarkTheme">#006EFF</color>
+    <color name="colorIconTabLightTheme">#006EFF</color>
+    <color name="colorIconTabBookTheme">#181818</color>
+
+    <!-- Tab Selected text color -->
+    <color name="colorSelectedTabTextDarkTheme">#006EFF</color>
+    <color name="colorSelectedTabTextLightTheme">#006EFF</color>
+    <color name="colorSelectedTabTextBookTheme">#181818</color>
+
+    <!-- Tab Unselected text color -->
+    <color name="colorUnselectedTabTextDarkTheme">#919191</color>
+    <color name="colorUnselectedTabTextLightTheme">#919191</color>
+    <color name="colorUnselectedTabTextBookTheme">#686868</color>
+
+    <!-- Tab indicator color -->
+    <color name="colorTabIndicatorDarkTheme">#006EFF</color>
+    <color name="colorTabIndicatorLightTheme">#006EFF</color>
+    <color name="colorTabIndicatorBookTheme">#2C2C2C</color>
+
+    <!-- Switch or CheckBox color for Light and Dark Themes -->
+    <color name="colorCheckedLightDarkThemes">#0062E2</color>
+    <color name="colorUncheckedLightDarkThemes">#919191</color>
+
+    <!-- Switch or CheckBox color for Book Theme -->
+    <color name="colorCheckedBookTheme">#181818</color>
+    <color name="colorUncheckedBookTheme">#636363</color>
+
+    <!-- Background color -->
+    <color name="colorBackgroundDarkTheme">#1d2731</color>
+    <color name="colorBackgroundLightTheme">#FFFFFF</color>
+    <color name="colorBackgroundBookTheme">#C59342</color>
+
+    <!-- Button "Apply" color -->
+    <color name="colorButtonApplyLightTheme">#006EFF</color>
+    <color name="colorButtonApplyDarkTheme">#22526b</color>
+    <color name="colorButtonApplyBookTheme">#a66a41</color>
+</resources>

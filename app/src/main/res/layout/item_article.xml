@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="5dp"
+    app:cardElevation="7dp"
+    app:cardUseCompatPadding="true"
+    tools:cardBackgroundColor="@color/colorPrimaryDark"
+    tools:targetApi="lollipop">
+
+    <ProgressBar
+        android:layout_width="75dp"
+        android:layout_height="75dp" />
+
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:orientation="vertical"
+        android:transitionName="layout">
+
+        <ImageView
+            android:id="@+id/ivArticleImage"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:scaleType="fitXY"
+            android:transitionName="articleImage"
+            tools:src="@drawable/example_picture" />
+
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+            android:id="@+id/tvNewArticle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_margin="6dp"
+            android:fontFamily="@font/neo_sans_pro_regular_cyr"
+            android:text="@string/tv_new_article" />
+
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+            android:id="@+id/tvArticleName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ivArticleImage"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/neo_sans_pro_regular_cyr"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:transitionName="articleName"
+            tools:text="Какой была природа в Эдэме?" />
+
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+            android:id="@+id/tvArticleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvArticleName"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="12dp"
+            android:ellipsize="end"
+            android:lineSpacingExtra="-2dp"
+            android:maxLines="2"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:transitionName="articleText"
+            tools:text="Лука любил молитву, и он определённо хотел сказать другим о необходимости молиться. В отличие от других Евангелистов, он пишет, что в момент крещения Христос молился и открылись небеса" />
+    </com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout>
+</com.google.android.material.card.MaterialCardView>

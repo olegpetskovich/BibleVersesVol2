@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/horizontalViewPager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:clipToPadding="false"
+            android:paddingStart="34dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="34dp"
+            android:paddingBottom="70dp" />
+    </androidx.core.widget.NestedScrollView>
+</com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout>

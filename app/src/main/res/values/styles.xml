@@ -1,0 +1,66 @@
+<resources>
+
+    <!-- Light/Day Mode theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:fontFamily">@font/avenir_next_regular_cyr</item>
+
+        <!--        <item name="primary_dark_color">@color/colorPrimaryDark</item>-->
+        <!--        <item name="background_color">@android:color/white</item>-->
+        <!--        <item name="text_color">#222222</item>-->
+        <!--        <item name="icon_color">#222222</item>-->
+        <!--        <item name="views_color">@color/colorPrimary</item>-->
+        <!--        <item name="views_accent_color">@color/colorAccent</item>-->
+        <!--        <item name="line_color">@color/colorGrayLight</item>-->
+        <!--        <item name="ripple_color">@color/colorGrayLight</item>-->
+        <!--       <item name="android:windowAnimationStyle">@style/WindowsAnimationTransitions</item>-->
+    </style>
+
+    <!-- Dark/Night Mode theme. -->
+    <!--    <style name="DarkTheme" parent="Theme.MaterialComponents.Light.NoActionBar">-->
+    <!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+    <!--        <item name="colorPrimary">@color/colorPrimary</item>-->
+    <!--        <item name="colorPrimaryDark">?attr/primary_dark_color</item>-->
+    <!--        <item name="colorAccent">@color/colorAccent</item>-->
+    <!--        <item name="android:fontFamily">@font/avenir_next_regular_cyr</item>-->
+
+    <!--        <item name="primary_dark_color">#1A1D22</item>-->
+    <!--        <item name="background_color">@color/colorDarkBackgroundTheme</item>-->
+    <!--        <item name="text_color">#DDDDDD</item>-->
+    <!--        <item name="icon_color">@color/colorGray</item>-->
+    <!--        <item name="views_color">@color/colorPrimary</item>-->
+    <!--        <item name="views_accent_color">@color/colorAccent</item>-->
+    <!--        <item name="line_color">#1A1D22</item>-->
+    <!--        <item name="ripple_color">#293136</item>-->
+    <!--&lt;!&ndash;        <item name="android:windowAnimationStyle">@style/WindowsAnimationTransitions</item>&ndash;&gt;-->
+    <!--    </style>-->
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="TextViewStyleBold" parent="Widget.AppCompat.TextView">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextViewStyleNormal" parent="Widget.AppCompat.TextView">
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TabTextOptions" parent="Widget.Design.TabLayout">
+        <item name="android:textSize">15sp</item>
+        <!--Сохранил эту строку, чтобы показать, что можно устанавливать шрифт отдельно-->
+<!--        <item name="android:fontFamily">@font/avenir_next_regular_cyr</item>-->
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--    <style name="WindowsAnimationTransitions">-->
+    <!--        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>-->
+    <!--        <item name="android:windowExitAnimation">@android:anim/fade_out</item>-->
+    <!--    </style>-->
+</resources>

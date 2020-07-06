@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "853408184229",
+    "firebase_url": "https://knowbible-73e70.firebaseio.com",
+    "project_id": "knowbible-73e70",
+    "storage_bucket": "knowbible-73e70.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:853408184229:android:b02e564291f22693759a4c",
+        "android_client_info": {
+          "package_name": "com.android.bible.knowbible"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "853408184229-cfk31os2mfnjj6pv53t22q2s21g6hk91.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.bible.knowbible",
+            "certificate_hash": "eaf53a767e7461457b03a4b64453c41614248cd2"
+          }
+        },
+        {
+          "client_id": "853408184229-69o1ivico3m8i2v6u0jvji3e4bsn6j7n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAd16VgJJPLFNfG-K6e8Z2hZcqkCYQkYsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "853408184229-69o1ivico3m8i2v6u0jvji3e4bsn6j7n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

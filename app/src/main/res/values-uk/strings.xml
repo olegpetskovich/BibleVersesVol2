@@ -1,0 +1,87 @@
+<resources>
+    <string name="app_name">KnowBible</string>
+    <string name="deleting">Видалити всі вірші?</string>
+    <string name="delete">Видалити</string>
+    <string name="cancel">Відміна</string>
+
+    <string name="title_articles">Статті</string>
+    <string name="title_bible">Біблія</string>
+    <string name="title_more">Більше</string>
+
+    <!-- TextView -->
+    <string name="tv_find_your_daily_verse">Знайди свій вірш дня!</string>
+    <string name="tv_find">Знайти</string>
+    <string name="tv_list">Список</string>
+    <string name="tv_remember_verse">Запам\'ятати \n вірш</string>
+    <string name="tv_settings">Налаштування</string>
+    <string name="tv_theme">Тема</string>
+    <string name="tv_have_to_download_bible">Щоб користуватися додатком, вам необхідно завантажити, як мінімум, один з представлених перекладів Біблії. Після того, як переклад завантажиться, натисніть на нього, і ви перейдете до вікна Біблії.</string>
+    <string name="tv_notes">Нотатки</string>
+    <string name="tv_search">Пошук</string>
+    <string name="tv_daily_verse">Вірш дня</string>
+    <string name="tv_bible_translation">Біблійний переклад</string>
+    <string name="tv_downloading_canceled">Завантаження перекладу скасовано</string>
+    <string name="tv_new_article">Нова стаття!</string>
+    <string name="tv_about_writing_articles">Ми з радістю надаємо вам можливість писати і публікувати власні статті! Для цього вам потрібно звернутися до нас, перейшовши за посиланням нижче на наш Telegram канал. Якщо ваша стаття пройде перевірку на відповідність заданого нами регламенту, ми опублікуємо її. Ознайомитися з регламентом ви можете натиснувши на кнопку нижче.</string>
+    <string name="tv_copy_verse">Копіювати</string>
+    <string name="tv_highlight_verse">Виділити</string>
+    <string name="tv_add_note">Додати замітку</string>
+    <string name="tv_share">Поділитися</string>
+    <string name="tv_select_color">Оберіть колір</string>
+    <string name="tv_color_sample">«Так бо Бог полюбив світ…»</string>
+    <string name="tv_remove_highlighted_verse">Видалити виділення</string>
+
+    <!-- Button -->
+    <string name="btn_old_testament">Старий\nЗаповіт</string>
+    <string name="btn_new_testament">Новий\nЗаповіт</string>
+    <string name="btn_old_testament_short">С.З.</string>
+    <string name="btn_new_testament_short">Н.З.</string>
+    <string name="btn_download">Завантажити</string>
+    <string name="btn_apply">Застосувати</string>
+    <string name="btn_cancel">Відміна</string>
+    <string name="btn_select">Обрати</string>
+    <string name="btn_save_note">Зберегти</string>
+
+    <!-- CheckBox -->
+    <string name="cb_add_bold_text">Додати жирний шрифт</string>
+    <string name="cb_add_underline">Додати підкреслення</string>
+    <string name="cb_add_to_daily_verse">Додати в «Вірш дня»</string>
+
+    <!-- Toast -->
+    <string name="toast_find_verse">Знайдіть вірш</string>
+    <string name="toast_share_verse">Поділитися віршем</string>
+    <string name="toast_translation_saved">Переклад збережено</string>
+    <string name="toast_download_translation">Завантажте переклад, перш ніж використовувати його</string>
+    <string name="toast_no_internet_connection">Немає інтернет-з\'єднання</string>
+    <string name="toast_select_translation">Оберіть переклад</string>
+    <string name="toast_please_wait">Будь ласка, зачекайте поки завершиться завантаження перекладу</string>
+    <string name="toast_error_picture_loading">Збій завантаження картинки</string>
+    <string name="toast_note_added">Замітку додано</string>
+    <string name="toast_note_edited">Замітку відредаговано</string>
+    <string name="toast_note_deleted">Замітку видалено</string>
+    <string name="toast_field_cant_be_empty">Поле не може бути порожнім</string>
+
+    <string name="et_thoughts">Ваші роздуми</string>
+
+    <string name="day_theme">Світла тема</string>
+    <string name="my_daily_verse">Мій вірш дня:</string>
+    <string name="tv_interface_language">Мова інтерфейсу</string>
+    <string name="folder_name">KnowBible</string>
+    <string name="russian_language_translation">Російська</string>
+    <string name="ukrainian_language_translation">Українська</string>
+    <string name="english_language_translation">Англійська</string>
+    <string name="synodal_translation">Синодальний переклад</string>
+    <string name="ogienko_translation">Переклад Івана Огієнка</string>
+    <string name="kjv_translation">Переклад Короля Якова</string>
+    <string name="english_lang">English</string>
+    <string name="english_lang_local_name">Англійська</string>
+    <string name="russian_lang">Русский</string>
+    <string name="russian_lang_local_name">Росьійська</string>
+    <string name="ukrainian_lang">Українська</string>
+    <string name="ukrainian_lang_local_name">Українська</string>
+    <string name="nrt_translation">Новий Російський Переклад</string>
+    <string name="night_theme">Темна тема</string>
+    <string name="book_theme">Книжна тема</string>
+    <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
+    <string name="verse_copied">Вірш скопійовано</string>
+</resources>

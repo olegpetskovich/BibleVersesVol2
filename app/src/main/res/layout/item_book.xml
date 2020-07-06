@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><!--По какой-то причине только на дефолтный LinearLayout получается установить атрибут background="?attr/selectableItemBackground". Если менять на кастомный, то не устанавливается-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <ImageView
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ephesians_updated" />
+
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+        android:id="@+id/tvBookName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:textSize="20sp"
+        tools:text="1 Коринфянам" />
+
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+        android:id="@+id/btnBookInfo"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_gravity="center_vertical"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_articles_info" />
+
+</LinearLayout>

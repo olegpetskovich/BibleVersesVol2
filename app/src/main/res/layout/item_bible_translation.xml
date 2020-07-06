@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingStart="10dp"
+    android:paddingTop="12dp"
+    tools:ignore="RtlSymmetry">
+
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+        android:id="@+id/tvTranslateName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginEnd="100dp"
+        android:maxLines="2"
+        android:text="@string/tv_bible_translation"
+        android:textSize="18sp"
+        tools:ignore="RtlHardcoded" />
+
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+        android:id="@+id/tvAbbreviationName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTranslateName"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginEnd="100dp"
+        android:fontFamily="@font/quicksand_eng"
+        android:textSize="15sp"
+        tools:ignore="RtlHardcoded"
+        tools:text="SYNO" />
+
+    <TextView
+        android:id="@+id/tvLanguageName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvAbbreviationName"
+        android:layout_marginStart="10dp"
+        android:text="@string/tv_bible_translation"
+        android:textSize="12sp"
+        tools:textColor="@color/colorGray" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDownloadBibleTranslate"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="2dp"
+        android:text="@string/btn_download"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:backgroundTint="@android:color/transparent"
+        app:cornerRadius="20dp"
+        tools:textColor="@color/colorPrimary" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="10dp"
+        android:padding="8dp"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/layProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="10dp"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/downloadProgressBar"
+            style="?android:progressBarStyleHorizontal"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
+            android:max="100"
+            android:progress="74"
+            android:rotation="-90"
+            tools:progressDrawable="@drawable/circle_progress_bar" />
+
+        <TextView
+            android:id="@+id/progressCountTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            tools:ignore="SmallSp"
+            tools:text="74%"
+            tools:textColor="@color/colorPrimary" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/ivDownloaded"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_downloaded_on_phone"
+        android:visibility="visible"
+        tools:ignore="ContentDescription"
+        tools:tint="@color/colorPrimary" />
+
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyView
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="0.8dp"
+        android:layout_below="@id/tvLanguageName"
+        android:layout_alignStart="@id/tvLanguageName"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="12dp"
+        android:paddingBottom="1dp" />
+</RelativeLayout>

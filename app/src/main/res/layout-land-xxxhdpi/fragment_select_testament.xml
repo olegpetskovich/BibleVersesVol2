@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.bible.knowbible.mvvm.view.theme_editor.MyNestedScrollViewLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
+            android:id="@+id/btnOldTestament"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="320dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="2"
+            android:lineSpacingExtra="-6dp"
+            android:text="@string/btn_old_testament"
+            android:textSize="22sp"
+            app:strokeWidth="0.6dp"
+            tools:ignore="RtlHardcoded" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
+                    android:id="@+id/btnNotes"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="70dp"
+                    android:layout_height="80dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:padding="12dp"
+                    android:paddingStart="14dp"
+                    app:cornerRadius="40dp"
+                    app:icon="@drawable/ic_notes"
+                    app:iconSize="36dp"
+                    app:iconTint="@color/colorGray"
+                    app:strokeWidth="0.8dp"
+                    tools:ignore="RtlSymmetry" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnNotes"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/tv_notes"
+                    android:textSize="20sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
+                    android:id="@+id/btnDailyVerse"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="70dp"
+                    android:layout_height="80dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:padding="12dp"
+                    android:paddingStart="14dp"
+                    app:cornerRadius="40dp"
+                    app:icon="@drawable/ic_daily_verse"
+                    app:iconSize="36dp"
+                    app:iconTint="@color/colorGray"
+                    app:strokeWidth="0.8dp"
+                    tools:ignore="RtlSymmetry" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnDailyVerse"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/tv_daily_verse"
+                    android:textSize="20sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
+                    android:id="@+id/btnSearch"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="70dp"
+                    android:layout_height="80dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:padding="12dp"
+                    android:paddingStart="14dp"
+                    app:cornerRadius="40dp"
+                    app:icon="@drawable/ic_search"
+                    app:iconSize="36dp"
+                    app:iconTint="@color/colorGray"
+                    app:strokeWidth="0.8dp"
+                    tools:ignore="RtlSymmetry" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnSearch"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/tv_search"
+                    android:textSize="20sp" />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
+            android:id="@+id/btnNewTestament"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="320dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="2"
+            android:lineSpacingExtra="-6dp"
+            android:text="@string/btn_new_testament"
+            android:textSize="22sp"
+            app:strokeWidth="0.6dp"
+            tools:ignore="RtlHardcoded" />
+    </LinearLayout>
+
+</com.android.bible.knowbible.mvvm.view.theme_editor.MyNestedScrollViewLayout>

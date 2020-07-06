@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.bible.knowbible.mvvm.view.theme_editor.MyNestedScrollViewLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="20dp">
+
+        <RelativeLayout
+            android:id="@+id/btnSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="16dp"
+            android:paddingLeft="16dp"
+            android:paddingTop="20dp"
+            tools:ignore="RtlSymmetry">
+
+            <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                android:id="@+id/ivSettings"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/ic_settings" />
+
+            <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+                android:id="@+id/tvSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_toEndOf="@id/ivSettings"
+                android:layout_toRightOf="@id/ivSettings"
+                android:text="@string/tv_settings"
+                android:textSize="18sp" />
+
+            <com.android.bible.knowbible.mvvm.view.theme_editor.MyView
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_below="@id/tvSettings"
+                android:layout_alignStart="@id/tvSettings"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="16dp"
+                android:paddingBottom="1dp" />
+        </RelativeLayout>
+
+    </LinearLayout>
+</com.android.bible.knowbible.mvvm.view.theme_editor.MyNestedScrollViewLayout>

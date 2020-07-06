@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingStart="10dp"
+    android:paddingTop="16dp"
+    tools:ignore="RtlSymmetry">
+
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+        android:id="@+id/tvLanguageName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="10dp"
+        android:text="@string/tv_interface_language"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tvLocalLanguageName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvLanguageName"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="@string/tv_interface_language"
+        android:textColor="@color/colorGray"
+        android:textSize="12sp"
+        tools:ignore="RtlHardcoded" />
+
+    <ImageView
+        android:id="@+id/ivSelectedLanguage"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="22dp"
+        android:src="@drawable/ic_selected_language"
+        android:visibility="gone"
+        tools:tint="@color/colorPrimary" />
+
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyView
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="0.8dp"
+        android:layout_below="@id/tvLocalLanguageName"
+        android:layout_alignStart="@id/tvLocalLanguageName"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="1dp" />
+</RelativeLayout>

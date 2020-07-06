@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KnowBible</string>
+    <string name="deleting">Delete all verses?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="my_daily_verse">Мой стих дня:</string>
+
+    <string name="title_articles">Articles</string>
+    <string name="title_bible">Bible</string>
+    <string name="title_more">More</string>
+
+    <!-- TextView -->
+    <string name="tv_find_your_daily_verse">Найди свой стих дня!</string>
+    <string name="tv_find">Найти</string>
+    <string name="tv_list">Список</string>
+    <string name="tv_settings">Settings</string>
+    <string name="tv_remember_verse">Запомнить \\n стих</string>
+    <string name="tv_interface_language">Interface language</string>
+    <string name="tv_theme">Theme</string>
+    <string name="tv_have_to_download_bible">In order to use the application, you need to download at least one of the Bible translations presented. After the translation has loaded, click on it and you will be taken to the Bible window.</string>
+    <string name="tv_new_article">New article!</string>
+    <string name="tv_about_writing_articles">We are happy to give you the opportunity to write and publish your own articles! To do this, you need to contact us by clicking on the link below to our Telegram channel. If your article passes the test for compliance with the rules set by us, we will publish it. You can familiarize yourself with the regulations by clicking on the button below.</string>
+    <string name="tv_notes">Notes</string>
+    <string name="tv_search">Search</string>
+    <string name="tv_daily_verse">Daily verse</string>
+    <string name="tv_bible_translation">Bible translation</string>
+    <string name="tv_downloading_canceled">Translation downloading aborted</string>
+    <string name="tv_copy_verse">Copy</string>
+    <string name="tv_highlight_verse">Highlight</string>
+    <string name="tv_add_note">Add note</string>
+    <string name="tv_share">Share</string>
+    <string name="tv_color_sample">«For God so loved the world…»</string>
+    <string name="tv_remove_highlighted_verse">Remove highlighting</string>
+    <string name="tv_select_color">Select color</string>
+
+    <!-- Button -->
+    <string name="btn_old_testament">Old\nTestament</string>
+    <string name="btn_new_testament">New\nTestament</string>
+    <string name="btn_download">Download</string>
+    <string name="btn_old_testament_short">O.T.</string>
+    <string name="btn_new_testament_short">N.T.</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_select">Select</string>
+    <string name="btn_save_note">Save</string>
+    <string name="btn_apply">Apply</string>
+
+    <!-- CheckBox -->
+    <string name="cb_add_bold_text">Add Bold</string>
+    <string name="cb_add_underline">Add underline</string>
+    <string name="cb_add_to_daily_verse">Add to Daily verse</string>
+
+    <!-- Toast -->
+    <string name="toast_find_verse">Найдите стих</string>
+    <string name="toast_share_verse">Share verse</string>
+    <string name="toast_translation_saved">Translate saved</string>
+    <string name="toast_download_translation">Download the translation before using it.</string>
+    <string name="toast_no_internet_connection">No internet connection</string>
+    <string name="toast_select_translation">Select translation</string>
+    <string name="toast_please_wait">Please wait while the translation download is completed</string>
+    <string name="toast_error_picture_loading">Picture loading failed</string>
+    <string name="toast_note_added">Note added</string>
+    <string name="toast_note_edited">Note edited</string>
+    <string name="toast_note_deleted">Note deleted</string>
+    <string name="toast_field_cant_be_empty">Field cannot be empty</string>
+
+    <string name="et_thoughts">Your thoughts</string>
+
+    <string name="folder_name">KnowBible</string>
+    <string name="russian_language_translation">Russian</string>
+    <string name="ukrainian_language_translation">Ukrainian</string>
+    <string name="english_language_translation">English</string>
+    <string name="synodal_translation">Synodal Translation</string>
+    <string name="ogienko_translation">Ivan Ogienko Translation</string>
+    <string name="kjv_translation">King James Translation</string>
+    <string name="english_lang">English</string>
+    <string name="english_lang_local_name">English</string>
+    <string name="russian_lang">Русский</string>
+    <string name="russian_lang_local_name">Russian</string>
+    <string name="ukrainian_lang">Українська</string>
+    <string name="ukrainian_lang_local_name">Ukrainian</string>
+    <string name="nrt_translation">New Russian Translation</string>
+    <string name="day_theme">Light theme</string>
+    <string name="night_theme">Dark theme</string>
+    <string name="book_theme">Book theme</string>
+    <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
+    <string name="verse_copied">Verse copied</string>
+</resources>

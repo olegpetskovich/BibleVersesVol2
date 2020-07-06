@@ -1,0 +1,87 @@
+<resources>
+    <string name="app_name">KnowBible</string>
+    <string name="deleting">Удалить все стихи?</string>
+    <string name="delete">Удалить</string>
+    <string name="cancel">Отмена</string>
+    <string name="my_daily_verse">Мой стих дня:</string>
+
+    <string name="title_articles">Статьи</string>
+    <string name="title_bible">Библия</string>
+    <string name="title_more">Ещё</string>
+
+    <!-- TextView -->
+    <string name="tv_settings">Настройки</string>
+    <string name="tv_find_your_daily_verse">Найди свой стих дня!</string>
+    <string name="tv_find">Найти</string>
+    <string name="tv_list">Список</string>
+    <string name="tv_remember_verse">Запомнить \\n стих</string>
+    <string name="tv_theme">Тема</string>
+    <string name="tv_interface_language">Язык интерфейса</string>
+    <string name="tv_have_to_download_bible">Чтобы пользоваться приложением, вам необходимо скачать, как минимум, один из представленных переводов Библии. После того, как перевод загрузится, нажмите на него, и вы перейдёте в окно Библии.</string>
+    <string name="tv_notes">Заметки</string>
+    <string name="tv_search">Поиск</string>
+    <string name="tv_daily_verse">Стих дня</string>
+    <string name="tv_copy_verse">Копировать</string>
+    <string name="tv_highlight_verse">Выделить</string>
+    <string name="tv_add_note">Добавить заметку</string>
+    <string name="tv_share">Поделиться</string>
+    <string name="tv_select_color">Выберите цвет</string>
+    <string name="tv_bible_translation">Библейский перевод</string>
+    <string name="tv_downloading_canceled">Скачивание перевода прервано</string>
+    <string name="tv_color_sample">«Ибо так возлюбил Бог мир…»</string>
+    <string name="tv_remove_highlighted_verse">Убрать выделение</string>
+    <string name="tv_new_article">Новая статья!</string>
+    <string name="tv_about_writing_articles">Мы с радостью предоставляем вам возможность писать и публиковать собственные статьи! Для этого вам нужно обратиться к нам, перейдя по ссылке ниже на наш Telegram канал. Если ваша статья пройдёт проверку на соответствие заданного нами регламента, мы опубликуем её. Ознакомиться с регламентом вы можете нажав на кнопку ниже.</string>
+
+    <!-- Button -->
+    <string name="btn_old_testament">Ветхий\nЗавет</string>
+    <string name="btn_new_testament">Новый\nЗавет</string>
+    <string name="btn_old_testament_short">В.З.</string>
+    <string name="btn_new_testament_short">Н.З.</string>
+    <string name="btn_download">Скачать</string>
+    <string name="btn_apply">Применить</string>
+    <string name="btn_cancel">Отмена</string>
+    <string name="btn_select">Выбрать</string>
+    <string name="btn_save_note">Сохранить</string>
+
+    <!-- CheckBox -->
+    <string name="cb_add_bold_text">Добавить жирный шрифт</string>
+    <string name="cb_add_underline">Добавить подчёркивание</string>
+    <string name="cb_add_to_daily_verse">Добавить в «Стих дня»</string>
+
+    <!-- Toast -->
+    <string name="toast_translation_saved">Перевод сохранён</string>
+    <string name="toast_download_translation">Скачайте перевод, прежде чем использовать его</string>
+    <string name="toast_no_internet_connection">Нет интернет-соединения</string>
+    <string name="toast_select_translation">Выберите перевод</string>
+    <string name="toast_please_wait">Пожалуйста, подождите пока завершится загрузка перевода</string>
+    <string name="toast_note_added">Заметка добавлена</string>
+    <string name="toast_note_edited">Заметка отредактирована</string>
+    <string name="toast_note_deleted">Заметка удалена</string>
+    <string name="toast_field_cant_be_empty">Поле не может быть пустым</string>
+    <string name="toast_find_verse">Найдите стих</string>
+    <string name="toast_share_verse">Поделиться стихом</string>
+    <string name="toast_error_picture_loading">Сбой загрузки картинки</string>
+
+    <string name="et_thoughts">Ваши размышления</string>
+
+    <string name="folder_name">KnowBible</string>
+    <string name="russian_language_translation">Русский</string>
+    <string name="ukrainian_language_translation">Украинский</string>
+    <string name="english_language_translation">Английский</string>
+    <string name="synodal_translation">Синодальный перевод</string>
+    <string name="ogienko_translation">Перевод Ивана Огиенка</string>
+    <string name="kjv_translation">Перевод Короля Иакова</string>
+    <string name="english_lang">English</string>
+    <string name="english_lang_local_name">Английский</string>
+    <string name="russian_lang">Русский</string>
+    <string name="russian_lang_local_name">Русский</string>
+    <string name="ukrainian_lang">Українська</string>
+    <string name="ukrainian_lang_local_name">Украинский</string>
+    <string name="nrt_translation">Новый Русский Перевод</string>
+    <string name="day_theme">Светлая тема</string>
+    <string name="night_theme">Тёмная тема</string>
+    <string name="book_theme">Книжная тема</string>
+    <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
+    <string name="verse_copied">Стих скопирован</string>
+</resources>
