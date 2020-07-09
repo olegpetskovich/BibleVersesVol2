@@ -1,22 +1,31 @@
 package com.android.bible.knowbible.mvvm.view.fragment.bible_section.daily_verse_subsection
 
-import android.app.ListActivity
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.android.bible.knowbible.R
+import com.android.bible.knowbible.data.local.BibleTextInfoDBHelper
+import com.android.bible.knowbible.mvvm.model.BibleTextInfoModel
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
+import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.google.android.material.button.MaterialButton
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 class DailyVerseFragment : Fragment() {
@@ -24,69 +33,74 @@ class DailyVerseFragment : Fragment() {
 
     private lateinit var listener: IActivityCommunicationListener
 
+    private lateinit var bibleDataViewModel: BibleDataViewModel
+    private lateinit var bibleTextInfoDBHelper: BibleTextInfoDBHelper
+
+    private lateinit var ivBook: ImageView
     private lateinit var tvVerse: TextView
     private lateinit var btnFind: TextView
 
     private lateinit var btnList: MaterialButton
     private lateinit var btnShare: MaterialButton
 
+    private lateinit var dailyVersesInfo: ArrayList<BibleTextInfoModel>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true //Без этого кода не будет срабатывать поворот экрана
     }
 
+    @SuppressLint("CheckResult")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val myView: View = inflater.inflate(R.layout.fragment_daily_verse, container, false)
         listener.setTheme(ThemeManager.theme, false) //Если не устанавливать тему каждый раз при открытии фрагмента, то по какой-то причине внешний вид View не обновляется, поэтому на данный момент только такое решение
 
+        //ViewModel для получения конкретного текста для Стих дня
+        bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
+
+        bibleTextInfoDBHelper = BibleTextInfoDBHelper.getInstance(context)!! //DBHelper для работы с БД информации текста
+        bibleTextInfoDBHelper
+                .loadDailyVersesInfo()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { dailyVersesInfo ->
+                    this.dailyVersesInfo = dailyVersesInfo
+                }
+
+        ivBook = myView.findViewById(R.id.ivBook)
         tvVerse = myView.findViewById(R.id.tvVerse)
 
         btnFind = myView.findViewById(R.id.btnFind)
         btnFind.setOnClickListener {
+            if (dailyVersesInfo.size == 0) {
+                Toast.makeText(context!!, getString(R.string.toast_no_verses_in_daily_verse), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            setRandomVerse(dailyVersesInfo)
             val animation = AnimationUtils.loadAnimation(context, R.anim.myanim)
-//            tvVerse.text = getRandomObject(verses!!)
             tvVerse.startAnimation(animation)
         }
 
         btnList = myView.findViewById(R.id.btnList)
         btnList.setOnClickListener {
-            val intent = Intent(context, ListActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(context, ListActivity::class.java)
+//            startActivity(intent)
         }
 
         btnShare = myView.findViewById(R.id.btnShare)
         btnShare.setOnClickListener {
             if (tvVerse.text.toString() == getString(R.string.tv_find_your_daily_verse)) {
                 Toast.makeText(context, getString(R.string.toast_find_verse), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
             val myIntent = Intent(Intent.ACTION_SEND)
             myIntent.type = "text/plain"
             val shareBody = getString(R.string.my_daily_verse) + " \n" + tvVerse.text.toString()
             myIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
             startActivity(Intent.createChooser(myIntent, getString(R.string.toast_share_verse)))
         }
-
-        when (ThemeManager.theme) {
-            ThemeManager.Theme.LIGHT -> {
-                btnList.setBackgroundColor(ContextCompat.getColor(context!!, R.color.colorBackgroundLightTheme))
-                btnList.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextLightTheme))
-                btnShare.setBackgroundColor(ContextCompat.getColor(context!!, R.color.colorBackgroundLightTheme))
-                btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextLightTheme))
-            }
-            ThemeManager.Theme.DARK -> {
-                btnList.setBackgroundColor(ContextCompat.getColor(context!!, R.color.colorBackgroundDarkTheme))
-                btnList.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextDarkTheme))
-                btnShare.setBackgroundColor(ContextCompat.getColor(context!!, R.color.colorBackgroundDarkTheme))
-                btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextDarkTheme))
-            }
-            ThemeManager.Theme.BOOK -> {
-                btnList.setBackgroundColor(ContextCompat.getColor(context!!, R.color.colorBackgroundBookTheme))
-                btnList.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextBookTheme))
-                btnShare.setBackgroundColor(ContextCompat.getColor(context!!, R.color.colorBackgroundBookTheme))
-                btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextBookTheme))
-            }
-        }
-
         return myView
     }
 
@@ -94,10 +108,31 @@ class DailyVerseFragment : Fragment() {
         this.myFragmentManager = myFragmentManager
     }
 
-    private fun getRandomObject(from: Collection<*>): String {
-        val rnd = Random()
-        val i = rnd.nextInt(from.size)
-        return from.toTypedArray()[i].toString()
+    private fun setRandomVerse(dailyVersesInfo: ArrayList<BibleTextInfoModel>) {
+        val random = Random()
+        val dailyVerseInfo: BibleTextInfoModel = dailyVersesInfo[random.nextInt(dailyVersesInfo.size)]
+
+        bibleDataViewModel
+                .getBibleVerse(BibleDataViewModel.TABLE_VERSES, dailyVerseInfo.bookNumber, dailyVerseInfo.chapterNumber, dailyVerseInfo.verseNumber)
+                .observe(viewLifecycleOwner, Observer { verseModel ->
+                    bibleDataViewModel
+                            .getBookShortName(BibleDataViewModel.TABLE_BOOKS, dailyVerseInfo.bookNumber)
+                            .observe(viewLifecycleOwner, Observer { verseShortName ->
+                                //Очищаем текст от ненужных тегов. Эти действия называются регулярными выражениями
+                                var str = verseModel.text
+//                                val reg = Regex(pattern = """<(\w)>|</(\w)>[\s]?""")
+                                val reg1 = Regex("""<S>(\d+)</S>""")
+                                val reg2 = Regex("""<f>(\S+)</f>""")
+                                val reg3 = Regex("""<(\w)>|</(\w)>""") //Без удаления пробела
+
+                                str = str.replace(reg1, "")
+                                str = str.replace(reg2, "")
+                                str = str.replace(reg3, "")
+                                str = str.replace("<pb/>", "")
+
+                                tvVerse.text = "«" + str + "»" + " (" + verseShortName + ". " + verseModel.chapter + ":" + verseModel.verse + ")"
+                            })
+                })
     }
 
     override fun onAttach(context: Context) {
@@ -108,6 +143,37 @@ class DailyVerseFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        //Обновляем тему вьюшек в onResume, чтобы при смене темы и возврата к этому фрагменту, внешний вид вьюшек поменялся в соответствии с темой
+        when (ThemeManager.theme) {
+            ThemeManager.Theme.LIGHT -> {
+                ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconLightTheme), PorterDuff.Mode.SRC_IN)
+
+                btnList.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconLightTheme)
+                btnList.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextLightTheme))
+
+                btnShare.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconLightTheme)
+                btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextLightTheme))
+            }
+            ThemeManager.Theme.DARK -> {
+                ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconDarkTheme), PorterDuff.Mode.SRC_IN)
+
+                btnList.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconLightTheme)
+                btnList.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextDarkTheme))
+
+                btnShare.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconLightTheme)
+                btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextDarkTheme))
+            }
+            ThemeManager.Theme.BOOK -> {
+                ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconBookTheme), PorterDuff.Mode.SRC_IN)
+
+                btnList.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconBookTheme)
+                btnList.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextBookTheme))
+
+                btnShare.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconBookTheme)
+                btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextBookTheme))
+            }
+        }
+
         listener.setTabNumber(1)
         listener.setMyFragmentManager(myFragmentManager)
         listener.setIsBackStackNotEmpty(true)

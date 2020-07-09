@@ -42,8 +42,7 @@ class NotesDBHelper(context: Context) {
     }
 
     fun addNote(note: NoteModel) {
-        if (note.isNoteForVerse) cv.put("is_note_for_verse", 1)
-        else cv.put("is_note_for_verse", 0)
+        cv.put("is_note_for_verse", note.isNoteForVerse)
         cv.put("verse", note.verseText)
         cv.put("text", note.text)
 
@@ -51,8 +50,7 @@ class NotesDBHelper(context: Context) {
     }
 
     fun updateNote(note: NoteModel) {
-        if (note.isNoteForVerse) cv.put("is_note_for_verse", 1)
-        else cv.put("is_note_for_verse", 0)
+        cv.put("is_note_for_verse", note.isNoteForVerse)
         cv.put("verse", note.verseText)
         cv.put("text", note.text)
 

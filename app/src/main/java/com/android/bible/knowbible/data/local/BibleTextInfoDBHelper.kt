@@ -78,6 +78,38 @@ class BibleTextInfoDBHelper private constructor() {
         return Single.fromCallable<ArrayList<BibleTextInfoModel>> { collection }
     }
 
+    fun loadDailyVersesInfo(): Single<ArrayList<BibleTextInfoModel>> {
+        val cursor = dataBase.query("my_bible_text_info_table",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null)
+
+        val collection = ArrayList<BibleTextInfoModel>()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val isTextToDailyVerse = cursor.getInt(cursor.getColumnIndex("text_to_daily_verse")) != 0 //Конвертируем int на boolean
+                //Добавляем в коллекцию только те тексты, которые были добавлены в "Стих дня"
+                if (isTextToDailyVerse) {
+                    val id = cursor.getLong(cursor.getColumnIndex("id"))
+                    val bookNumber = cursor.getInt(cursor.getColumnIndex("book_number"))
+                    val chapterNumber = cursor.getInt(cursor.getColumnIndex("chapter_number"))
+                    val verseNumber = cursor.getInt(cursor.getColumnIndex("verse_number"))
+                    val textColorHex = cursor.getString(cursor.getColumnIndex("text_color_hex"))
+                    val isTextBold = cursor.getInt(cursor.getColumnIndex("text_bold")) != 0 //Конвертируем int на boolean
+                    val isTextUnderline = cursor.getInt(cursor.getColumnIndex("text_underline")) != 0 //Конвертируем int на boolean
+
+                    collection.add(BibleTextInfoModel(id, bookNumber, chapterNumber, verseNumber, textColorHex, isTextBold, isTextUnderline, isTextToDailyVerse))
+                }
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return Single.fromCallable<ArrayList<BibleTextInfoModel>> { collection }
+    }
+
     fun addBibleTextInfo(bibleTextInfo: BibleTextInfoModel): Long {
         cv.put("book_number", bibleTextInfo.bookNumber)
         cv.put("chapter_number", bibleTextInfo.chapterNumber)

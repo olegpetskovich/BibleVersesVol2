@@ -75,6 +75,14 @@ class RepositoryLocal {
                 }
     }
 
+    fun getBibleVerse(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int): Single<BibleTextModel> {
+        return dbBibleHelper.loadBibleVerse(tableName, bookNumber, chapterNumber, verseNumber)
+                .flatMap { response: BibleTextModel ->
+                    //flatMap здесь используется, чтобы показать, что при получении данных, их можно сначала отредактировать как надо, а потом отправить дальше
+                    return@flatMap Single.fromCallable<BibleTextModel> { return@fromCallable response }
+                }
+    }
+
     fun getBookShortName(tableName: String, bookNumber: Int): Single<String> {
         return dbBibleHelper.loadBookShortName(tableName, bookNumber)
                 .flatMap { response: String ->

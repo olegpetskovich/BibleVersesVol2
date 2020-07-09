@@ -84,4 +84,5 @@
     <string name="book_theme">Книжная тема</string>
     <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
     <string name="verse_copied">Стих скопирован</string>
+    <string name="toast_no_verses_in_daily_verse">Вы не добавили ни одного стиха в «Стих дня»</string>
 </resources>

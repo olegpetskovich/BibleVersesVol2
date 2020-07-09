@@ -7,7 +7,6 @@ import com.android.bible.knowbible.mvvm.model.ChapterModel
 import io.reactivex.Single
 import kotlin.collections.ArrayList
 
-
 class BibleTextDBHelper {
     private lateinit var dataBase: SQLiteDatabase
     private val matthewBookNumber = 470 //Это код книги Евангелие Матфея в Базе Данных. С помощью этого номера будет определяться, данные какого завета возвращать по запросу.
@@ -148,6 +147,32 @@ class BibleTextDBHelper {
         }
         cursor.close()
         return Single.fromCallable<ArrayList<ArrayList<BibleTextModel>>> { collectionOfChaptersText }
+    }
+
+    fun loadBibleVerse(tableName: String, myBookNumber: Int, myChapterNumber: Int, myVerseNumber: Int): Single<BibleTextModel> {
+        val cursor = dataBase.query(tableName,
+                null,
+                "book_number == ? AND chapter = ? AND verse = ?",
+                arrayOf(myBookNumber.toString(), myChapterNumber.toString(), myVerseNumber.toString()),
+                null,
+                null,
+                null)
+
+        var verse: BibleTextModel? = null
+
+        if (cursor.moveToFirst()) {
+            do {
+                val bookNumber = cursor.getInt(cursor.getColumnIndex("book_number"))
+                val chapterNumber = cursor.getInt(cursor.getColumnIndex("chapter"))
+                val verseNumber = cursor.getInt(cursor.getColumnIndex("verse"))
+                val text = cursor.getString(cursor.getColumnIndex("text"))
+
+                verse = BibleTextModel(-1/*Тут это заглушка*/, bookNumber, chapterNumber, verseNumber, text, null, isTextBold = false/*Тут это заглушка*/, isTextUnderline = false/*Тут это заглушка*/, isTextToDailyVerse = false/*Тут это заглушка*/)
+
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return Single.fromCallable<BibleTextModel> { verse }
     }
 
     fun loadBookShortName(tableName: String, myBookNumber: Int): Single<String> {

@@ -85,4 +85,5 @@
     <string name="book_theme">Book theme</string>
     <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
     <string name="verse_copied">Verse copied</string>
+    <string name="toast_no_verses_in_daily_verse">You have not added a single verse in «DailyVerse»</string>
 </resources>

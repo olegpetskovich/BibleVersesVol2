@@ -29,6 +29,7 @@ class BibleDataViewModel : ViewModel() {
     private val chaptersListLiveData = MutableLiveData<ArrayList<ChapterModel>>()
     private val bibleTextOfChapterLiveData = MutableLiveData<ArrayList<BibleTextModel>>()
     private val bibleTextOfBookLiveData = MutableLiveData<ArrayList<ArrayList<BibleTextModel>>>()
+    private val bibleVerseLiveData = MutableLiveData<BibleTextModel>()
     private val bookShortNameLiveData = MutableLiveData<String>()
 
     fun openDatabase(dbPath: String) {
@@ -66,6 +67,11 @@ class BibleDataViewModel : ViewModel() {
     fun getBibleTextOfBook(tableName: String, bookNumber: Int): LiveData<ArrayList<ArrayList<BibleTextModel>>> {
         getBibleTextOfBookData(tableName, bookNumber)
         return bibleTextOfBookLiveData
+    }
+
+    fun getBibleVerse(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int): LiveData<BibleTextModel> {
+        getBibleVerseData(tableName, bookNumber, chapterNumber, verseNumber)
+        return bibleVerseLiveData
     }
 
     fun getBookShortName(tableName: String, bookNumber: Int): LiveData<String> {
@@ -125,6 +131,17 @@ class BibleDataViewModel : ViewModel() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Consumer {
                     bibleTextOfBookLiveData.value = it
+                })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getBibleVerseData(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int) {
+        localRepository
+                .getBibleVerse(tableName, bookNumber, chapterNumber, verseNumber)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(Consumer {
+                    bibleVerseLiveData.value = it
                 })
     }
 
