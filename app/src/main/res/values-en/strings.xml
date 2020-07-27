@@ -11,9 +11,9 @@
     <string name="title_more">More</string>
 
     <!-- TextView -->
-    <string name="tv_find_your_daily_verse">Найди свой стих дня!</string>
-    <string name="tv_find">Найти</string>
-    <string name="tv_list">Список</string>
+    <string name="tv_find_your_daily_verse">Find your daily verse!</string>
+    <string name="tv_find_verse">Verse</string>
+    <string name="tv_list">List</string>
     <string name="tv_settings">Settings</string>
     <string name="tv_remember_verse">Запомнить \\n стих</string>
     <string name="tv_interface_language">Interface language</string>

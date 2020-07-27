@@ -12,7 +12,7 @@
     <!-- TextView -->
     <string name="tv_settings">Настройки</string>
     <string name="tv_find_your_daily_verse">Найди свой стих дня!</string>
-    <string name="tv_find">Найти</string>
+    <string name="tv_find_verse">Стих</string>
     <string name="tv_list">Список</string>
     <string name="tv_remember_verse">Запомнить \\n стих</string>
     <string name="tv_theme">Тема</string>

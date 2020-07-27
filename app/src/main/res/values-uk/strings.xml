@@ -10,7 +10,7 @@
 
     <!-- TextView -->
     <string name="tv_find_your_daily_verse">Знайди свій вірш дня!</string>
-    <string name="tv_find">Знайти</string>
+    <string name="tv_find_verse">Вірш</string>
     <string name="tv_list">Список</string>
     <string name="tv_remember_verse">Запам\'ятати \n вірш</string>
     <string name="tv_settings">Налаштування</string>
