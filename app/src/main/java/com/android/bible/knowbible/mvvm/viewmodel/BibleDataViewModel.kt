@@ -9,6 +9,7 @@ import com.android.bible.knowbible.data.local.RepositoryLocal
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.BookModel
 import com.android.bible.knowbible.mvvm.model.ChapterModel
+import com.android.bible.knowbible.utility.SingleLiveEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
@@ -28,8 +29,10 @@ class BibleDataViewModel : ViewModel() {
     private val booksListLiveData = MutableLiveData<ArrayList<BookModel>>()
     private val chaptersListLiveData = MutableLiveData<ArrayList<ChapterModel>>()
     private val bibleTextOfChapterLiveData = MutableLiveData<ArrayList<BibleTextModel>>()
+    private val searchedBibleVersesLiveData = MutableLiveData<ArrayList<BibleTextModel>>()
     private val bibleTextOfBookLiveData = MutableLiveData<ArrayList<ArrayList<BibleTextModel>>>()
-    private val bibleVerseLiveData = MutableLiveData<BibleTextModel>()
+    private val bibleTextOfAllBibleLiveData = SingleLiveEvent<ArrayList<BibleTextModel>>()
+    private val bibleVerseLiveData = SingleLiveEvent<BibleTextModel>() //Здесь используется кастомный класс SingleLiveEvent. Потому что MutableLiveData вызывается много раз, а SingleLiveEvent один раз, как мне и надо.
     private val bookShortNameLiveData = MutableLiveData<String>()
 
     fun openDatabase(dbPath: String) {
@@ -69,14 +72,33 @@ class BibleDataViewModel : ViewModel() {
         return bibleTextOfBookLiveData
     }
 
-    fun getBibleVerse(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int): LiveData<BibleTextModel> {
+    fun getBibleTextOfAllBible(tableName: String): SingleLiveEvent<ArrayList<BibleTextModel>> {
+        getBibleTextOfAllBibleData(tableName)
+        return bibleTextOfAllBibleLiveData
+    }
+
+    fun getBibleVerse(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int): SingleLiveEvent<BibleTextModel> {
         getBibleVerseData(tableName, bookNumber, chapterNumber, verseNumber)
         return bibleVerseLiveData
+    }
+
+    fun getBibleVerseForDailyVerse(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int): SingleLiveEvent<BibleTextModel> {
+        getBibleVerseForDailyVerseData(tableName, bookNumber, chapterNumber, verseNumber)
+        return bibleVerseLiveData
+    }
+
+    fun getSearchedBibleVerses(tableName: String, searchingSection: Int, searchingText: String): LiveData<ArrayList<BibleTextModel>> {
+        getSearchedBibleVersesData(tableName, searchingSection, searchingText)
+        return searchedBibleVersesLiveData
     }
 
     fun getBookShortName(tableName: String, bookNumber: Int): LiveData<String> {
         getBookShortNameData(tableName, bookNumber)
         return bookShortNameLiveData
+    }
+
+    fun updateBibleTextInDB(bibleTextModel: BibleTextModel) {
+        updateBibleTextInDBData(bibleTextModel)
     }
 
     @SuppressLint("CheckResult")
@@ -135,9 +157,43 @@ class BibleDataViewModel : ViewModel() {
     }
 
     @SuppressLint("CheckResult")
+    private fun getBibleTextOfAllBibleData(tableName: String) {
+        localRepository
+                .getBibleTextOfAllBible(tableName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(Consumer {
+                    bibleTextOfAllBibleLiveData.value = it
+                })
+    }
+
+    @SuppressLint("CheckResult")
     private fun getBibleVerseData(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int) {
         localRepository
                 .getBibleVerse(tableName, bookNumber, chapterNumber, verseNumber)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(Consumer {
+                    bibleVerseLiveData.value = it
+                })
+
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getSearchedBibleVersesData(tableName: String, searchingSection: Int, searchingText: String) {
+        localRepository
+                .getSearchedBibleVerses(tableName, searchingSection, searchingText)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(Consumer {
+                    searchedBibleVersesLiveData.value = it
+                })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getBibleVerseForDailyVerseData(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int) {
+        localRepository
+                .getBibleVerseForDailyVerse(tableName, bookNumber, chapterNumber, verseNumber)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Consumer {
@@ -154,5 +210,10 @@ class BibleDataViewModel : ViewModel() {
                 .subscribe(Consumer {
                     bookShortNameLiveData.value = it
                 })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun updateBibleTextInDBData(bibleTextModel: BibleTextModel) {
+        localRepository.updateBibleTextInDB(bibleTextModel)
     }
 }

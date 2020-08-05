@@ -6,5 +6,4 @@ data class BibleTextInfoModel(var id: Long = -1,
                               val verseNumber: Int,
                               var textColorHex: String?,
                               var isTextBold: Boolean,
-                              var isTextUnderline: Boolean,
-                              var isTextToDailyVerse: Boolean)
+                              var isTextUnderline: Boolean)

@@ -68,9 +68,8 @@ class BibleTextInfoDBHelper private constructor() {
                 val textColorHex = cursor.getString(cursor.getColumnIndex("text_color_hex"))
                 val isTextBold = cursor.getInt(cursor.getColumnIndex("text_bold")) != 0 //Конвертируем int на boolean
                 val isTextUnderline = cursor.getInt(cursor.getColumnIndex("text_underline")) != 0 //Конвертируем int на boolean
-                val isTextToDailyVerse = cursor.getInt(cursor.getColumnIndex("text_to_daily_verse")) != 0 //Конвертируем int на boolean
 
-                collection.add(BibleTextInfoModel(id, bookNumber, chapterNumber, verseNumber, textColorHex, isTextBold, isTextUnderline, isTextToDailyVerse))
+                collection.add(BibleTextInfoModel(id, bookNumber, chapterNumber, verseNumber, textColorHex, isTextBold, isTextUnderline))
 
             } while (cursor.moveToNext())
         }
@@ -102,7 +101,7 @@ class BibleTextInfoDBHelper private constructor() {
                     val isTextBold = cursor.getInt(cursor.getColumnIndex("text_bold")) != 0 //Конвертируем int на boolean
                     val isTextUnderline = cursor.getInt(cursor.getColumnIndex("text_underline")) != 0 //Конвертируем int на boolean
 
-                    collection.add(BibleTextInfoModel(id, bookNumber, chapterNumber, verseNumber, textColorHex, isTextBold, isTextUnderline, isTextToDailyVerse))
+                    collection.add(BibleTextInfoModel(id, bookNumber, chapterNumber, verseNumber, textColorHex, isTextBold, isTextUnderline))
                 }
             } while (cursor.moveToNext())
         }
@@ -117,7 +116,6 @@ class BibleTextInfoDBHelper private constructor() {
         cv.put("text_color_hex", bibleTextInfo.textColorHex)
         cv.put("text_bold", bibleTextInfo.isTextBold)
         cv.put("text_underline", bibleTextInfo.isTextUnderline)
-        cv.put("text_to_daily_verse", bibleTextInfo.isTextToDailyVerse)
 
         Utility.log("Add")
 
@@ -131,7 +129,6 @@ class BibleTextInfoDBHelper private constructor() {
         cv.put("text_color_hex", bibleTextInfo.textColorHex)
         cv.put("text_bold", bibleTextInfo.isTextBold)
         cv.put("text_underline", bibleTextInfo.isTextUnderline)
-        cv.put("text_to_daily_verse", bibleTextInfo.isTextToDailyVerse)
 
         Utility.log("Update")
 
@@ -170,8 +167,7 @@ class BibleTextInfoDBHelper private constructor() {
                     + "verse_number integer,"
                     + "text_color_hex text,"
                     + "text_bold integer,"
-                    + "text_underline integer,"
-                    + "text_to_daily_verse integer" + ");")
+                    + "text_underline integer" + ");")
         }
 
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}

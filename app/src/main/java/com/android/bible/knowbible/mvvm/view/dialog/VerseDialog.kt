@@ -24,8 +24,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.data.local.BibleTextInfoDBHelper
+import com.android.bible.knowbible.data.local.DailyVersesDBHelper
 import com.android.bible.knowbible.mvvm.model.BibleTextInfoModel
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
+import com.android.bible.knowbible.mvvm.model.DailyVerseModel
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
@@ -43,6 +45,8 @@ class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFr
 
     private lateinit var verseData: BibleTextModel
     private lateinit var verseShortName: String
+
+    private lateinit var dailyVersesDBHelper: DailyVersesDBHelper
 
     private lateinit var myFragmentManager: FragmentManager
 
@@ -83,7 +87,7 @@ class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFr
                     //Устаналиваем текст здесь, потому что нужно дождаться получения verseShortName, который приходит в отдельном потоке и потом возвращается в главный.
                     //В противном случае возникнет NPE
                     tvVerse = view.findViewById(R.id.tvVerse)
-                    tvVerse.text = "«" + verseData.text + "»" + " (" + verseShortName + ". " + verseData.chapter + ":" + verseData.verse + ")"
+                    tvVerse.text = "«" + verseData.text + "»" + " (" + verseShortName + ". " + verseData.chapter_number + ":" + verseData.verse_number + ")"
                     //Устанавливаем текст выделения, если этот текст был выделен ранее
                     if (ThemeManager.theme == ThemeManager.Theme.DARK) {
                         tvVerse.setTextColor(ContextCompat.getColor(context!!, R.color.colorTextDarkTheme))
@@ -109,7 +113,7 @@ class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFr
         tvCopy.setOnClickListener {
             //Код для копирования текста
             val clipboard = activity!!.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("label", "«" + verseData.text + "»" + " (" + verseShortName + ". " + verseData.chapter + ":" + verseData.verse + ")")
+            val clip = ClipData.newPlainText("label", "«" + verseData.text + "»" + " (" + verseShortName + ". " + verseData.chapter_number + ":" + verseData.verse_number + ")")
             clipboard.setPrimaryClip(clip)
 
             Toast.makeText(context, getString(R.string.verse_copied), Toast.LENGTH_SHORT).show()
@@ -131,13 +135,35 @@ class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFr
         if (verseData.textColorHex != null) tvRemoveHighlighting.visibility = View.VISIBLE
         else tvRemoveHighlighting.visibility = View.GONE
         tvRemoveHighlighting.setOnClickListener {
-            val verseForRemoveHighlighting = BibleTextInfoModel(verseData.id, verseData.book_number, verseData.chapter, verseData.verse, null, isTextBold = false, isTextUnderline = false, isTextToDailyVerse = false)
+            val verseForRemoveHighlighting = BibleTextInfoModel(verseData.id, verseData.book_number, verseData.chapter_number, verseData.verse_number, null, isTextBold = false, isTextUnderline = false)
             bibleTextInfoDBHelper.deleteBibleTextInfo(verseForRemoveHighlighting.id)
 
             verseForRemoveHighlighting.id = -1 //Обновляем также и данные в коллекции, чтобы не было проблем при очередной попытке добавить, обновить или удалить текст
             listener.updateItemColor(verseForRemoveHighlighting)
             listener.dismissDialog()
         }
+
+        val tvAddToDailyVerse: TextView = view.findViewById(R.id.tvAddToDailyVerse)
+        tvAddToDailyVerse.setOnClickListener {
+            dailyVersesDBHelper.addDailyVerse(DailyVerseModel(-1/*Тут это заглушка*/, verseData.book_number, verseData.chapter_number, verseData.verse_number))
+            listener.dismissDialog()
+        }
+
+        val tvRemoveFromDailyVerse: TextView = view.findViewById(R.id.tvRemoveFromDailyVerse)
+        tvRemoveFromDailyVerse.setOnClickListener {
+            dailyVersesDBHelper.deleteDailyVerse(verseData.book_number, verseData.chapter_number, verseData.verse_number)
+            listener.dismissDialog()
+        }
+
+        dailyVersesDBHelper = DailyVersesDBHelper(context!!) //DBHelper для работы с БД информации раздела "Стих дня"
+        if (dailyVersesDBHelper.isBibleTextInfoInDB(verseData.book_number, verseData.chapter_number, verseData.verse_number)) {
+            tvAddToDailyVerse.visibility = View.GONE
+            tvRemoveFromDailyVerse.visibility = View.VISIBLE
+        } else {
+            tvAddToDailyVerse.visibility = View.VISIBLE
+            tvRemoveFromDailyVerse.visibility = View.GONE
+        }
+
 
         val tvAddToNotes: TextView = view.findViewById(R.id.tvAddToNotes)
         tvAddToNotes.setOnClickListener {

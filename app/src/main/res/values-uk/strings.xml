@@ -30,6 +30,8 @@
     <string name="tv_select_color">Оберіть колір</string>
     <string name="tv_color_sample">«Так бо Бог полюбив світ…»</string>
     <string name="tv_remove_highlighted_verse">Видалити виділення</string>
+    <string name="tv_add_to_daily_verse">Додати в «Вірш дня»</string>
+    <string name="tv_remove_from_daily_verse">Видалити з «Вірш дня»</string>
 
     <!-- Button -->
     <string name="btn_old_testament">Старий\nЗаповіт</string>
@@ -45,7 +47,6 @@
     <!-- CheckBox -->
     <string name="cb_add_bold_text">Додати жирний шрифт</string>
     <string name="cb_add_underline">Додати підкреслення</string>
-    <string name="cb_add_to_daily_verse">Додати в «Вірш дня»</string>
 
     <!-- Toast -->
     <string name="toast_find_verse">Знайдіть вірш</string>
@@ -85,4 +86,8 @@
     <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
     <string name="verse_copied">Вірш скопійовано</string>
     <string name="toast_no_verses_in_daily_verse">Ви не додали жодного вірша в «Вірш дня»</string>
+    <string name="tv_empty_daily_verses_list">Список віршів порожній</string>
+    <string name="rb_all_bible">Вся Біблія</string>
+    <string name="rb_old_testament">Старий Заповіт</string>
+    <string name="rb_new_testament">Новий Заповіт</string>
 </resources>

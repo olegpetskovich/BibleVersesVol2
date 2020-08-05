@@ -73,12 +73,11 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
                     if (textInfoList.size != 0) {
                         for (textInfoItem in textInfoList) {
                             for (item in textList) {
-                                if (textInfoItem.bookNumber == item.book_number && textInfoItem.chapterNumber == item.chapter && textInfoItem.verseNumber == item.verse) {
+                                if (textInfoItem.bookNumber == item.book_number && textInfoItem.chapterNumber == item.chapter_number && textInfoItem.verseNumber == item.verse_number) {
                                     item.id = textInfoItem.id //id этого значения в БД. Это поле нужно для того, чтобы удалять данные из БД.
                                     item.textColorHex = textInfoItem.textColorHex
                                     item.isTextBold = textInfoItem.isTextBold
                                     item.isTextUnderline = textInfoItem.isTextUnderline
-                                    item.isTextToDailyVerse = textInfoItem.isTextToDailyVerse
                                 }
                             }
                         }

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Typeface
 import android.os.Build
 import android.text.SpannableString
 import android.text.style.LeadingMarginSpan
@@ -23,6 +22,7 @@ import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
 import com.android.bible.knowbible.mvvm.view.dialog.VerseDialog
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
+import com.android.bible.knowbible.utility.Utility
 import com.android.bible.knowbible.utility.Utility.Companion.convertDbInPx
 
 //FragmentManager нужен здесь для открытия диалога
@@ -54,7 +54,7 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
         //Устанавливаем анимацию на item
 //        setAnimation(holder.itemView, position) //Немного влияет на производительность, пока будет отключено
 
-        val verseNumber = models[position].verse
+        val verseNumber = models[position].verse_number
 
         //Чтобы установить выделенный цвет, нужно задержать немного время, чтобы устанавливать его тогда, когда адаптер окончательно отобразит все данные, после всех обновлений
 
@@ -93,20 +93,6 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
             holder.tvVerseNumber.setTextColor(ContextCompat.getColor(context, R.color.colorGray))
         }
         holder.tvVerseNumber.text = verseNumber.toString()
-
-        //Очищаем текст от ненужных тегов. Эти действия называются регулярными выражениями
-        var str = models[position].text
-
-        //        val reg = Regex(pattern = """<(\w)>|</(\w)>[\s]?""")
-        val reg1 = Regex("""<S>(\d+)</S>""")
-        val reg2 = Regex("""<f>(\S+)</f>""")
-        val reg3 = Regex("""<(\w)>|</(\w)>""") //Без удаления пробела
-
-        str = str.replace(reg1, "")
-        str = str.replace(reg2, "")
-        str = str.replace(reg3, "")
-        str = str.replace("<pb/>", "")
-        models[position].text = str
 
         //switch case для проверки того, какое количество цифр в номере стиха. И в соответствии с этим выставляем нужный отступ  первой строчки для самого текста стиха
         when {
@@ -173,13 +159,12 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
             if (selectedItem != -1) {
                 //Проверка на сходство на всякий случай
                 if (model.book_number == bibleTextInfo.bookNumber
-                        && model.chapter == bibleTextInfo.chapterNumber
-                        && model.verse == bibleTextInfo.verseNumber) {
+                        && model.chapter_number == bibleTextInfo.chapterNumber
+                        && model.verse_number == bibleTextInfo.verseNumber) {
                     model.id = bibleTextInfo.id
                     model.textColorHex = bibleTextInfo.textColorHex
                     model.isTextBold = bibleTextInfo.isTextBold
                     model.isTextUnderline = bibleTextInfo.isTextUnderline
-                    model.isTextToDailyVerse = bibleTextInfo.isTextToDailyVerse
                     notifyItemChanged(selectedItem, Unit)
                     selectedItem = -1
                 }

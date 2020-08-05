@@ -73,11 +73,11 @@
     <color name="colorTabIndicatorLightTheme">#006EFF</color>
     <color name="colorTabIndicatorBookTheme">#2C2C2C</color>
 
-    <!-- Switch or CheckBox color for Light and Dark Themes -->
+    <!-- Switch, RadioButton or CheckBox color for Light and Dark Themes -->
     <color name="colorCheckedLightDarkThemes">#0062E2</color>
     <color name="colorUncheckedLightDarkThemes">#919191</color>
 
-    <!-- Switch or CheckBox color for Book Theme -->
+    <!-- Switch, RadioButton or CheckBox color for Book Theme -->
     <color name="colorCheckedBookTheme">#181818</color>
     <color name="colorUncheckedBookTheme">#636363</color>
 

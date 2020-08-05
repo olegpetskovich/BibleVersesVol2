@@ -29,6 +29,7 @@ class MyLayoutInflater(private val delegate: AppCompatDelegate) : LayoutInflater
             "TabLayout" -> MyTabLayout(context, attrs)
             "View" -> MyView(context, attrs)
             "ImageView" -> MyIconImageView(context, attrs)
+            "AppCompatRadioButton" -> MyRadioButton(context, attrs)
             else -> delegate.createView(parent, name, context, attrs)
         }
     }

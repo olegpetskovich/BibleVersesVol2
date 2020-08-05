@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.mvvm.model.BibleTranslationModel
 import java.io.File
+import java.lang.StringBuilder
 
 class Utility {
     companion object {
@@ -59,6 +60,27 @@ class Utility {
                     .apply {
                         duration = myDuration
                     }
+        }
+
+        fun getClearedStringFromTags(string: String): String {
+            //Очистка текст от ненужных тегов и знаков с помощью "регулярных выражений"
+            val reg1 = Regex("""<S>(\d+)</S>""")
+            val reg2 = Regex("""<f>(\S+)</f>""")
+            val reg3 = Regex("""<(\w)>|</(\w)>""") //Без удаления пробела
+
+            var str = string
+            str = str.replace(reg1, "")
+            str = str.replace(reg2, "")
+            str = str.replace(reg3, "")
+            str = str.replace("<pb/>", "")
+
+            return str
+        }
+
+        fun getClearedText(sb: StringBuilder): String {
+            if (sb[0] == ' ') sb.deleteCharAt(0)
+            if (sb[sb.length - 1] == '.' || sb[sb.length - 1] == ',' || sb[sb.length - 1] == ';' || sb[sb.length - 1] == ' ') sb.deleteCharAt(sb.length - 1)
+            return sb.toString()
         }
 
         fun hideKeyboard(activity: Activity) {

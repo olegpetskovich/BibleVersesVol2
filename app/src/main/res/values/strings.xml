@@ -32,6 +32,8 @@
     <string name="tv_remove_highlighted_verse">Убрать выделение</string>
     <string name="tv_new_article">Новая статья!</string>
     <string name="tv_about_writing_articles">Мы с радостью предоставляем вам возможность писать и публиковать собственные статьи! Для этого вам нужно обратиться к нам, перейдя по ссылке ниже на наш Telegram канал. Если ваша статья пройдёт проверку на соответствие заданного нами регламента, мы опубликуем её. Ознакомиться с регламентом вы можете нажав на кнопку ниже.</string>
+    <string name="tv_add_to_daily_verse">Добавить в «Стих дня»</string>
+    <string name="tv_remove_from_daily_verse">Удалить из «Стих дня»</string>
 
     <!-- Button -->
     <string name="btn_old_testament">Ветхий\nЗавет</string>
@@ -47,7 +49,6 @@
     <!-- CheckBox -->
     <string name="cb_add_bold_text">Добавить жирный шрифт</string>
     <string name="cb_add_underline">Добавить подчёркивание</string>
-    <string name="cb_add_to_daily_verse">Добавить в «Стих дня»</string>
 
     <!-- Toast -->
     <string name="toast_translation_saved">Перевод сохранён</string>
@@ -85,4 +86,8 @@
     <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
     <string name="verse_copied">Стих скопирован</string>
     <string name="toast_no_verses_in_daily_verse">Вы не добавили ни одного стиха в «Стих дня»</string>
+    <string name="tv_empty_daily_verses_list">Список стихов пока что пуст</string>
+    <string name="rb_all_bible">Вся Библия</string>
+    <string name="rb_old_testament">Ветхий Завет</string>
+    <string name="rb_new_testament">Новый Завет</string>
 </resources>

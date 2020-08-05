@@ -90,8 +90,6 @@ class SelectBibleBookFragment : Fragment(), IChangeFragment, IThemeChanger, ISel
         bibleDataViewModel
                 .getTestamentBooksList(BibleDataViewModel.TABLE_BOOKS, isOldTestament)
                 .observe(viewLifecycleOwner, Observer { list ->
-//                    GlobalScope.launch(Dispatchers.Main) {
-//                        delay(150)
 
                     rvAdapter = BooksRVAdapter(list)
                     rvAdapter.setFragmentChangerListener(this@SelectBibleBookFragment)
@@ -101,9 +99,7 @@ class SelectBibleBookFragment : Fragment(), IChangeFragment, IThemeChanger, ISel
 
                     recyclerView.adapter = rvAdapter
                     progressBar.visibility = View.GONE
-//                    }
                 })
-
         return myView
     }
 

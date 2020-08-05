@@ -16,20 +16,26 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.data.local.BibleTextInfoDBHelper
-import com.android.bible.knowbible.mvvm.model.BibleTextInfoModel
-import com.android.bible.knowbible.mvvm.model.BibleTextModel
+import com.android.bible.knowbible.data.local.DailyVersesDBHelper
+import com.android.bible.knowbible.mvvm.model.DailyVerseModel
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
+import com.android.bible.knowbible.utility.Utility
 import com.google.android.material.button.MaterialButton
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.lang.StringBuilder
 import java.util.*
-import kotlin.collections.ArrayList
 
 class DailyVerseFragment : Fragment() {
     lateinit var myFragmentManager: FragmentManager
@@ -39,17 +45,17 @@ class DailyVerseFragment : Fragment() {
     private lateinit var bibleDataViewModel: BibleDataViewModel
     private lateinit var bibleTextInfoDBHelper: BibleTextInfoDBHelper
 
-    private lateinit var dailyVerses: ArrayList<BibleTextModel>
+    private lateinit var dailyVersesDBHelper: DailyVersesDBHelper
 
     private lateinit var progressBar: ProgressBar
     private lateinit var ivBook: ImageView
     private lateinit var tvVerse: TextView
-    private lateinit var btnFind: TextView
+    private lateinit var btnFind: MaterialButton
 
     private lateinit var btnList: MaterialButton
     private lateinit var btnShare: MaterialButton
 
-    private lateinit var dailyVersesInfo: ArrayList<BibleTextInfoModel>
+    private lateinit var dailyVersesListInfo: ArrayList<DailyVerseModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,11 +67,6 @@ class DailyVerseFragment : Fragment() {
         val myView: View = inflater.inflate(R.layout.fragment_daily_verse, container, false)
         listener.setTheme(ThemeManager.theme, false) //Если не устанавливать тему каждый раз при открытии фрагмента, то по какой-то причине внешний вид View не обновляется, поэтому на данный момент только такое решение
 
-        //ViewModel для получения конкретного текста для Стих дня
-        bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
-
-        dailyVerses = ArrayList()
-
         ivBook = myView.findViewById(R.id.ivBook)
         tvVerse = myView.findViewById(R.id.tvVerse)
         progressBar = myView.findViewById(R.id.progressBar)
@@ -73,37 +74,54 @@ class DailyVerseFragment : Fragment() {
         //При открытии фрагмента сразу получаем, форматируем и добавляем готовые тексты для "Стих дня" в коллекцию.
         progressBar.visibility = View.VISIBLE
         tvVerse.visibility = View.GONE
-        bibleTextInfoDBHelper = BibleTextInfoDBHelper.getInstance(context)!! //DBHelper для работы с БД информации текста
-        bibleTextInfoDBHelper
-                .loadDailyVersesInfo()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { dailyVersesInfo ->
-                    this.dailyVersesInfo = dailyVersesInfo
 
-                    progressBar.visibility = View.GONE
-                    tvVerse.visibility = View.VISIBLE
-                    val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
-                    tvVerse.startAnimation(animation)
-                }
+        GlobalScope.launch(Dispatchers.Main) {
+            delay(200)
+            //ViewModel для получения конкретного текста для Стих дня
+            bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
 
+            bibleTextInfoDBHelper = BibleTextInfoDBHelper.getInstance(context)!! //DBHelper для работы с БД информации текста
+
+            dailyVersesDBHelper = DailyVersesDBHelper(context!!)
+            dailyVersesDBHelper
+                    .loadDailyVersesList()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { dailyVersesList ->
+                        dailyVersesListInfo = dailyVersesList
+
+                        progressBar.visibility = View.GONE
+                        tvVerse.visibility = View.VISIBLE
+                        val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
+                        tvVerse.startAnimation(animation)
+                    }
+        }
 
         btnFind = myView.findViewById(R.id.btnFind)
         btnFind.setOnClickListener {
-            if (dailyVersesInfo.size == 0) {
+            if (dailyVersesListInfo.size == 0) {
                 Toast.makeText(context!!, getString(R.string.toast_no_verses_in_daily_verse), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            setRandomVerse(dailyVersesInfo)
+            setRandomVerse(dailyVersesListInfo)
             val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
             tvVerse.startAnimation(animation)
         }
 
         btnList = myView.findViewById(R.id.btnList)
         btnList.setOnClickListener {
-//            val intent = Intent(context, ListActivity::class.java)
-//            startActivity(intent)
+            myFragmentManager.let {
+                val dailyVersesListFragment = DailyVersesListFragment()
+                dailyVersesListFragment.setRootFragmentManager(myFragmentManager)
+                dailyVersesListFragment.setDailyVersesListInfo(dailyVersesListInfo)
+
+                val transaction: FragmentTransaction = it.beginTransaction()
+                transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                transaction.addToBackStack(null)
+                transaction.replace(R.id.fragment_container_bible, dailyVersesListFragment)
+                transaction.commit()
+            }
         }
 
         btnShare = myView.findViewById(R.id.btnShare)
@@ -127,10 +145,10 @@ class DailyVerseFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setRandomVerse(dailyVerses: ArrayList<BibleTextInfoModel>) {
+    private fun setRandomVerse(dailyVerses: ArrayList<DailyVerseModel>) {
         val random = Random()
         val randomNumber = random.nextInt(dailyVerses.size)
-        val dailyVerse: BibleTextInfoModel = dailyVerses[randomNumber]
+        val dailyVerse: DailyVerseModel = dailyVerses[randomNumber]
 
         bibleDataViewModel
                 .getBibleVerse(BibleDataViewModel.TABLE_VERSES, dailyVerse.bookNumber, dailyVerse.chapterNumber, dailyVerse.verseNumber)
@@ -144,17 +162,9 @@ class DailyVerseFragment : Fragment() {
                             .observe(viewLifecycleOwner, Observer { verseShortName ->
                                 if (index == 0) {
                                     //Очищаем текст от ненужных тегов. Эти действия называются регулярными выражениями
-                                    var str = verseModel.text
-                                    val reg1 = Regex("""<S>(\d+)</S>""")
-                                    val reg2 = Regex("""<f>(\S+)</f>""")
-                                    val reg3 = Regex("""<(\w)>|</(\w)>""") //Без удаления пробела
+                                    val str = Utility.getClearedText(StringBuilder(verseModel!!.text))
 
-                                    str = str.replace(reg1, "")
-                                    str = str.replace(reg2, "")
-                                    str = str.replace(reg3, "")
-                                    str = str.replace("<pb/>", "")
-
-                                    tvVerse.text = "«" + str + "»" + " (" + verseShortName + ". " + verseModel.chapter + ":" + verseModel.verse + ")"
+                                    tvVerse.text = "«" + str + "»" + " (" + verseShortName + ". " + verseModel.chapter_number + ":" + verseModel.verse_number + ")"
 
                                     index++
                                 }

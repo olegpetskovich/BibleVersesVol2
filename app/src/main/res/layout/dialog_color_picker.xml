@@ -85,23 +85,12 @@
         android:text="@string/cb_add_underline"
         tools:ignore="RtlSymmetry" />
 
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/addToDailyVerse"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/addUnderline"
-        android:minWidth="2dp"
-        android:minHeight="2dp"
-        android:paddingStart="8dp"
-        android:text="@string/cb_add_to_daily_verse"
-        tools:ignore="RtlSymmetry" />
-
     <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
         android:id="@+id/btnCancel"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/addToDailyVerse"
+        android:layout_below="@id/addUnderline"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="2dp"
         android:layout_toStartOf="@id/btnSelect"
@@ -117,7 +106,7 @@
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/addToDailyVerse"
+        android:layout_below="@id/addUnderline"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="6dp"
         android:padding="4dp"

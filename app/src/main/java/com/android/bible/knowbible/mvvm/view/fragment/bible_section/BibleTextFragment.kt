@@ -41,6 +41,8 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     private lateinit var saveLoadData: SaveLoadData
     private lateinit var bibleDataViewModel: BibleDataViewModel
 
+    private lateinit var progressBar: ProgressBar
+
     private lateinit var myFragmentManager: FragmentManager
 
     private var vpAdapter: ViewPager2Adapter? = null
@@ -63,8 +65,7 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
 //        bibleDataViewModel.setDatabase() //Вызов этого метода не нужен скорее всего
 
-        val progressBar: ProgressBar = myView.findViewById(R.id.downloadProgressBar)
-        progressBar.visibility = View.VISIBLE
+        progressBar = myView.findViewById(R.id.downloadProgressBar)
 
         viewPager2 = myView.findViewById(R.id.viewPager2)
 //        viewPager2.offscreenPageLimit = 10 //Потестировать этот метод, чтобы не было мелкого пролага при перелистывании
@@ -74,8 +75,6 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                 .observe(viewLifecycleOwner, Observer { shortName ->
                     listener.setTvSelectedBibleText("$shortName.", true)
                 })
-
-        progressBar.visibility = View.GONE
 
         reduceDragSensitivity(viewPager2)
 
@@ -130,10 +129,31 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                 setScroll(page, false)
             } else setScroll(page, false)
         } else {
+//            bibleDataViewModel
+//                    .getBibleTextOfAllBible(BibleDataViewModel.TABLE_VERSES)
+//                    .observe(viewLifecycleOwner, Observer { allBibleTexts ->
+            //Код для преобразования тексто в БД НИ В КОЕМ СЛУЧАЕ НЕ УДАЛЯТЬ!
+//                        val mainHandler = Handler(context!!.mainLooper)
+//                        val myRunnable = Runnable {
+//                            progressBar.visibility = View.VISIBLE
+//
+//                            allBibleTexts?.forEachIndexed { indexBible, text ->
+//                                bibleDataViewModel.updateBibleTextInDB(text)
+//                                Utility.log("Verse of book: " + text.book_number + ", " + text.chapter_number + ":" + text.verse_number + " is changed")
+//                                if (indexBible == allBibleTexts.size - 1) {
+//                                    progressBar.visibility = View.GONE
+//                                    Utility.log("Verses changing of ALL BIBLE in DB is finished!")
+//                                }
+//                            }
+//                        }
+//                        mainHandler.post(myRunnable)
+
             bibleDataViewModel
                     .getBibleTextOfBook(BibleDataViewModel.TABLE_VERSES, chapterInfo?.bookNumber!!)
-                    .observe(viewLifecycleOwner, Observer {
-                        vpAdapter = ViewPager2Adapter(context!!, it, myFragmentManager)
+                    .observe(viewLifecycleOwner, Observer { bookTexts ->
+
+
+                        vpAdapter = ViewPager2Adapter(context!!, bookTexts, myFragmentManager)
                         vpAdapter!!.setRecyclerViewThemeChangerListener(this)
                         vpAdapter!!.setIFragmentCommunicationListener(this)
 

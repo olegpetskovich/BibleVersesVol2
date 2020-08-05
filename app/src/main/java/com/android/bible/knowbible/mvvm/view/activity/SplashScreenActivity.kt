@@ -52,7 +52,7 @@ class SplashScreenActivity : AppCompatActivity() {
         animationLogo.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationRepeat(animation: Animation?) {}
             override fun onAnimationEnd(animation: Animation?) {
-                val anim = viewAnimatorY(Utility.convertDbInPx(this@SplashScreenActivity, -90f), iV, 450)
+                val anim = viewAnimatorY(Utility.convertDbInPx(this@SplashScreenActivity, -70f), iV, 450)
                 anim?.addListener(object : Animator.AnimatorListener {
                     override fun onAnimationRepeat(animation: Animator?) {}
                     override fun onAnimationEnd(animation: Animator?) {

@@ -17,6 +17,7 @@ import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommun
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTranslationsFragment.Companion.TRANSLATION_DB_FILE_JSON_INFO
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.daily_verse_subsection.DailyVerseFragment
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.notes_subsection.NotesFragment
+import com.android.bible.knowbible.mvvm.view.fragment.bible_section.search_subsection.SearchFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
@@ -80,7 +81,8 @@ open class SelectTestamentFragment : Fragment() {
 
                 dataToRestoreModel!!.bookNumber = -1 //Устанавливаем значение -1, чтобы при попытке вернуться на прежний фрагмент, пользователя снова не перебрасывало на уже открытый
             }
-        } else {
+        }
+        else {
             myFragmentManager.let {
                 val transaction: FragmentTransaction = it.beginTransaction()
                 transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
@@ -131,6 +133,15 @@ open class SelectTestamentFragment : Fragment() {
                     val dailyVerseFragment = DailyVerseFragment()
                     dailyVerseFragment.setRootFragmentManager(myFragmentManager)
                     transaction.replace(R.id.fragment_container_bible, dailyVerseFragment)
+                    transaction.addToBackStack(null)
+                    transaction.commit()
+                }
+
+                val btnSearch: MaterialButton = myView.findViewById(R.id.btnSearch)
+                btnSearch.setOnClickListener {
+                    val searchFragment = SearchFragment()
+                    searchFragment.setRootFragmentManager(myFragmentManager)
+                    transaction.replace(R.id.fragment_container_bible, searchFragment)
                     transaction.addToBackStack(null)
                     transaction.commit()
                 }

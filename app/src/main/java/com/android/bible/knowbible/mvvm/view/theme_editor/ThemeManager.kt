@@ -63,6 +63,15 @@ object ThemeManager {
             val cursorColor: Int
     )
 
+    data class RadioButtonTheme(
+            @ColorRes
+            val textColor: Int,
+            @ColorRes
+            val checkedColor: Int,
+            @ColorRes
+            val uncheckedColor: Int
+    )
+
     data class ToolbarTheme(
             @ColorRes
             val backgroundColor: Int,
@@ -81,6 +90,7 @@ object ThemeManager {
             val viewGroupTheme: ViewGroupTheme,
             val tabLayoutTheme: TabLayoutTheme,
             val editTextTheme: EditTextTheme,
+            val radioButtonTheme: RadioButtonTheme,
             val toolbarTheme: ToolbarTheme,
             val viewLineTheme: ViewLineTheme
     ) {
@@ -111,6 +121,11 @@ object ThemeManager {
                         R.color.colorTextDarkTheme,
                         R.color.colorGray,
                         R.color.colorIconCursorDarkTheme),
+                radioButtonTheme = RadioButtonTheme(
+                        textColor = R.color.colorTextDarkTheme,
+                        checkedColor = R.color.colorCheckedLightDarkThemes,
+                        uncheckedColor = R.color.colorUncheckedLightDarkThemes
+                ),
                 toolbarTheme = ToolbarTheme(
                         backgroundColor = R.color.colorBackgroundDarkTheme,
                         arrowColor = android.R.color.darker_gray
@@ -146,6 +161,11 @@ object ThemeManager {
                         R.color.colorTextLightTheme,
                         R.color.colorGray,
                         R.color.colorIconCursorLightTheme),
+                radioButtonTheme = RadioButtonTheme(
+                        textColor = R.color.colorTextLightTheme,
+                        checkedColor = R.color.colorCheckedLightDarkThemes,
+                        uncheckedColor = R.color.colorUncheckedLightDarkThemes
+                ),
                 toolbarTheme = ToolbarTheme(
                         backgroundColor = R.color.colorBackgroundLightTheme,
                         arrowColor = android.R.color.darker_gray
@@ -181,6 +201,11 @@ object ThemeManager {
                         R.color.colorTextBookTheme,
                         R.color.colorGrayBookTheme,
                         R.color.colorIconCursorBookTheme),
+                radioButtonTheme = RadioButtonTheme(
+                        textColor = R.color.colorTextBookTheme,
+                        checkedColor = R.color.colorCheckedBookTheme,
+                        uncheckedColor = R.color.colorUncheckedBookTheme
+                ),
                 toolbarTheme = ToolbarTheme(
                         backgroundColor = R.color.colorBackgroundBookTheme,
                         arrowColor = android.R.color.darker_gray

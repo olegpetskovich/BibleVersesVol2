@@ -33,6 +33,8 @@
     <string name="tv_color_sample">«For God so loved the world…»</string>
     <string name="tv_remove_highlighted_verse">Remove highlighting</string>
     <string name="tv_select_color">Select color</string>
+    <string name="tv_add_to_daily_verse">Add to «Daily verse»</string>
+    <string name="tv_remove_from_daily_verse">Remove from «Daily Verse»</string>
 
     <!-- Button -->
     <string name="btn_old_testament">Old\nTestament</string>
@@ -48,10 +50,9 @@
     <!-- CheckBox -->
     <string name="cb_add_bold_text">Add Bold</string>
     <string name="cb_add_underline">Add underline</string>
-    <string name="cb_add_to_daily_verse">Add to Daily verse</string>
 
     <!-- Toast -->
-    <string name="toast_find_verse">Найдите стих</string>
+    <string name="toast_find_verse">Find your Daily Verse</string>
     <string name="toast_share_verse">Share verse</string>
     <string name="toast_translation_saved">Translate saved</string>
     <string name="toast_download_translation">Download the translation before using it.</string>
@@ -86,4 +87,8 @@
     <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
     <string name="verse_copied">Verse copied</string>
     <string name="toast_no_verses_in_daily_verse">You have not added a single verse in «DailyVerse»</string>
+    <string name="tv_empty_daily_verses_list">List of verses is empty</string>
+    <string name="rb_all_bible">All Bible</string>
+    <string name="rb_old_testament">Old Testament</string>
+    <string name="rb_new_testament">New Testament</string>
 </resources>

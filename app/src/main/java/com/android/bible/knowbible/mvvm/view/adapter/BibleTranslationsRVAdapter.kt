@@ -59,6 +59,7 @@ class BibleTranslationsRVAdapter(private val context: Context, private val model
             holder.ivDownloaded.setColorFilter(ContextCompat.getColor(context, android.R.color.black))
         } else {
             holder.tvLanguageName.setTextColor(ContextCompat.getColor(context, R.color.colorGray))
+            holder.tvLanguageName.setTextColor(ContextCompat.getColor(context, R.color.colorGray))
             holder.btnDownloadBibleTranslate.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
             holder.downloadProgressBar.progressDrawable = ContextCompat.getDrawable(context, R.drawable.circle_progress_bar)
             holder.progressCountTitle.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))

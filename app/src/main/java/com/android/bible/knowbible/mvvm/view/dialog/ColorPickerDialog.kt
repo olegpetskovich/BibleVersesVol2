@@ -63,7 +63,6 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
 
         val addBoldText: MaterialCheckBox = view.findViewById(R.id.addBoldText)
         val addUnderline: MaterialCheckBox = view.findViewById(R.id.addUnderline)
-        val addToDailyVerse: MaterialCheckBox = view.findViewById(R.id.addToDailyVerse)
 
         //По непонятной причине в диалогах тема не меняется, поэтому приходится менять их в каждом диалоге
         when (SaveLoadData(context!!).loadString(ThemeModeFragment.THEME_NAME_KEY)) {
@@ -74,10 +73,6 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
                         ContextCompat.getColor(context!!, R.color.colorCheckedLightDarkThemes),
                         ContextCompat.getColor(context!!, R.color.colorTextLightTheme))
                 setCheckBoxColor(addUnderline,
-                        ContextCompat.getColor(context!!, R.color.colorUncheckedLightDarkThemes),
-                        ContextCompat.getColor(context!!, R.color.colorCheckedLightDarkThemes),
-                        ContextCompat.getColor(context!!, R.color.colorTextLightTheme))
-                setCheckBoxColor(addToDailyVerse,
                         ContextCompat.getColor(context!!, R.color.colorUncheckedLightDarkThemes),
                         ContextCompat.getColor(context!!, R.color.colorCheckedLightDarkThemes),
                         ContextCompat.getColor(context!!, R.color.colorTextLightTheme))
@@ -92,10 +87,6 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
                         ContextCompat.getColor(context!!, R.color.colorUncheckedLightDarkThemes),
                         ContextCompat.getColor(context!!, R.color.colorCheckedLightDarkThemes),
                         ContextCompat.getColor(context!!, R.color.colorTextDarkTheme))
-                setCheckBoxColor(addToDailyVerse,
-                        ContextCompat.getColor(context!!, R.color.colorUncheckedLightDarkThemes),
-                        ContextCompat.getColor(context!!, R.color.colorCheckedLightDarkThemes),
-                        ContextCompat.getColor(context!!, R.color.colorTextDarkTheme))
             }
             ThemeModeFragment.BOOK_THEME -> {
                 ThemeManager.theme = ThemeManager.Theme.BOOK
@@ -104,10 +95,6 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
                         ContextCompat.getColor(context!!, R.color.colorCheckedBookTheme),
                         ContextCompat.getColor(context!!, R.color.colorTextBookTheme))
                 setCheckBoxColor(addUnderline,
-                        ContextCompat.getColor(context!!, R.color.colorUncheckedBookTheme),
-                        ContextCompat.getColor(context!!, R.color.colorCheckedBookTheme),
-                        ContextCompat.getColor(context!!, R.color.colorTextBookTheme))
-                setCheckBoxColor(addToDailyVerse,
                         ContextCompat.getColor(context!!, R.color.colorUncheckedBookTheme),
                         ContextCompat.getColor(context!!, R.color.colorCheckedBookTheme),
                         ContextCompat.getColor(context!!, R.color.colorTextBookTheme))
@@ -137,7 +124,6 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
             addUnderline.isChecked = verseData.isTextUnderline
             tvColoredVerse.paintFlags = tvColoredVerse.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         }
-        if (verseData.isTextToDailyVerse) addToDailyVerse.isChecked = verseData.isTextToDailyVerse
 
         addBoldText.setOnCheckedChangeListener { _, isChecked ->
             //Устанавливаем и отключаем жирный шрифт именно таким образом. Установка через параметр Typeface не подходит
@@ -201,14 +187,14 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
             //Проверяем, есть ли эти данные в БД, смотря на то, какое значение в поле id.
             //Если id == -1, то данные ещё не добавлены, потому что у добавленных данных о стихе в поле id у объекта verseData будет значение id этих данных в БД.
             if (verseData.id != -1L) {
-                bibleTextInfoDBHelper.updateBibleTextInfo(BibleTextInfoModel(verseData.id, verseData.book_number, verseData.chapter, verseData.verse, hexColor, addBoldText.isChecked, addUnderline.isChecked, addToDailyVerse.isChecked))
-                listener.updateItemColor(BibleTextInfoModel(verseData.id, verseData.book_number, verseData.chapter, verseData.verse, hexColor, addBoldText.isChecked, addUnderline.isChecked, addToDailyVerse.isChecked))
+                bibleTextInfoDBHelper.updateBibleTextInfo(BibleTextInfoModel(verseData.id, verseData.book_number, verseData.chapter_number, verseData.verse_number, hexColor, addBoldText.isChecked, addUnderline.isChecked))
+                listener.updateItemColor(BibleTextInfoModel(verseData.id, verseData.book_number, verseData.chapter_number, verseData.verse_number, hexColor, addBoldText.isChecked, addUnderline.isChecked))
             } else {
                 //Сохраняем в БД hex код выбранного цвета, чтобы при загрузке текстов Библии потом отобразить текст с выбранном цветом
                 val idOfAddedData = bibleTextInfoDBHelper.addBibleTextInfo(BibleTextInfoModel(
                         -1/*-1 здесь как заглушка, этот параметр нужен не при добавлении, а при получении данных, потому что там id создаётся автоматически*/,
-                        verseData.book_number, verseData.chapter, verseData.verse, hexColor, addBoldText.isChecked, addUnderline.isChecked, addToDailyVerse.isChecked))
-                listener.updateItemColor(BibleTextInfoModel(idOfAddedData, verseData.book_number, verseData.chapter, verseData.verse, hexColor, addBoldText.isChecked, addUnderline.isChecked, addToDailyVerse.isChecked))
+                        verseData.book_number, verseData.chapter_number, verseData.verse_number, hexColor, addBoldText.isChecked, addUnderline.isChecked))
+                listener.updateItemColor(BibleTextInfoModel(idOfAddedData, verseData.book_number, verseData.chapter_number, verseData.verse_number, hexColor, addBoldText.isChecked, addUnderline.isChecked))
             }
 
             listener.dismissDialog(true)
