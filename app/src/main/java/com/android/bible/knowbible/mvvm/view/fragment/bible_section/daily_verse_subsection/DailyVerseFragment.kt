@@ -72,11 +72,10 @@ class DailyVerseFragment : Fragment() {
         progressBar = myView.findViewById(R.id.progressBar)
 
         //При открытии фрагмента сразу получаем, форматируем и добавляем готовые тексты для "Стих дня" в коллекцию.
-        progressBar.visibility = View.VISIBLE
         tvVerse.visibility = View.GONE
 
         GlobalScope.launch(Dispatchers.Main) {
-            delay(200)
+            delay(300)
             //ViewModel для получения конкретного текста для Стих дня
             bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
 
@@ -90,7 +89,6 @@ class DailyVerseFragment : Fragment() {
                     .subscribe { dailyVersesList ->
                         dailyVersesListInfo = dailyVersesList
 
-                        progressBar.visibility = View.GONE
                         tvVerse.visibility = View.VISIBLE
                         val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
                         tvVerse.startAnimation(animation)

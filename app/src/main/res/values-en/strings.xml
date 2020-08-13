@@ -23,6 +23,7 @@
     <string name="tv_about_writing_articles">We are happy to give you the opportunity to write and publish your own articles! To do this, you need to contact us by clicking on the link below to our Telegram channel. If your article passes the test for compliance with the rules set by us, we will publish it. You can familiarize yourself with the regulations by clicking on the button below.</string>
     <string name="tv_notes">Notes</string>
     <string name="tv_search">Search</string>
+    <string name="ed_search">Search…</string>
     <string name="tv_daily_verse">Daily verse</string>
     <string name="tv_bible_translation">Bible translation</string>
     <string name="tv_downloading_canceled">Translation downloading aborted</string>
@@ -91,4 +92,7 @@
     <string name="rb_all_bible">All Bible</string>
     <string name="rb_old_testament">Old Testament</string>
     <string name="rb_new_testament">New Testament</string>
+    <string name="toast_at_least_three_letters">The search field must contain at least three letters</string>
+    <string name="btn_home">Home</string>
+    <string name="btn_interpretation">Interpretation</string>
 </resources>

@@ -19,7 +19,9 @@ import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment
+import com.android.bible.knowbible.utility.Utility
 import com.google.android.material.button.MaterialButton
+import java.lang.StringBuilder
 
 class AddNoteDialog(private val listener: DialogListener) : AppCompatDialogFragment() {
     private lateinit var notesDBHelper: NotesDBHelper

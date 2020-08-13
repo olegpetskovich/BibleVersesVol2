@@ -14,13 +14,19 @@ import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTextFra
 
 class ChaptersRVAdapter(private val models: ArrayList<ChapterModel>) : RecyclerView.Adapter<ChaptersRVAdapter.MyViewHolder>() {
     private lateinit var fragmentChanger: IChangeFragment
-    fun setFragmentChangerListener(fragmentChanger: IChangeFragment) { this.fragmentChanger = fragmentChanger }
+    fun setFragmentChangerListener(fragmentChanger: IChangeFragment) {
+        this.fragmentChanger = fragmentChanger
+    }
 
     private lateinit var themeChanger: IThemeChanger
-    fun setRecyclerViewThemeChangerListener(themeChanger: IThemeChanger) { this.themeChanger = themeChanger }
-    
+    fun setRecyclerViewThemeChangerListener(themeChanger: IThemeChanger) {
+        this.themeChanger = themeChanger
+    }
+
     private lateinit var selectBibleTextListener: ISelectBibleText
-    fun setSelectedBibleTextListener(selectBibleTextListener: ISelectBibleText) { this.selectBibleTextListener = selectBibleTextListener }
+    fun setSelectedBibleTextListener(selectBibleTextListener: ISelectBibleText) {
+        this.selectBibleTextListener = selectBibleTextListener
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val inflater = LayoutInflater.from(parent.context)

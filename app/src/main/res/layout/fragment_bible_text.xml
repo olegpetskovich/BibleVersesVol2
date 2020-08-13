@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.android.bible.knowbible.mvvm.view.theme_editor.MyConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.android.bible.knowbible.mvvm.view.fragment.bible_section.SelectBibleBookFragment">
+    app:layout_behavior=".utility.BottomAppBarBehavior">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <ProgressBar
-        android:id="@+id/downloadProgressBar"
+        android:id="@+id/progressBar"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_centerInParent="true"
         android:layout_marginTop="100dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</com.android.bible.knowbible.mvvm.view.theme_editor.MyConstraintLayout>
+        android:visibility="gone" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

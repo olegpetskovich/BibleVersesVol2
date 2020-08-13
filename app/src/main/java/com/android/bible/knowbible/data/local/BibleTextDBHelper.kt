@@ -234,17 +234,19 @@ class BibleTextDBHelper {
                 val verseNumber = cursor.getInt(cursor.getColumnIndex("verse"))
                 val text = cursor.getString(cursor.getColumnIndex("text"))
 
-                var str = Utility.getClearedText(StringBuilder(text))
+                var str = text
 
                 loadBookShortName(BibleDataViewModel.TABLE_BOOKS, bookNumber)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe { shortName ->
+                            //Достаём из строки все слова, которые совпадают со словом или фразой, которое ищет пользователь и каждон из найденного слова или фразы выделяем
                             val pattern: Pattern = Pattern.compile(searchingText, Pattern.CASE_INSENSITIVE)
                             val matcher: Matcher = pattern.matcher(str)
                             while (matcher.find()) {
                                 val foundedWord = matcher.group()
                                 if (str.contains(foundedWord, true)) {
+                                    str = str.replace("\\s{2,}".toRegex(), " ").trim();
                                     str = str.replace(foundedWord, "<b>$foundedWord</b>")
                                 }
                             }

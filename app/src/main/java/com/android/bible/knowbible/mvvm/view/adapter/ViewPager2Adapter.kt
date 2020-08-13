@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AbsListView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +24,7 @@ import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
+
 class ViewPager2Adapter(private val context: Context, private val chaptersTextList: ArrayList<ArrayList<BibleTextModel>>, private val myFragmentManager: FragmentManager) : RecyclerView.Adapter<ViewPager2Adapter.PagerVH>() {
     lateinit var dataToRestoreData: DataToRestoreModel //Поле для определения и сохранения скролла в Ресайклере
 
@@ -31,6 +33,15 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
     private lateinit var rvAdapter: BibleTextRVAdapter
 
     private var mapRV = hashMapOf<Int, RecyclerView>()
+
+    interface IBottomAppBarListener {
+        fun setBottomAppBarVisibility(isMakeVisible: Boolean)
+    }
+
+    private lateinit var bottomAppBarListener: IBottomAppBarListener
+    fun setIBottomAppBarListener(bottomAppBarListener: IBottomAppBarListener) {
+        this.bottomAppBarListener = bottomAppBarListener
+    }
 
     interface IFragmentCommunication {
         fun saveScrollPosition(bookNumber: Int, chapterNumber: Int, scrollPosition: Int)
@@ -87,6 +98,19 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
                     rvAdapter = BibleTextRVAdapter(context, textList, myFragmentManager)
                     rvAdapter.setRecyclerViewThemeChangerListener(themeChanger) //Для RecyclerView тему нужно обновлять отдельно от смены темы для всего фрагмента. Если менять тему только для всего фрагмента, не меняя при этом тему для списка, то в списке тема не поменяется.
                     val rvItem = holder.recyclerView
+                    rvItem.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+                            if (dy > 0) {
+                                Utility.log("Scrolled down")
+                                bottomAppBarListener.setBottomAppBarVisibility(false)
+                            } else if (dy < 0) {
+                                Utility.log("Scrolled up")
+                                bottomAppBarListener.setBottomAppBarVisibility(true)
+                            }
+                        }
+                    })
+
                     rvItem.adapter = rvAdapter
 
                     rvItem.layoutManager = LinearLayoutManager(context)
@@ -108,6 +132,11 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
         } else {
             0
         }
+    }
+
+    fun getRecyclerView(posPage: Int): RecyclerView? {
+        return if (mapRV[posPage]?.layoutManager != null) mapRV[posPage]
+        else null
     }
 
     //Ничего не менять
@@ -142,7 +171,7 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
     }
 
     inner class PagerVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val recyclerView: RecyclerView = itemView.findViewById(R.id.recyclerView)
+        val recyclerView: RecyclerView = itemView.findViewById(R.id.recyclerViewVP2)
     }
 }
 

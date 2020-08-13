@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/btnHome"
+        android:icon="@drawable/ic_home"
+        android:title=""
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/btnInterpretation"
+        android:icon="@drawable/ic_interpretation"
+        android:title=""
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_empty"
+        android:checkable="false"
+        android:checked="false"
+        android:enabled="false"
+        android:title=""
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/btnNotes"
+        android:icon="@drawable/ic_write_note"
+        android:title=""
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/btnSearch"
+        android:icon="@drawable/ic_search_2"
+        android:title=""
+        app:showAsAction="always" />
+</menu>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -18,15 +17,51 @@
         android:layout_centerInParent="true"
         android:visibility="gone" />
 
-    <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
-        android:id="@+id/tvDailyVerse"
+    <TextView
+        android:id="@+id/tvVerse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="6dp"
+        android:layout_toStartOf="@id/layButtons"
         android:gravity="start"
         android:textSize="16sp"
         tools:text="Sample text" />
+
+    <LinearLayout
+        android:id="@+id/layButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/btnAddNote"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_write_note" />
+
+        <ImageView
+            android:id="@+id/btnCopyVerse"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_copy" />
+
+        <ImageView
+            android:id="@+id/btnShare"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_share" />
+    </LinearLayout>
 </RelativeLayout>
 

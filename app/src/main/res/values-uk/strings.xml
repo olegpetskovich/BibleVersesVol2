@@ -18,6 +18,7 @@
     <string name="tv_have_to_download_bible">Щоб користуватися додатком, вам необхідно завантажити, як мінімум, один з представлених перекладів Біблії. Після того, як переклад завантажиться, натисніть на нього, і ви перейдете до вікна Біблії.</string>
     <string name="tv_notes">Нотатки</string>
     <string name="tv_search">Пошук</string>
+    <string name="ed_search">Пошук…</string>
     <string name="tv_daily_verse">Вірш дня</string>
     <string name="tv_bible_translation">Біблійний переклад</string>
     <string name="tv_downloading_canceled">Завантаження перекладу скасовано</string>
@@ -90,4 +91,7 @@
     <string name="rb_all_bible">Вся Біблія</string>
     <string name="rb_old_testament">Старий Заповіт</string>
     <string name="rb_new_testament">Новий Заповіт</string>
+    <string name="toast_at_least_three_letters">В поле пошуку повинно бути щонайменше три букви</string>
+    <string name="btn_home">Додому</string>
+    <string name="btn_interpretation">Тлумачення</string>
 </resources>

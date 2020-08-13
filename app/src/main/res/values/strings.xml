@@ -20,6 +20,7 @@
     <string name="tv_have_to_download_bible">Чтобы пользоваться приложением, вам необходимо скачать, как минимум, один из представленных переводов Библии. После того, как перевод загрузится, нажмите на него, и вы перейдёте в окно Библии.</string>
     <string name="tv_notes">Заметки</string>
     <string name="tv_search">Поиск</string>
+    <string name="ed_search">Поиск…</string>
     <string name="tv_daily_verse">Стих дня</string>
     <string name="tv_copy_verse">Копировать</string>
     <string name="tv_highlight_verse">Выделить</string>
@@ -90,4 +91,7 @@
     <string name="rb_all_bible">Вся Библия</string>
     <string name="rb_old_testament">Ветхий Завет</string>
     <string name="rb_new_testament">Новый Завет</string>
+    <string name="toast_at_least_three_letters">В поле поиска должно быть минимум три буквы</string>
+    <string name="btn_home">Домой</string>
+    <string name="btn_interpretation">Толкование</string>
 </resources>

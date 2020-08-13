@@ -12,6 +12,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -48,6 +49,8 @@ import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFrag
 import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.DARK_THEME
 import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.LIGHT_THEME
 import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.THEME_NAME_KEY
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import io.reactivex.Completable
@@ -101,6 +104,14 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: CustomViewPager
 
+    private lateinit var btnFAB: FloatingActionButton
+    private lateinit var appBar: BottomAppBar
+
+    private lateinit var btnHome: LinearLayout
+    private lateinit var btnInterpretation: LinearLayout
+    private lateinit var btnNotes: LinearLayout
+    private lateinit var btnSearch: LinearLayout
+
     private lateinit var articlesInfoDialog: ArticlesInfoDialog
 
     private lateinit var saveLoadData: SaveLoadData
@@ -132,6 +143,21 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         viewPager.offscreenPageLimit = 2 /*ВАЖНО ПОМНИТЬ, ЕСЛИ КОЛИЧЕСТВО ТАБОВ РАСТЁТ, ТО И ЛИМИТ СОХРАНЁННЫХ ФРАГМЕНТОВ НУЖНО ПОВЫШАТЬ
                                            Объяснение вызова этого метода: https://stackoverflow.com/questions/27601920/android-viewpager-with-tabs-save-state, https://developer.android.com/reference/android/support/v4/view/ViewPager#setoffscreenpagelimit*/
         setupViewPager(viewPager)
+
+        btnFAB = findViewById(R.id.btnFAB)
+        appBar = findViewById(R.id.appBar)
+
+        btnHome = findViewById(R.id.btnHome)
+        btnHome.setOnClickListener { }
+
+        btnInterpretation = findViewById(R.id.btnInterpretation)
+        btnInterpretation.setOnClickListener { }
+
+        btnNotes = findViewById(R.id.btnNotes)
+        btnNotes.setOnClickListener { }
+
+        btnSearch = findViewById(R.id.btnSearch)
+        btnSearch.setOnClickListener { }
 
         tabLayout = findViewById(R.id.tabLayout)
         tabLayout.setupWithViewPager(viewPager)
@@ -514,6 +540,38 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
 
     override fun setTabNumber(tabNumber: Int) {
         this.tabNumber = tabNumber
+    }
+
+    override fun setBottomAppBarVisibility(visibility: Int) {
+        val animation1: Animation
+        val animation2: Animation
+        if (visibility == View.VISIBLE) {
+            animation1 = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+            animation2 = AnimationUtils.loadAnimation(this, R.anim.zoom_in_slow)
+        } else {
+            animation1 = AnimationUtils.loadAnimation(this, R.anim.fade_out)
+            animation2 = AnimationUtils.loadAnimation(this, R.anim.zoom_out_slow)
+        }
+        appBar.visibility = visibility
+        appBar.startAnimation(animation1)
+
+        btnFAB.visibility = visibility
+        btnFAB.startAnimation(animation2)
+    }
+
+    //Не используем методы show() и hide(), потому что они тяжёлые, при их срабатывании происходит пролаг
+    override fun setFABVisibility(fabVisibility: Boolean) {
+        if (fabVisibility) {
+            btnFAB.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_in_slow))
+            btnFAB.visibility = View.VISIBLE
+        } else {
+            btnFAB.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out_slow))
+            btnFAB.visibility = View.GONE
+        }
+    }
+
+    override fun getFABVisibility(): Int {
+        return btnFAB.visibility
     }
 
     override fun onStop() {

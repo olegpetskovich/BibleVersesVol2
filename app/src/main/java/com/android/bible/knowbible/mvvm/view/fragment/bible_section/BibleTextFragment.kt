@@ -2,10 +2,15 @@ package com.android.bible.knowbible.mvvm.view.fragment.bible_section
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
@@ -23,6 +28,8 @@ import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -30,7 +37,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.reflect.Field
 
-class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragmentCommunication {
+class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragmentCommunication, ViewPager2Adapter.IBottomAppBarListener {
     companion object {
         const val DATA_TO_RESTORE = "DATA_TO_RESTORE"
     }
@@ -41,7 +48,9 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     private lateinit var saveLoadData: SaveLoadData
     private lateinit var bibleDataViewModel: BibleDataViewModel
 
+
     private lateinit var progressBar: ProgressBar
+
 
     private lateinit var myFragmentManager: FragmentManager
 
@@ -65,7 +74,7 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
 //        bibleDataViewModel.setDatabase() //Вызов этого метода не нужен скорее всего
 
-        progressBar = myView.findViewById(R.id.downloadProgressBar)
+        progressBar = myView.findViewById(R.id.progressBar)
 
         viewPager2 = myView.findViewById(R.id.viewPager2)
 //        viewPager2.offscreenPageLimit = 10 //Потестировать этот метод, чтобы не было мелкого пролага при перелистывании
@@ -80,6 +89,55 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 
         return myView
     }
+
+    //Методы expand и collapse предназанчены для плавного появления и исчезнования вьюшек, пока что не буду удалять, потому что могут понадобиться
+//    private fun expand(v: View) {
+//        val matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
+//        val wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+//        v.measure(matchParentMeasureSpec, wrapContentMeasureSpec)
+//        val targetHeight = v.measuredHeight
+//
+//        // Older versions of android (pre API 21) cancel animations for views with a height of 0.
+//        v.layoutParams.height = 1
+//        v.visibility = View.VISIBLE
+//        val a: Animation = object : Animation() {
+//            override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+//                v.layoutParams.height = if (interpolatedTime == 1f) ViewGroup.LayoutParams.WRAP_CONTENT else (targetHeight * interpolatedTime).toInt()
+//                v.requestLayout()
+//            }
+//
+//            override fun willChangeBounds(): Boolean {
+//                return true
+//            }
+//        }
+//
+//        // Expansion speed of 1dp/ms
+//        a.duration = ((targetHeight / v.context.resources.displayMetrics.density).toLong())
+//        v.startAnimation(a)
+//    }
+//
+//    private fun collapse(v: View) {
+//        val initialHeight = v.measuredHeight
+//        val a: Animation = object : Animation() {
+//            override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+//                if (interpolatedTime == 1f) {
+//                    v.visibility = View.GONE
+//                } else {
+//                    v.layoutParams.height = initialHeight - (initialHeight * interpolatedTime).toInt()
+//                    v.requestLayout()
+//                }
+//            }
+//
+//            override fun willChangeBounds(): Boolean {
+//                return true
+//            }
+//        }
+//
+//        // Collapse speed of 1dp/ms
+//        a.duration = ((initialHeight / v.context.resources.displayMetrics.density).toLong())
+//        v.startAnimation(a)
+//    }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -96,6 +154,9 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         Utility.log("BibleTextFragment: onResume")
         //Включаем свайп для листания глав Библии, отключая при этом свайп для навигации между табами
         swipeListener.setViewPagerSwipeState(false)
+
+        //Показываем BottomAppBar, чтобы он был только в BibleTextFragment
+        listener.setBottomAppBarVisibility(View.VISIBLE)
 
         listener.setTabNumber(1)
         listener.setMyFragmentManager(myFragmentManager)
@@ -129,10 +190,10 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                 setScroll(page, false)
             } else setScroll(page, false)
         } else {
+            //Код для преобразования текстов в БД НИ В КОЕМ СЛУЧАЕ НЕ УДАЛЯТЬ!
 //            bibleDataViewModel
 //                    .getBibleTextOfAllBible(BibleDataViewModel.TABLE_VERSES)
 //                    .observe(viewLifecycleOwner, Observer { allBibleTexts ->
-            //Код для преобразования тексто в БД НИ В КОЕМ СЛУЧАЕ НЕ УДАЛЯТЬ!
 //                        val mainHandler = Handler(context!!.mainLooper)
 //                        val myRunnable = Runnable {
 //                            progressBar.visibility = View.VISIBLE
@@ -152,8 +213,8 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                     .getBibleTextOfBook(BibleDataViewModel.TABLE_VERSES, chapterInfo?.bookNumber!!)
                     .observe(viewLifecycleOwner, Observer { bookTexts ->
 
-
                         vpAdapter = ViewPager2Adapter(context!!, bookTexts, myFragmentManager)
+                        vpAdapter!!.setIBottomAppBarListener(this)
                         vpAdapter!!.setRecyclerViewThemeChangerListener(this)
                         vpAdapter!!.setIFragmentCommunicationListener(this)
 
@@ -195,6 +256,9 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         Utility.log("BibleTextFragment: onPause")
         //Включаем свайп для навигации между табами, отключая при этом свайп для листания глав Библии
         swipeListener.setViewPagerSwipeState(true)
+
+        //Убираем BottomAppBar, чтобы его не было нигде, кроме BibleTextFragment
+        listener.setBottomAppBarVisibility(View.GONE)
 
         val jsonScrollData = saveLoadData.loadString(DATA_TO_RESTORE)
 
@@ -297,5 +361,17 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         dataToRestore.bookNumber = bookNumber
         dataToRestore.chapterNumber = chapterNumber
         dataToRestore.scrollPosition = scrollPosition
+    }
+
+    override fun setBottomAppBarVisibility(isMakeVisible: Boolean) {
+        if (isMakeVisible) {
+            if (listener.getFABVisibility() != View.VISIBLE) {
+                listener.setFABVisibility(true)
+            }
+        } else {
+            if (listener.getFABVisibility() != View.GONE) {
+                listener.setFABVisibility(false)
+            }
+        }
     }
 }

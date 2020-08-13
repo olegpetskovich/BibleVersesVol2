@@ -22,8 +22,8 @@ import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
 import com.android.bible.knowbible.mvvm.view.dialog.VerseDialog
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
-import com.android.bible.knowbible.utility.Utility
 import com.android.bible.knowbible.utility.Utility.Companion.convertDbInPx
+import kotlin.text.StringBuilder
 
 //FragmentManager нужен здесь для открытия диалога
 class BibleTextRVAdapter(private val context: Context, private val models: ArrayList<BibleTextModel>, private val myFragmentManager: FragmentManager) : RecyclerView.Adapter<BibleTextRVAdapter.MyViewHolder>() {
@@ -57,7 +57,6 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
         val verseNumber = models[position].verse_number
 
         //Чтобы установить выделенный цвет, нужно задержать немного время, чтобы устанавливать его тогда, когда адаптер окончательно отобразит все данные, после всех обновлений
-
         if (ThemeManager.theme == ThemeManager.Theme.DARK) {
             holder.tvVerse.setTextColor(ContextCompat.getColor(context, R.color.colorTextDarkTheme))
         } else {
@@ -93,6 +92,10 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
             holder.tvVerseNumber.setTextColor(ContextCompat.getColor(context, R.color.colorGray))
         }
         holder.tvVerseNumber.text = verseNumber.toString()
+
+        //Удаляем пробел в начале текста, если он есть
+        val textSB = StringBuilder(models[position].text)
+        if (textSB[0] == ' ') models[position].text = textSB.deleteCharAt(0).toString()
 
         //switch case для проверки того, какое количество цифр в номере стиха. И в соответствии с этим выставляем нужный отступ  первой строчки для самого текста стиха
         when {
