@@ -145,11 +145,11 @@ class SearchFragment : Fragment(), IChangeFragment, ISelectBibleText {
             }
             Utility.hideKeyboard(activity!!)
 
-            GlobalScope.launch(Dispatchers.Main) {
-                delay(100)
-                //Выводим осуществление запроса в отдельный поток для того, чтобы не стопорить главный
-                val mainHandler = Handler(context!!.mainLooper)
-                val myRunnable = Runnable {
+            val mainHandler = Handler(context!!.mainLooper)
+            val myRunnable = Runnable {
+                GlobalScope.launch(Dispatchers.Main) {
+                    delay(100)
+                                                                                                       //Выводим осуществление запроса в отдельный поток для того, чтобы не стопорить главный
                     bibleDataViewModel                                                                 //Перед отправкой текста для поиска, очищаем его от лишний пробелов, если такие имеются
                                                                                                        //Метод trim() не нужен, потому что пользователь может захотеть найти слово с пробелом до или после него
                             .getSearchedBibleVerses(BibleDataViewModel.TABLE_VERSES, searchingSection, searchText.replace("\\s+".toRegex(), " "))
@@ -165,8 +165,8 @@ class SearchFragment : Fragment(), IChangeFragment, ISelectBibleText {
                                 progressBar.visibility = View.GONE
                             })
                 }
-                mainHandler.post(myRunnable)
             }
+            mainHandler.post(myRunnable)
         }
     }
 

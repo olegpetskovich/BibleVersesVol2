@@ -119,16 +119,8 @@ class DailyVersesListFragment : Fragment(), IThemeChanger, DailyVersesListRVAdap
         else throw RuntimeException("$context must implement IActivityCommunicationListener")
     }
 
-    //Поле для того, чтобы сравнивать какая тема и если тема меняется, то адаптер обновляется
-    private var currentTheme = ThemeManager.theme
     override fun onResume() {
         super.onResume()
-
-        //Обновляем адаптер, чтобы при смене темы все айтемы обновились
-//        if (currentTheme != ThemeManager.theme) {
-//            rvAdapter.notifyDataSetChanged()
-//            currentTheme = ThemeManager.theme
-//        }
 
         listener.setTabNumber(1)
         listener.setMyFragmentManager(myFragmentManager)

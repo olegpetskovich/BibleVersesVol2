@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,7 +34,7 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
     private var mapRV = hashMapOf<Int, RecyclerView>()
 
     interface IBottomAppBarListener {
-        fun setBottomAppBarVisibility(isMakeVisible: Boolean)
+        fun setBottomAppBarFABVisibility(isMakeVisible: Boolean)
     }
 
     private lateinit var bottomAppBarListener: IBottomAppBarListener
@@ -103,10 +102,10 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
                             super.onScrolled(recyclerView, dx, dy)
                             if (dy > 0) {
                                 Utility.log("Scrolled down")
-                                bottomAppBarListener.setBottomAppBarVisibility(false)
+                                bottomAppBarListener.setBottomAppBarFABVisibility(false)
                             } else if (dy < 0) {
                                 Utility.log("Scrolled up")
-                                bottomAppBarListener.setBottomAppBarVisibility(true)
+                                bottomAppBarListener.setBottomAppBarFABVisibility(true)
                             }
                         }
                     })

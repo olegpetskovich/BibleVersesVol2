@@ -2,17 +2,13 @@ package com.android.bible.knowbible.mvvm.view.fragment.bible_section
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.ProgressBar
-import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
@@ -24,12 +20,12 @@ import com.android.bible.knowbible.mvvm.view.activity.MainActivity.Companion.isB
 import com.android.bible.knowbible.mvvm.view.adapter.ViewPager2Adapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
+import com.android.bible.knowbible.mvvm.view.fragment.bible_section.notes_subsection.NotesFragment
+import com.android.bible.knowbible.mvvm.view.fragment.bible_section.search_subsection.SearchFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
-import com.google.android.material.bottomappbar.BottomAppBar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -41,6 +37,10 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     companion object {
         const val DATA_TO_RESTORE = "DATA_TO_RESTORE"
     }
+
+    //Поле нужно в случае, когда была нажата кнопки btnHome в BottomAppBar и нам нужно очистить данные сохранённого скролла,
+    //чтобы при очищении стэка фрагментов не открывался снова BibleTextFragment с ранее сохранёнными данными
+    private var isBtnHomeClicked: Boolean = false
 
     private lateinit var swipeListener: OnViewPagerSwipeStateListener
     private lateinit var listener: IActivityCommunicationListener
@@ -68,6 +68,8 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         val myView: View = inflater.inflate(R.layout.fragment_bible_text, container, false)
         Utility.log("BibleTextFragment: onCreateView")
         listener.setTheme(ThemeManager.theme, false) //Если не устанавливать тему каждый раз при открытии фрагмента, то по какой-то причине внешний вид View не обновляется, поэтому на данный момент только такой решение
+
+        listener.setBibleTextFragment(this)
 
         saveLoadData = SaveLoadData(context!!)
 
@@ -162,17 +164,13 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         listener.setMyFragmentManager(myFragmentManager)
         listener.setIsBackStackNotEmpty(true)
 
-        //Оповещаем Activity, что BibleTextFragment открыт и видимости пользователя, чтобы,
-
         //Аннулируем здесь значение переменной isBackButtonClicked, потому что оно может установиться на true при нажатии кнопки "Назад" в других фрагментах
         //и при закрытии приложения через диспетчер задач данные сохраненного скролла всё равно будут стёрты,
         //потому что вызовется onPause, совершится проверка на то, была ли нажата кнопка назад и если там будет true, то данные скролла очистятся.
         //Ориентируясь на значение этой переменной, нужно очищать данные скролла только тогда,
-        //когда кнопка "Назад" была нажата именно в открытом BibleTextFragment в табе "Библия", а не в каком-то другом табе(по этой причине здесь и присваивается ей значение true)
+        //когда кнопка "Назад" была нажата именно в открытом BibleTextFragment в табе "Библия", а не в каком-то другом табе(по этой причине здесь и присваивается ей значение false)
         //Потому что пользователь может нажать кнопку "Назад" в табе "Статьи", а данные сохранённого скролла Библии всё равно очистаться,
-        //хотя пользователь этого естественно не хотел. Также, очищать данные сохранённого скролла нужно в Activity в методе onBackPressed,
-        //потому что даже если данные будут очищаться в onDestroy BibleTextFragment, а кнопка "Назад" будет нажата, опять же, в другом табе "Статьи",
-        //то onDestroy BibleTextFragment(а) всё равно сработает, и данные сохранённого скролла всё равно очистяться, без желания пользователя.
+        //хотя пользователь этого естественно не хотел(Потому что этот фрагмент может быть открыт в фоне, если юзер его открыл и перешёл в другой таб).
         //Надеюсь, логика понятна... Вибачайте, якшо по молдавському
         isBackButtonClicked = false
 
@@ -259,6 +257,10 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 
         //Убираем BottomAppBar, чтобы его не было нигде, кроме BibleTextFragment
         listener.setBottomAppBarVisibility(View.GONE)
+
+        //Если нажата кнопка btnHome, очищающая стэк фрагментов, то просто выходим из этого метода,
+        //не выполняя дальнейший код, потому что данные сохранённого стэка уже очищены в методе btnHomeClicked()
+        if (isBtnHomeClicked) return
 
         val jsonScrollData = saveLoadData.loadString(DATA_TO_RESTORE)
 
@@ -363,15 +365,50 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         dataToRestore.scrollPosition = scrollPosition
     }
 
-    override fun setBottomAppBarVisibility(isMakeVisible: Boolean) {
+    override fun setBottomAppBarFABVisibility(isMakeVisible: Boolean) {
         if (isMakeVisible) {
-            if (listener.getFABVisibility() != View.VISIBLE) {
+            if (!listener.isFabShown()) {
                 listener.setFABVisibility(true)
             }
         } else {
-            if (listener.getFABVisibility() != View.GONE) {
+            if (listener.isFabShown()) {
                 listener.setFABVisibility(false)
             }
         }
+    }
+
+    fun btnHomeClicked() {
+        isBtnHomeClicked = true
+
+        //Очищаем сохранённые данные скролла, чтобы при очищении стэка вновь не открывался BibleTextFragment с ранее сохранёнными данными скрола
+        saveLoadData.saveString(DATA_TO_RESTORE, Gson().toJson(DataToRestoreModel(-1, -1, -1)))
+
+        myFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    }
+
+    fun btnInterpretationClicked() {
+
+    }
+
+    fun btnNotesClicked() {
+        val transaction: FragmentTransaction = myFragmentManager.beginTransaction()
+        transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+
+        val notesFragment = NotesFragment()
+        notesFragment.setRootFragmentManager(myFragmentManager)
+        transaction.replace(R.id.fragment_container_bible, notesFragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
+
+    fun btnSearchClicked() {
+        val transaction: FragmentTransaction = myFragmentManager.beginTransaction()
+        transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+
+        val searchFragment = SearchFragment()
+        searchFragment.setRootFragmentManager(myFragmentManager)
+        transaction.replace(R.id.fragment_container_bible, searchFragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 }

@@ -29,13 +29,18 @@ import com.android.bible.knowbible.mvvm.view.adapter.BibleTranslationsRVAdapter
 import com.android.bible.knowbible.mvvm.view.adapter.ViewPagerAdapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
-import com.android.bible.knowbible.mvvm.view.fragment.bible_section.notes_subsection.AddEditNoteFragment
 import com.android.bible.knowbible.mvvm.view.dialog.ArticlesInfoDialog
 import com.android.bible.knowbible.mvvm.view.fragment.articles_section.ArticlesRootFragment
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleRootFragment
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTextFragment
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTranslationsFragment
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTranslationsFragment.Companion.TRANSLATION_DB_FILE_JSON_INFO
+import com.android.bible.knowbible.mvvm.view.fragment.bible_section.notes_subsection.AddEditNoteFragment
+import com.android.bible.knowbible.mvvm.view.fragment.more_section.AppLanguageFragment
+import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.BOOK_THEME
+import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.DARK_THEME
+import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.LIGHT_THEME
+import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.THEME_NAME_KEY
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.CustomViewPager
@@ -43,12 +48,7 @@ import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
 import com.android.bible.knowbible.utility.Utility.Companion.convertDbInPx
 import com.android.bible.knowbible.utility.Utility.Companion.viewAnimatorX
-import com.android.bible.knowbible.mvvm.view.fragment.more_section.AppLanguageFragment
 import com.apps.oleg.bibleverses.mvvm.view.fragment.more_section.MoreRootFragment
-import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.BOOK_THEME
-import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.DARK_THEME
-import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.LIGHT_THEME
-import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.THEME_NAME_KEY
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
@@ -61,32 +61,32 @@ import java.util.*
 
 class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStateListener, IActivityCommunicationListener, AppLanguageFragment.IAppLanguageChangerListener, DialogListener {
     /* ОБЪЯСНЕНИЕ НАЛИЧИЯ ЭТОГО КОДА.
-    *       Изначально проблема заключалась в том, что для всех фрагментов, даже если они расположены в отдельных табах, по умолчанию идёт один backStack.
-    * То есть, если, к примеру, в первом табе перейти из Фрагмент1 в Фрагмент2, добавив при этом Фрагмент2 в backStack(методом addToBackStack(null)),
-    * а потом перейти во второй таб и нажать кнопку "Назад"(при этом предполагая, что по логике приложение закроется),
-    * то приложение не закроется, но вместо этого из backStack будет удалён Фрагмент2, и если мы перейдём обратно в первый таб, то увидим, что Фрагмент2 закрыт.
-    * Другими словами, в первом табе мы перешли из Фрагмент1 в Фрагмент2, затем открыли второй таб, нажимаем кнопку "Назад", визуально перед пользователем ничего не происходит
-    * (а в действительности в первом табе закрывается Фрагмент2, но пользователь этого не видит, потому что перед ним открыт второй таб)
-    * и чтобы всё же закрыть приложение, нужно снова нажать кнопку "Назад".
-    *       Решением этой проблемы стала реализация отдельного backStack для каждого таба, но реализовано это с некоторыми нюансами.
-    * Сделано это вот каким образом: в каждом табе сделан первичный главный Фрагмент(RootFragment), и вместо того,
-    * чтобы во всех фрагментах использовать общий FragmentManager(как это обычно делается), в данном случае в главном фрагмент каждого отдельного таба вызывается метод childFragmentManager.
-    * Этот childFragmentManager в дальнейшем передаётся во всех последующие фрагменты, которые содержаться в главном фрагменте.
-    * И когда в каждом отдельном табе используется свой childFragmentManager, то и backStack у каждого свой, потому что backStack мы получаем из childFragmentManager.
-    * Но в этом решении есть нюанс — по непонятной причине, вызывая addToBackStack(null) фрагменты добавляются в backStack, но, нажимая кнопку "Назад",
-    * фрагменты не закрываются по тому порядку, в котором они находятся в backStack, вместо этого приложение вовсе закрывается.
-    * И чтобы решить эту проблему, пришлось использовать static поля и переопределять метод onBackPressed() в данном активити.
-    * Поле var isBackStackNotEmpty: Boolean нужно для того, чтобы указать, есть ли фрагменты в backStack или их нет. Значение в это поле устанавливается в каждом фрагменте.
-    * Указывается оно в методе фрагмента onResume() (Ни в каком другом, потому что onResume() вызывается сразу как открывается таб,
-    * а нам как раз нужно устанавливать значение каждого таба как только он открыт, потому что onCreate, к примеру, срабатывает только при создании фрагмента, а не при каждом его открытии).
-    * Если backStack пустой, то при нажатии "Назад" приложение закроется, если же backStack содержит фрагменты, то сработает код с использованием поля var myFragmentManager: FragmentManager.
-    * Поле var myFragmentManager: FragmentManager нужно для того, чтобы присваивать ему childFragmentManager каждого отдельного RootFragment и таким образом очищать стэк в каждом табе поотдельности.
-    * В конечном итоге логика работы такова: мы устанавливаем значение true в поле var isBackStackNotEmpty: Boolean в фрагменте,
-    * который нужно удалить из backStack, закрывая его кнопкной "Назад" и присваиваем в поле myFragmentManager тот childFragmentManager, в фрагментах которого мы находимся.
-    * В override методе onBackPressed() присходит проверка: если isBackStackNotEmpty true,
-    * то вызывается метод удаления фрагмента из backStack. А вызывается метод удаления фрагмента в том childFragmentManager, который отправлен в поле myFragmentManager.
-    * Если же isBackStackNotEmpty == false, то срабатывает стандартный код системного метода onBackPressed() и приложение просто закрывается.
-    * Это единственный удобный способ без кучи кода, который я сам и придумал, перерыв до этого весь интернет по этому вопросу, официальной версии решения этого вопроса нет.*/
+        *       Изначально проблема заключалась в том, что для всех фрагментов, даже если они расположены в отдельных табах, по умолчанию идёт один backStack.
+        * То есть, если, к примеру, в первом табе перейти из Фрагмент1 в Фрагмент2, добавив при этом Фрагмент2 в backStack(методом addToBackStack(null)),
+        * а потом перейти во второй таб и нажать кнопку "Назад"(при этом предполагая, что по логике приложение закроется),
+        * то приложение не закроется, но вместо этого из backStack будет удалён Фрагмент2, и если мы перейдём обратно в первый таб, то увидим, что Фрагмент2 закрыт.
+        * Другими словами, в первом табе мы перешли из Фрагмент1 в Фрагмент2, затем открыли второй таб, нажимаем кнопку "Назад", визуально перед пользователем ничего не происходит
+        * (а в действительности в первом табе закрывается Фрагмент2, но пользователь этого не видит, потому что перед ним открыт второй таб)
+        * и чтобы всё же закрыть приложение, нужно снова нажать кнопку "Назад".
+        *       Решением этой проблемы стала реализация отдельного backStack для каждого таба, но реализовано это с некоторыми нюансами.
+        * Сделано это вот каким образом: в каждом табе сделан первичный главный Фрагмент(RootFragment), и вместо того,
+        * чтобы во всех фрагментах использовать общий FragmentManager(как это обычно делается), в данном случае в главном фрагмент каждого отдельного таба вызывается метод childFragmentManager.
+        * Этот childFragmentManager в дальнейшем передаётся во всех последующие фрагменты, которые содержаться в главном фрагменте.
+        * И когда в каждом отдельном табе используется свой childFragmentManager, то и backStack у каждого свой, потому что backStack мы получаем из childFragmentManager.
+        * Но в этом решении есть нюанс — по непонятной причине, вызывая addToBackStack(null) фрагменты добавляются в backStack, но, нажимая кнопку "Назад",
+        * фрагменты не закрываются по тому порядку, в котором они находятся в backStack, вместо этого приложение вовсе закрывается.
+        * И чтобы решить эту проблему, пришлось использовать static поля и переопределять метод onBackPressed() в данном активити.
+        * Поле var isBackStackNotEmpty: Boolean нужно для того, чтобы указать, есть ли фрагменты в backStack или их нет. Значение в это поле устанавливается в каждом фрагменте.
+        * Указывается оно в методе фрагмента onResume() (Ни в каком другом, потому что onResume() вызывается сразу как открывается таб,
+        * а нам как раз нужно устанавливать значение каждого таба как только он открыт, потому что onCreate, к примеру, срабатывает только при создании фрагмента, а не при каждом его открытии).
+        * Если backStack пустой, то при нажатии "Назад" приложение закроется, если же backStack содержит фрагменты, то сработает код с использованием поля var myFragmentManager: FragmentManager.
+        * Поле var myFragmentManager: FragmentManager нужно для того, чтобы присваивать ему childFragmentManager каждого отдельного RootFragment и таким образом очищать стэк в каждом табе поотдельности.
+        * В конечном итоге логика работы такова: мы устанавливаем значение true в поле var isBackStackNotEmpty: Boolean в фрагменте,
+        * который нужно удалить из backStack, закрывая его кнопкной "Назад" и присваиваем в поле myFragmentManager тот childFragmentManager, в фрагментах которого мы находимся.
+        * В override методе onBackPressed() присходит проверка: если isBackStackNotEmpty true,
+        * то вызывается метод удаления фрагмента из backStack. А вызывается метод удаления фрагмента в том childFragmentManager, который отправлен в поле myFragmentManager.
+        * Если же isBackStackNotEmpty == false, то срабатывает стандартный код системного метода onBackPressed() и приложение просто закрывается.
+        * Это единственный удобный способ без кучи кода, который я сам и придумал, перерыв до этого весь интернет по этому вопросу, официальной версии решения этого вопроса нет.*/
     private var isBackStackNotEmpty: Boolean = false
     private lateinit var myFragmentManager: FragmentManager
     private var isTranslationDownloaded: Boolean = true //Поле сугубо для BibleLanguageFragment, которое нужно, чтобы указывать скачан перевод или нет. Если не скачан, то при нажатии кнопки назад приложение закрывается, если же перевод есть, то при нажатии назад будет открыт предыдущий фрагмент.
@@ -103,6 +103,8 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
     private lateinit var toolbar: Toolbar
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: CustomViewPager
+
+    private lateinit var bibleTextFragment: BibleTextFragment //Объект необходим для управления BottomAppBar в BibleTextFragment
 
     private lateinit var btnFAB: FloatingActionButton
     private lateinit var appBar: BottomAppBar
@@ -144,20 +146,20 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
                                            Объяснение вызова этого метода: https://stackoverflow.com/questions/27601920/android-viewpager-with-tabs-save-state, https://developer.android.com/reference/android/support/v4/view/ViewPager#setoffscreenpagelimit*/
         setupViewPager(viewPager)
 
-        btnFAB = findViewById(R.id.btnFAB)
         appBar = findViewById(R.id.appBar)
+        btnFAB = findViewById(R.id.btnFAB)
 
         btnHome = findViewById(R.id.btnHome)
-        btnHome.setOnClickListener { }
+        btnHome.setOnClickListener { bibleTextFragment.btnHomeClicked() }
 
         btnInterpretation = findViewById(R.id.btnInterpretation)
         btnInterpretation.setOnClickListener { }
 
         btnNotes = findViewById(R.id.btnNotes)
-        btnNotes.setOnClickListener { }
+        btnNotes.setOnClickListener { bibleTextFragment.btnNotesClicked() }
 
         btnSearch = findViewById(R.id.btnSearch)
-        btnSearch.setOnClickListener { }
+        btnSearch.setOnClickListener { bibleTextFragment.btnSearchClicked() }
 
         tabLayout = findViewById(R.id.tabLayout)
         tabLayout.setupWithViewPager(viewPager)
@@ -542,36 +544,35 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         this.tabNumber = tabNumber
     }
 
-    override fun setBottomAppBarVisibility(visibility: Int) {
-        val animation1: Animation
-        val animation2: Animation
-        if (visibility == View.VISIBLE) {
-            animation1 = AnimationUtils.loadAnimation(this, R.anim.fade_in)
-            animation2 = AnimationUtils.loadAnimation(this, R.anim.zoom_in_slow)
-        } else {
-            animation1 = AnimationUtils.loadAnimation(this, R.anim.fade_out)
-            animation2 = AnimationUtils.loadAnimation(this, R.anim.zoom_out_slow)
-        }
-        appBar.visibility = visibility
-        appBar.startAnimation(animation1)
-
-        btnFAB.visibility = visibility
-        btnFAB.startAnimation(animation2)
+    override fun setBibleTextFragment(bibleTextFragment: BibleTextFragment) {
+        this.bibleTextFragment = bibleTextFragment
     }
 
-    //Не используем методы show() и hide(), потому что они тяжёлые, при их срабатывании происходит пролаг
+    override fun setBottomAppBarVisibility(visibility: Int) {
+        if (visibility == View.VISIBLE) {
+            appBar.visibility = visibility
+            appBar.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in))
+
+            btnFAB.show()
+        } else {
+            appBar.visibility = visibility
+            appBar.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out))
+
+            btnFAB.hide()
+        }
+    }
+
+    //Метод для установления видимости во время скрола списка
     override fun setFABVisibility(fabVisibility: Boolean) {
         if (fabVisibility) {
-            btnFAB.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_in_slow))
-            btnFAB.visibility = View.VISIBLE
+            btnFAB.show()
         } else {
-            btnFAB.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out_slow))
-            btnFAB.visibility = View.GONE
+            btnFAB.hide()
         }
     }
 
-    override fun getFABVisibility(): Int {
-        return btnFAB.visibility
+    override fun isFabShown(): Boolean {
+        return btnFAB.isShown
     }
 
     override fun onStop() {
