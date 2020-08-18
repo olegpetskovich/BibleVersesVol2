@@ -86,8 +86,23 @@
     <color name="colorBackgroundLightTheme">#FFFFFF</color>
     <color name="colorBackgroundBookTheme">#C59342</color>
 
+    <!-- Multi Selection Background color -->
+    <color name="colorMultiSelectionBackgroundDarkTheme">#3E4E5E</color>
+    <color name="colorMultiSelectionBackgroundLightTheme">#CCECFF</color>
+    <color name="colorMultiSelectionBackgroundBookTheme">#C59342</color>
+
     <!-- Button "Apply" color -->
     <color name="colorButtonApplyLightTheme">#006EFF</color>
     <color name="colorButtonApplyDarkTheme">#22526b</color>
     <color name="colorButtonApplyBookTheme">#a66a41</color>
+
+    <!-- FAB background color -->
+    <color name="colorBackgroundFABDarkTheme">#006EFF</color>
+    <color name="colorBackgroundFABLightTheme">#006EFF</color>
+    <color name="colorBackgroundFABBookTheme">#181818</color>
+
+    <!-- FAB icon color -->
+    <color name="colorIconFABDarkTheme">#FFFFFF</color>
+    <color name="colorIconFABLightTheme">#FFFFFF</color>
+    <color name="colorIconFABBookTheme">#C59342</color>
 </resources>

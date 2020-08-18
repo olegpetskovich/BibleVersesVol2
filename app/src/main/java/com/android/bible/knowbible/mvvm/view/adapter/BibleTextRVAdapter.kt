@@ -1,10 +1,14 @@
 package com.android.bible.knowbible.mvvm.view.adapter
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.text.SpannableString
 import android.text.style.LeadingMarginSpan
 import android.view.LayoutInflater
@@ -22,12 +26,15 @@ import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
 import com.android.bible.knowbible.mvvm.view.dialog.VerseDialog
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
+import com.android.bible.knowbible.utility.Utility
 import com.android.bible.knowbible.utility.Utility.Companion.convertDbInPx
-import kotlin.text.StringBuilder
+
 
 //FragmentManager нужен здесь для открытия диалога
 class BibleTextRVAdapter(private val context: Context, private val models: ArrayList<BibleTextModel>, private val myFragmentManager: FragmentManager) : RecyclerView.Adapter<BibleTextRVAdapter.MyViewHolder>() {
     private var verseDialog: VerseDialog? = null
+
+    private var isMultiSelectionEnabled: Boolean = false
 
     private lateinit var fragmentChanger: IChangeFragment
     fun setFragmentChangerListener(fragmentChanger: IChangeFragment) {
@@ -97,7 +104,7 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
         val textSB = StringBuilder(models[position].text)
         if (textSB[0] == ' ') models[position].text = textSB.deleteCharAt(0).toString()
 
-        //switch case для проверки того, какое количество цифр в номере стиха. И в соответствии с этим выставляем нужный отступ  первой строчки для самого текста стиха
+        //switch case для проверки того, какое количество цифр в номере стиха. И в соответствии с этим выставляем нужный отступ первой строчки для самого текста стиха
         when {
             verseNumber < 10 -> {
                 holder.tvVerse.text = createIndentedText(models[position].text, convertDbInPx(context, 10f).toInt(), 0)
@@ -107,6 +114,20 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
             }
             else -> {
                 holder.tvVerse.text = createIndentedText(models[position].text, convertDbInPx(context, 20f).toInt(), 0)
+            }
+        }
+
+        //Этот блок кода необходим для того, чтобы при выборе нескольких айтемов, цвет фона менялся только в выбранных айтемах после срабатывания метода onBindViewHolder
+        //Цвет фона меняется в соответствии с выбранной темы
+        when (ThemeManager.theme) {
+            ThemeManager.Theme.LIGHT -> {
+                holder.itemView.setBackgroundColor(if (models[position].isTextSelected) ContextCompat.getColor(context, R.color.colorMultiSelectionBackgroundLightTheme) else ContextCompat.getColor(context, R.color.colorBackgroundLightTheme))
+            }
+            ThemeManager.Theme.DARK -> {
+                holder.itemView.setBackgroundColor(if (models[position].isTextSelected) ContextCompat.getColor(context, R.color.colorMultiSelectionBackgroundDarkTheme) else ContextCompat.getColor(context, R.color.colorBackgroundDarkTheme))
+            }
+            ThemeManager.Theme.BOOK -> {
+                holder.itemView.setBackgroundColor(if (models[position].isTextSelected) ContextCompat.getColor(context, R.color.colorMultiSelectionBackgroundBookTheme) else ContextCompat.getColor(context, android.R.color.transparent))
             }
         }
     }
@@ -139,14 +160,88 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
         init {
             themeChanger.changeItemTheme() //Смена темы для айтемов
 
-            itemView.setOnClickListener {
-                selectedItem = adapterPosition
+            val vb = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
 
-                verseDialog = VerseDialog(this)
-                verseDialog!!.setVerseData(models[adapterPosition])
-                verseDialog!!.setFragmentManager(myFragmentManager)
-                verseDialog!!.show(myFragmentManager, "Verse Dialog") //Тут должен быть именно childFragmentManager
+
+            itemView.setOnLongClickListener {
+                //Если режим Multi selection уже выбран, то выходим из метода
+                if (isMultiSelectionEnabled) return@setOnLongClickListener true
+
+                //При зажатии айтема делаем короткую вибрацию, говорящую об активации режима мульти выбора айтемов(выделение нескольких текстов Библии)
+                val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) vibrator.vibrate(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE))
+                else vibrator.vibrate(30)
+
+                isMultiSelectionEnabled = true //Включаем режим MultiSelection
+
+                changeBackgroundOfSelectedItem(itemView)
+
+                Utility.log("Long click listener worked")
+                return@setOnLongClickListener true
             }
+
+            itemView.setOnClickListener {
+                if (isMultiSelectionEnabled) {
+                    changeBackgroundOfSelectedItem(itemView)
+                } else {
+                    selectedItem = adapterPosition
+
+                    verseDialog = VerseDialog(this)
+                    verseDialog!!.setVerseData(models[adapterPosition])
+                    verseDialog!!.setFragmentManager(myFragmentManager)
+                    verseDialog!!.show(myFragmentManager, "Verse Dialog") //Тут должен быть именно childFragmentManager
+                }
+            }
+        }
+
+        private fun changeBackgroundOfSelectedItem(itemView: View) {
+            val from: Int
+            val to: Int
+
+            if (!models[adapterPosition].isTextSelected) {
+                models[adapterPosition].isTextSelected = true
+
+                when (ThemeManager.theme) {
+                    ThemeManager.Theme.LIGHT -> {
+                        from = ContextCompat.getColor(context, R.color.colorBackgroundLightTheme)
+                        to = ContextCompat.getColor(context, R.color.colorMultiSelectionBackgroundLightTheme)
+                    }
+                    ThemeManager.Theme.DARK -> {
+                        from = ContextCompat.getColor(context, R.color.colorBackgroundDarkTheme)
+                        to = ContextCompat.getColor(context, R.color.colorMultiSelectionBackgroundDarkTheme)
+                    }
+                    ThemeManager.Theme.BOOK -> {
+                        from = ContextCompat.getColor(context, android.R.color.transparent)
+                        to = ContextCompat.getColor(context, R.color.colorMultiSelectionBackgroundBookTheme)
+                    }
+                }
+
+            } else {
+                models[adapterPosition].isTextSelected = false
+
+                when (ThemeManager.theme) {
+                    ThemeManager.Theme.LIGHT -> {
+                        from = ContextCompat.getColor(context, R.color.colorMultiSelectionBackgroundLightTheme)
+                        to = ContextCompat.getColor(context, R.color.colorBackgroundLightTheme)
+                    }
+                    ThemeManager.Theme.DARK -> {
+                        from = ContextCompat.getColor(context, R.color.colorMultiSelectionBackgroundDarkTheme)
+                        to = ContextCompat.getColor(context, R.color.colorBackgroundDarkTheme)
+                    }
+                    ThemeManager.Theme.BOOK -> {
+                        from = ContextCompat.getColor(context, R.color.colorMultiSelectionBackgroundBookTheme)
+                        to = ContextCompat.getColor(context, android.R.color.transparent)
+                    }
+                }
+            }
+
+            val anim = ValueAnimator()
+            anim.setIntValues(from, to)
+            anim.setEvaluator(ArgbEvaluator())
+            anim.addUpdateListener { valueAnimator -> itemView.setBackgroundColor(valueAnimator.animatedValue as Int) }
+
+            anim.duration = 300
+            anim.start()
         }
 
         fun clearAnimation() {

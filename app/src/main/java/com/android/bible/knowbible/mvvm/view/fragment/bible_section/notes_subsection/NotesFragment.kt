@@ -21,7 +21,6 @@ import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlin.collections.ArrayList
 
 class NotesFragment : Fragment(), IThemeChanger, IChangeFragment {
     lateinit var myFragmentManager: FragmentManager
@@ -52,6 +51,14 @@ class NotesFragment : Fragment(), IThemeChanger, IChangeFragment {
                 .subscribe { listData ->
                     recyclerView = myView.findViewById(R.id.recyclerView)
                     recyclerView.layoutManager = LinearLayoutManager(context)
+                    recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            //Если скролл вниз, то FAB скрывается, если вверх, то появляется
+                            if (dy > 0) listener.setShowHideAddNoteButton(View.GONE)
+                            else listener.setShowHideAddNoteButton(View.VISIBLE)
+                            super.onScrolled(recyclerView, dx, dy)
+                        }
+                    })
 
                     listData.reverse() //Переворачиваем коллекцию, чтобы самые новые заметки были сверху
                     notesList = listData

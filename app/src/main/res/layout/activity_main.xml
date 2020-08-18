@@ -89,20 +89,7 @@
                     app:iconPadding="-8dp"
                     app:iconSize="17dp" />
 
-                <!-- Не менять расположение кнопок btnAddNote btnDeleteNote btnDeleteNote -->
-                <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
-                    android:id="@+id/btnAddNote"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="14dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:src="@drawable/ic_add_note"
-                    android:visibility="invisible" />
-
+                <!-- Не менять расположение кнопок btnDeleteNote и btnArticlesInfo -->
                 <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
                     android:id="@+id/btnDeleteNote"
                     android:layout_width="36dp"
@@ -154,8 +141,9 @@
         android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <com.google.android.material.bottomappbar.BottomAppBar
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyBottomAppBarLayout
         android:id="@+id/appBar"
+        style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -194,13 +182,13 @@
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp">
 
-                    <ImageView
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center_horizontal"
                         android:src="@drawable/ic_home" />
 
-                    <TextView
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
@@ -221,13 +209,13 @@
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp">
 
-                    <ImageView
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center_horizontal"
                         android:src="@drawable/ic_interpretation" />
 
-                    <TextView
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
@@ -257,13 +245,13 @@
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp">
 
-                    <ImageView
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center_horizontal"
                         android:src="@drawable/ic_write_note" />
 
-                    <TextView
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
@@ -284,13 +272,13 @@
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp">
 
-                    <ImageView
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center_horizontal"
                         android:src="@drawable/ic_search_2" />
 
-                    <TextView
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
@@ -299,9 +287,9 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-    </com.google.android.material.bottomappbar.BottomAppBar>
+    </com.android.bible.knowbible.mvvm.view.theme_editor.MyBottomAppBarLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
         android:id="@+id/btnFAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -310,5 +298,17 @@
         app:backgroundTint="@color/colorPrimary"
         app:fabSize="mini"
         app:layout_anchor="@id/appBar"
+        app:tint="@android:color/white" />
+
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
+        android:id="@+id/btnAddNoteFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:src="@drawable/ic_add_note"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorPrimary"
+        app:maxImageSize="30dp"
         app:tint="@android:color/white" />
 </com.android.bible.knowbible.mvvm.view.theme_editor.MyCoordinatorLayout>

@@ -21,7 +21,7 @@ interface IActivityCommunicationListener {
     fun setNoteIdForDelete(noteId: Int)
 
     fun setShowHideArticlesInfoButton(articlesInfoBtnVisibility: Int)
-    fun setShowHideAddNoteButton(addNoteBtnVisibility: Int)
+    fun setShowHideAddNoteButton(addNoteFABBtnVisibility: Int)
     fun setShowHideDeleteNoteButton(deleteNoteBtnVisibility: Int)
 
     fun updateTabIconAndTextColor()

@@ -83,6 +83,18 @@ object ThemeManager {
             val backgroundColor: Int
     )
 
+    data class BottomAppBarTheme(
+            @ColorRes
+            val backgroundColor: Int
+    )
+
+    data class FloatingActionButtonTheme(
+            @ColorRes
+            val backgroundColor: Int,
+            @ColorRes
+            val iconColor: Int
+    )
+
     enum class Theme(
             val iconTheme: IconTheme,
             val buttonTheme: ButtonTheme,
@@ -92,7 +104,9 @@ object ThemeManager {
             val editTextTheme: EditTextTheme,
             val radioButtonTheme: RadioButtonTheme,
             val toolbarTheme: ToolbarTheme,
-            val viewLineTheme: ViewLineTheme
+            val viewLineTheme: ViewLineTheme,
+            val bottomAppBarTheme: BottomAppBarTheme,
+            val floatingActionButtonTheme: FloatingActionButtonTheme
     ) {
         DARK(
                 iconTheme = IconTheme(
@@ -132,6 +146,13 @@ object ThemeManager {
                 ),
                 viewLineTheme = ViewLineTheme(
                         backgroundColor = R.color.colorLineDarkTheme
+                ),
+                bottomAppBarTheme = BottomAppBarTheme(
+                        backgroundColor = R.color.colorBackgroundDarkTheme
+                ),
+                floatingActionButtonTheme = FloatingActionButtonTheme(
+                        backgroundColor = R.color.colorBackgroundFABDarkTheme,
+                        iconColor = R.color.colorIconFABDarkTheme
                 )
         ),
         LIGHT(
@@ -172,6 +193,13 @@ object ThemeManager {
                 ),
                 viewLineTheme = ViewLineTheme(
                         backgroundColor = R.color.colorLineLightTheme
+                ),
+                bottomAppBarTheme = BottomAppBarTheme(
+                        backgroundColor = R.color.colorBackgroundLightTheme
+                ),
+                floatingActionButtonTheme = FloatingActionButtonTheme(
+                        backgroundColor = R.color.colorBackgroundFABLightTheme,
+                        iconColor = R.color.colorIconFABLightTheme
                 )
         ),
         BOOK(
@@ -212,6 +240,13 @@ object ThemeManager {
                 ),
                 viewLineTheme = ViewLineTheme(
                         backgroundColor = R.color.colorLineBookTheme
+                ),
+                bottomAppBarTheme = BottomAppBarTheme(
+                        backgroundColor = R.color.colorBackgroundBookTheme
+                ),
+                floatingActionButtonTheme = FloatingActionButtonTheme(
+                        backgroundColor = R.color.colorBackgroundFABBookTheme,
+                        iconColor = R.color.colorIconFABBookTheme
                 )
         )
     }

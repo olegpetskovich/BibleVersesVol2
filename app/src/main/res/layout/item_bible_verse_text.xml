@@ -3,10 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:layout_marginTop="2dp"
-    android:layout_marginStart="10dp"
-    android:layout_marginEnd="10dp">
+    android:paddingTop="2dp"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp">
 
     <TextView
         android:id="@+id/tvVerseNumber"
@@ -24,6 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
+        android:layerType="software"
         android:lineSpacingExtra="6dp"
         android:textSize="18sp"
         tools:text="В начале Бог сотворил небо и землю. Земля же была безвидна и пуста, и тьма над бездною." />

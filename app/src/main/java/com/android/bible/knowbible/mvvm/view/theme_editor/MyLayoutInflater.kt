@@ -24,6 +24,8 @@ class MyLayoutInflater(private val delegate: AppCompatDelegate) : LayoutInflater
             "RelativeLayout" -> MyRelativeLayout(context, attrs)
             "NestedScrollView" -> MyNestedScrollViewLayout(context, attrs)
             "AppBarLayout" -> MyAppBarLayout(context, attrs)
+            "FloatingActionButton" -> MyFloatingActionButton(context, attrs)
+            "BottomAppBar" -> MyBottomAppBarLayout(context, attrs)
             "Toolbar" -> MyToolbar(context, attrs)
             "EditText" -> MyEditText(context, attrs)
             "TabLayout" -> MyTabLayout(context, attrs)

@@ -176,7 +176,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             transaction.commit()
         }
 
-        btnAddNote.setOnClickListener {
+        btnAddNoteFAB.setOnClickListener {
             val fragment = AddEditNoteFragment()
             fragment.isNoteToAdd = true
             fragment.setRootFragmentManager(myFragmentManager)
@@ -316,26 +316,26 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         btnArticlesInfo.startAnimation(animation)
     }
 
-    override fun setShowHideAddNoteButton(addNoteBtnVisibility: Int) {
-        //Этот фрагмент кода нужен, чтобы btnAddNote не анимировался каждый раз при переходе между табами.
+    override fun setShowHideAddNoteButton(addNoteFABBtnVisibility: Int) {
+        //Этот фрагмент кода нужен, чтобы btnAddNoteFAB не анимировался каждый раз при переходе между табами.
         //Если в одном табе установлена видимость такая же, как и в другом, то всё остаётся на своих местах и ничего не анимируется.
         //Анимирование происходит только в случае, когда значение btnSelectTranslationVisibility меняется
-        val btnAddNoteVisibility = btnAddNote.visibility
-        if (btnAddNoteVisibility == addNoteBtnVisibility) {
+        val btnAddNoteFABVisibility = btnAddNoteFAB.visibility
+        if (btnAddNoteFABVisibility == addNoteFABBtnVisibility) {
             return
         }
 
         val animation: Animation?
-        if (addNoteBtnVisibility == View.VISIBLE) {
-            btnAddNote.visibility = View.VISIBLE
-            btnAddNote.isEnabled = true
+        if (addNoteFABBtnVisibility == View.VISIBLE) {
+            btnAddNoteFAB.visibility = View.VISIBLE
+            btnAddNoteFAB.isEnabled = true
             animation = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
         } else {
-            btnAddNote.visibility = View.GONE
-            btnAddNote.isEnabled = false //Нужно отключать кнопку, потому что в противном случае по какой-то причине кнопка продолжает нажиматься даже с видимостью GONE
+            btnAddNoteFAB.visibility = View.GONE
+            btnAddNoteFAB.isEnabled = false //Нужно отключать кнопку, потому что в противном случае по какой-то причине кнопка продолжает нажиматься даже с видимостью GONE
             animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
         }
-        btnAddNote.startAnimation(animation)
+        btnAddNoteFAB.startAnimation(animation)
     }
 
     override fun setShowHideDeleteNoteButton(deleteNoteBtnVisibility: Int) {
