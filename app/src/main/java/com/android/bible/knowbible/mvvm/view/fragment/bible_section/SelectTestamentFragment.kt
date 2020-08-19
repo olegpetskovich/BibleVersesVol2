@@ -81,8 +81,7 @@ open class SelectTestamentFragment : Fragment() {
 
                 dataToRestoreModel!!.bookNumber = -1 //Устанавливаем значение -1, чтобы при попытке вернуться на прежний фрагмент, пользователя снова не перебрасывало на уже открытый
             }
-        }
-        else {
+        } else {
             myFragmentManager.let {
                 val transaction: FragmentTransaction = it.beginTransaction()
                 transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)

@@ -28,13 +28,28 @@ import com.android.bible.knowbible.mvvm.view.dialog.VerseDialog
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.utility.Utility
 import com.android.bible.knowbible.utility.Utility.Companion.convertDbInPx
-
+import java.util.*
+import kotlin.Comparator
+import kotlin.collections.ArrayList
 
 //FragmentManager нужен здесь для открытия диалога
 class BibleTextRVAdapter(private val context: Context, private val models: ArrayList<BibleTextModel>, private val myFragmentManager: FragmentManager) : RecyclerView.Adapter<BibleTextRVAdapter.MyViewHolder>() {
     private var verseDialog: VerseDialog? = null
 
     private var isMultiSelectionEnabled: Boolean = false
+
+    private lateinit var multiSelectedTextsList: ArrayList<BibleTextModel>
+
+    interface MultiSelectionPanelListener {
+        fun openMultiSelectionPanel()
+        fun closeMultiSelectionPanel()
+        fun sendDataToActivity(multiSelectedTextsList: ArrayList<BibleTextModel>)
+    }
+
+    private lateinit var multiSelectionListener: MultiSelectionPanelListener
+    fun setMultiSelectionPanelListener(multiSelectionListener: MultiSelectionPanelListener) {
+        this.multiSelectionListener = multiSelectionListener
+    }
 
     private lateinit var fragmentChanger: IChangeFragment
     fun setFragmentChangerListener(fragmentChanger: IChangeFragment) {
@@ -152,7 +167,7 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
     }
 
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), VerseDialog.VerseDialogListener {
-        var selectedItem: Int = -1
+        private var selectedItem: Int = -1
 
         val tvVerseNumber: TextView = itemView.findViewById(R.id.tvVerseNumber)
         val tvVerse: TextView = itemView.findViewById(R.id.tvVerse)
@@ -174,7 +189,11 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
 
                 isMultiSelectionEnabled = true //Включаем режим MultiSelection
 
+                multiSelectedTextsList = ArrayList() //Создаём коллекцию, в которой будут храниться выбранные тексты
                 changeBackgroundOfSelectedItem(itemView)
+
+                multiSelectionListener.openMultiSelectionPanel()
+
 
                 Utility.log("Long click listener worked")
                 return@setOnLongClickListener true
@@ -200,6 +219,7 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
 
             if (!models[adapterPosition].isTextSelected) {
                 models[adapterPosition].isTextSelected = true
+                multiSelectedTextsList.add(models[adapterPosition])
 
                 when (ThemeManager.theme) {
                     ThemeManager.Theme.LIGHT -> {
@@ -218,6 +238,7 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
 
             } else {
                 models[adapterPosition].isTextSelected = false
+                multiSelectedTextsList.remove(models[adapterPosition])
 
                 when (ThemeManager.theme) {
                     ThemeManager.Theme.LIGHT -> {
@@ -242,6 +263,26 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
 
             anim.duration = 300
             anim.start()
+
+            //Если не выбран ни один текст, то отключаем режим мульти выбора текстов
+            if (multiSelectedTextsList.size == 0) {
+                isMultiSelectionEnabled = false
+                multiSelectionListener.closeMultiSelectionPanel()
+                return
+            }
+
+            Collections.sort(multiSelectedTextsList, Comparator { obj1, obj2 ->
+                // ## Ascending order
+                return@Comparator Integer.valueOf(obj1.verse_number).compareTo(obj2.verse_number) // To compare string values
+                // return Integer.valueOf(obj1.empId).compareTo(Integer.valueOf(obj2.empId)); // To compare integer values
+
+                // ## Descending order
+                // return obj2.firstName.compareToIgnoreCase(obj1.firstName); // To compare string values
+                // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); // To compare integer values
+            })
+
+
+            multiSelectionListener.sendDataToActivity(multiSelectedTextsList)
         }
 
         fun clearAnimation() {

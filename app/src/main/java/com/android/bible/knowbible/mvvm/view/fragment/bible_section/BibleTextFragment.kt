@@ -14,9 +14,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.android.bible.knowbible.R
+import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.ChapterModel
 import com.android.bible.knowbible.mvvm.model.DataToRestoreModel
 import com.android.bible.knowbible.mvvm.view.activity.MainActivity.Companion.isBackButtonClicked
+import com.android.bible.knowbible.mvvm.view.adapter.BibleTextRVAdapter
 import com.android.bible.knowbible.mvvm.view.adapter.ViewPager2Adapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
@@ -33,7 +35,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.reflect.Field
 
-class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragmentCommunication, ViewPager2Adapter.IBottomAppBarListener {
+class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragmentCommunication, ViewPager2Adapter.IBottomAppBarListener, BibleTextRVAdapter.MultiSelectionPanelListener {
     companion object {
         const val DATA_TO_RESTORE = "DATA_TO_RESTORE"
     }
@@ -47,7 +49,6 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 
     private lateinit var saveLoadData: SaveLoadData
     private lateinit var bibleDataViewModel: BibleDataViewModel
-
 
     private lateinit var progressBar: ProgressBar
 
@@ -215,6 +216,7 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                         vpAdapter!!.setIBottomAppBarListener(this)
                         vpAdapter!!.setRecyclerViewThemeChangerListener(this)
                         vpAdapter!!.setIFragmentCommunicationListener(this)
+                        vpAdapter!!.setMultiSelectionPanelListener(this)
 
                         vpAdapter!!.dataToRestoreData = DataToRestoreModel(chapterInfo?.bookNumber!!, chapterInfo?.chapterNumber!! - 1) //Поскольку счёт в коллекции начинается с 0, а главы начинаются с 1, то нужно номер главы минусовать. Также тут отправляем данные, чтобы сравнить и выяснить, тот ли отображён текст, данные скролла которого были сохранены ранее
 
@@ -410,5 +412,17 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         transaction.replace(R.id.fragment_container_bible, searchFragment)
         transaction.addToBackStack(null)
         transaction.commit()
+    }
+
+    override fun openMultiSelectionPanel() {
+        listener.setShowHideMultiSelectionPanel(true)
+    }
+
+    override fun closeMultiSelectionPanel() {
+        listener.setShowHideMultiSelectionPanel(false)
+    }
+
+    override fun sendDataToActivity(multiSelectedTextsList: ArrayList<BibleTextModel>) {
+        listener.sendMultiSelectedTextsData(multiSelectedTextsList)
     }
 }

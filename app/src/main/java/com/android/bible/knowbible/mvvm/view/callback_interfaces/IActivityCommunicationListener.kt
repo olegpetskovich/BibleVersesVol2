@@ -1,6 +1,7 @@
 package com.android.bible.knowbible.mvvm.view.callback_interfaces
 
 import androidx.fragment.app.FragmentManager
+import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTextFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 
@@ -20,8 +21,11 @@ interface IActivityCommunicationListener {
 
     fun setNoteIdForDelete(noteId: Int)
 
+    fun setShowHideMultiSelectionPanel(isVisible: Boolean)
+    fun sendMultiSelectedTextsData(multiSelectedTextsList: ArrayList<BibleTextModel>)
+
     fun setShowHideArticlesInfoButton(articlesInfoBtnVisibility: Int)
-    fun setShowHideAddNoteButton(addNoteFABBtnVisibility: Int)
+    fun setShowHideAddNoteButtonFAB(addNoteFABBtnVisibility: Int)
     fun setShowHideDeleteNoteButton(deleteNoteBtnVisibility: Int)
 
     fun updateTabIconAndTextColor()

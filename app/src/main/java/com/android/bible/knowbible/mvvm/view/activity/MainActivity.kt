@@ -12,10 +12,8 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -24,6 +22,7 @@ import androidx.viewpager.widget.ViewPager
 import com.android.bible.knowbible.App
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.data.local.NotesDBHelper
+import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.BibleTranslationModel
 import com.android.bible.knowbible.mvvm.view.adapter.BibleTranslationsRVAdapter
 import com.android.bible.knowbible.mvvm.view.adapter.ViewPagerAdapter
@@ -43,14 +42,11 @@ import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFrag
 import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment.Companion.THEME_NAME_KEY
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
-import com.android.bible.knowbible.utility.CustomViewPager
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
 import com.android.bible.knowbible.utility.Utility.Companion.convertDbInPx
 import com.android.bible.knowbible.utility.Utility.Companion.viewAnimatorX
 import com.apps.oleg.bibleverses.mvvm.view.fragment.more_section.MoreRootFragment
-import com.google.android.material.bottomappbar.BottomAppBar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import io.reactivex.Completable
@@ -58,6 +54,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStateListener, IActivityCommunicationListener, AppLanguageFragment.IAppLanguageChangerListener, DialogListener {
     /* ОБЪЯСНЕНИЕ НАЛИЧИЯ ЭТОГО КОДА.
@@ -100,19 +97,9 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
 
     private var noteId: Int = -1
 
-    private lateinit var toolbar: Toolbar
-    private lateinit var tabLayout: TabLayout
-    private lateinit var viewPager: CustomViewPager
-
     private lateinit var bibleTextFragment: BibleTextFragment //Объект необходим для управления BottomAppBar в BibleTextFragment
 
-    private lateinit var btnFAB: FloatingActionButton
-    private lateinit var appBar: BottomAppBar
-
-    private lateinit var btnHome: LinearLayout
-    private lateinit var btnInterpretation: LinearLayout
-    private lateinit var btnNotes: LinearLayout
-    private lateinit var btnSearch: LinearLayout
+    private lateinit var multiSelectedTextsList: ArrayList<BibleTextModel> //Список данных необходим для обработки двух и более выбранных текстов Библии в режиме мульти выбора
 
     private lateinit var articlesInfoDialog: ArticlesInfoDialog
 
@@ -136,49 +123,27 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             BOOK_THEME -> setTheme(ThemeManager.Theme.BOOK, false)
         }
 
-        toolbar = findViewById(R.id.toolbar)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        viewPager = findViewById(R.id.viewPager)
         viewPager.offscreenPageLimit = 2 /*ВАЖНО ПОМНИТЬ, ЕСЛИ КОЛИЧЕСТВО ТАБОВ РАСТЁТ, ТО И ЛИМИТ СОХРАНЁННЫХ ФРАГМЕНТОВ НУЖНО ПОВЫШАТЬ
                                            Объяснение вызова этого метода: https://stackoverflow.com/questions/27601920/android-viewpager-with-tabs-save-state, https://developer.android.com/reference/android/support/v4/view/ViewPager#setoffscreenpagelimit*/
         setupViewPager(viewPager)
-
-        appBar = findViewById(R.id.appBar)
-        btnFAB = findViewById(R.id.btnFAB)
-
-        btnHome = findViewById(R.id.btnHome)
-        btnHome.setOnClickListener { bibleTextFragment.btnHomeClicked() }
-
-        btnInterpretation = findViewById(R.id.btnInterpretation)
-        btnInterpretation.setOnClickListener { }
-
-        btnNotes = findViewById(R.id.btnNotes)
-        btnNotes.setOnClickListener { bibleTextFragment.btnNotesClicked() }
-
-        btnSearch = findViewById(R.id.btnSearch)
-        btnSearch.setOnClickListener { bibleTextFragment.btnSearchClicked() }
-
-        tabLayout = findViewById(R.id.tabLayout)
         tabLayout.setupWithViewPager(viewPager)
         viewPager.currentItem = tabNumber //устанавливаем, чтобы при открытии приложения, сразу включался второй таб
 
+        setupTabIconsContent()
+
+        btnHome.setOnClickListener { bibleTextFragment.btnHomeClicked() }
+        btnInterpretation.setOnClickListener { bibleTextFragment.btnInterpretationClicked() }
+        btnNotes.setOnClickListener { bibleTextFragment.btnNotesClicked() }
+        btnSearch.setOnClickListener { bibleTextFragment.btnSearchClicked() }
+
         btnBack.setOnClickListener { onBackPressed() }
+
         btnSelectTranslation.setOnClickListener {
             val fragment = BibleTranslationsFragment()
-            fragment.setRootFragmentManager(myFragmentManager)
-            val transaction: FragmentTransaction = myFragmentManager.beginTransaction()
-            transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-            transaction.replace(R.id.fragment_container_bible, fragment)
-            transaction.addToBackStack(null)
-            transaction.commit()
-        }
-
-        btnAddNoteFAB.setOnClickListener {
-            val fragment = AddEditNoteFragment()
-            fragment.isNoteToAdd = true
             fragment.setRootFragmentManager(myFragmentManager)
             val transaction: FragmentTransaction = myFragmentManager.beginTransaction()
             transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
@@ -190,11 +155,10 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         btnArticlesInfo.setOnClickListener {
             articlesInfoDialog = ArticlesInfoDialog(this)
 //            articlesInfoDialog.isCancelable = false
-            articlesInfoDialog.show(myFragmentManager, "Articles Info Dialog") //Тут должен быть именно childFragmentManager
+            articlesInfoDialog.show(myFragmentManager, "Articles Info Dialog")
         }
 
         btnDeleteNote.setOnClickListener {
-
             val mainHandler = Handler(mainLooper)
             if (noteId != -1) {
                 //Специальный вызов, для вызова метода в другом потоке с помощью RX
@@ -213,7 +177,16 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             }
         }
 
-        setupTabIconsContent()
+        btnAddNoteFAB.setOnClickListener {
+            val fragment = AddEditNoteFragment()
+            fragment.isNoteToAdd = true
+            fragment.setRootFragmentManager(myFragmentManager)
+            val transaction: FragmentTransaction = myFragmentManager.beginTransaction()
+            transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+            transaction.replace(R.id.fragment_container_bible, fragment)
+            transaction.addToBackStack(null)
+            transaction.commit()
+        }
 
         //Открываем БД с ранее используемым переводом Библии и в кнопку выбора переводов устанавливаем аббревиатуру перевода, который был ранее выбран пользователем
         val jsonBibleInfo = saveLoadData.loadString(TRANSLATION_DB_FILE_JSON_INFO)
@@ -294,6 +267,145 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         this.noteId = noteId
     }
 
+    override fun setShowHideMultiSelectionPanel(isVisible: Boolean) {
+        val animationBtnSelectTranslation: Animation
+
+        val animationBtnShare: Animation
+        val animationBtnCopy: Animation
+        val animationBtnAddNote: Animation
+        val animationBtnHighlight: Animation
+
+        if (isVisible) {
+            animationBtnSelectTranslation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
+
+            animationBtnShare = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
+            animationBtnCopy = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
+            animationBtnAddNote = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
+            animationBtnHighlight = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
+
+            btnSelectTranslation.startAnimation(animationBtnSelectTranslation)
+            btnSelectTranslation.visibility = View.GONE
+            animationBtnSelectTranslation?.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationRepeat(animation: Animation?) {}
+
+                override fun onAnimationEnd(animation: Animation?) {}
+
+                override fun onAnimationStart(animation: Animation?) {
+                    btnShare.startAnimation(animationBtnShare)
+                    btnShare.visibility = View.VISIBLE
+                    animationBtnShare.setAnimationListener(object : Animation.AnimationListener {
+                        override fun onAnimationRepeat(animation: Animation?) {}
+
+                        override fun onAnimationEnd(animation: Animation?) {
+                            btnCopy.startAnimation(animationBtnCopy)
+                            btnCopy.visibility = View.VISIBLE
+                            animationBtnCopy?.setAnimationListener(object : Animation.AnimationListener {
+                                override fun onAnimationRepeat(animation: Animation?) {}
+
+                                override fun onAnimationEnd(animation: Animation?) {
+                                    btnAddNote.startAnimation(animationBtnAddNote)
+                                    btnAddNote.visibility = View.VISIBLE
+                                    animationBtnAddNote.setAnimationListener(object : Animation.AnimationListener {
+                                        override fun onAnimationRepeat(animation: Animation?) {}
+
+                                        override fun onAnimationEnd(animation: Animation?) {
+                                            btnHighlight.startAnimation(animationBtnHighlight)
+                                            btnHighlight.visibility = View.VISIBLE
+                                        }
+
+                                        override fun onAnimationStart(animation: Animation?) {}
+                                    })
+                                }
+
+                                override fun onAnimationStart(animation: Animation?) {}
+                            })
+                        }
+
+                        override fun onAnimationStart(animation: Animation?) {}
+                    })
+                }
+            })
+        } else {
+            animationBtnSelectTranslation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+
+            animationBtnShare = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+            animationBtnCopy = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+            animationBtnAddNote = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+            animationBtnHighlight = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+
+            btnHighlight.startAnimation(animationBtnHighlight)
+            btnHighlight.visibility = View.GONE
+            animationBtnHighlight?.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationRepeat(animation: Animation?) {}
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    btnAddNote.startAnimation(animationBtnAddNote)
+                    btnAddNote.visibility = View.GONE
+                    animationBtnAddNote.setAnimationListener(object : Animation.AnimationListener {
+                        override fun onAnimationRepeat(animation: Animation?) {}
+
+                        override fun onAnimationEnd(animation: Animation?) {
+                            btnCopy.startAnimation(animationBtnCopy)
+                            btnCopy.visibility = View.GONE
+                            animationBtnCopy?.setAnimationListener(object : Animation.AnimationListener {
+                                override fun onAnimationRepeat(animation: Animation?) {}
+
+                                override fun onAnimationEnd(animation: Animation?) {
+                                    btnShare.startAnimation(animationBtnShare)
+                                    btnShare.visibility = View.GONE
+                                    animationBtnShare.setAnimationListener(object : Animation.AnimationListener {
+                                        override fun onAnimationRepeat(animation: Animation?) {}
+
+                                        override fun onAnimationEnd(animation: Animation?) {}
+
+                                        override fun onAnimationStart(animation: Animation?) {
+                                            btnSelectTranslation.startAnimation(animationBtnSelectTranslation)
+                                            btnSelectTranslation.visibility = View.VISIBLE
+                                        }
+                                    })
+                                }
+
+                                override fun onAnimationStart(animation: Animation?) {}
+                            })
+                        }
+
+                        override fun onAnimationStart(animation: Animation?) {}
+                    })
+                }
+
+                override fun onAnimationStart(animation: Animation?) {}
+            })
+        }
+    }
+
+    override fun sendMultiSelectedTextsData(multiSelectedTextsList: ArrayList<BibleTextModel>) {
+        this.multiSelectedTextsList = multiSelectedTextsList
+        setSelectedVerses(multiSelectedTextsList)
+    }
+
+    //Метод, форматирующий текст нужным образом при выделении стихов.
+    //Например, если выделены несколько текстов, идущих подряд друг за другом (например, 4,5,6,7),
+    //то отрезок будет отформатирован с помощью дефиза, вот так: 4-7 , то есть с 4 по 7 стихи.
+    //Если же выбираются тексты на следующий друг за другом, то они буду разделяться запятой.
+    //К примеру, пользователь выделил 4 стих, а потом 7 стих, на выходе будет выглядеть вот так: 4,7, то есть отдельно 4 стих и отдельно 7 стих
+    private fun setSelectedVerses(multiSelectedTextsList: ArrayList<BibleTextModel>) {
+        var selectedVerses = ":" + multiSelectedTextsList[0].verse_number
+        for ((index, bibleTextModel) in multiSelectedTextsList.withIndex()) {
+            if (multiSelectedTextsList.size > 1 && index != 0) {
+                selectedVerses = if ((bibleTextModel.verse_number - multiSelectedTextsList[index - 1].verse_number) == 1) {
+                    if (index + 1 != multiSelectedTextsList.size && (multiSelectedTextsList[index + 1].verse_number - bibleTextModel.verse_number) == 1) {
+                        continue
+                    }
+                    selectedVerses + "-" + bibleTextModel.verse_number
+                } else {
+                    selectedVerses + "," + bibleTextModel.verse_number
+                }
+            }
+        }
+        tvSelectedBibleVerse.visibility = View.VISIBLE
+        tvSelectedBibleVerse.text = selectedVerses
+    }
+
     override fun setShowHideArticlesInfoButton(articlesInfoBtnVisibility: Int) {
         //Этот фрагмент кода нужен, чтобы btnArticlesInfo не анимировался каждый раз при переходе между табами.
         //Если в одном табе установлена видимость такая же, как и в другом, то всё остаётся на своих местах и ничего не анимируется.
@@ -316,7 +428,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         btnArticlesInfo.startAnimation(animation)
     }
 
-    override fun setShowHideAddNoteButton(addNoteFABBtnVisibility: Int) {
+    override fun setShowHideAddNoteButtonFAB(addNoteFABBtnVisibility: Int) {
         //Этот фрагмент кода нужен, чтобы btnAddNoteFAB не анимировался каждый раз при переходе между табами.
         //Если в одном табе установлена видимость такая же, как и в другом, то всё остаётся на своих местах и ничего не анимируется.
         //Анимирование происходит только в случае, когда значение btnSelectTranslationVisibility меняется
@@ -396,8 +508,8 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         //Этот фрагмент кода нужен, чтобы tvSelectedBibleText и toolbarTitle не анимировались каждый раз при переходе между табами.
         //Если в одном табе установлена видимость такая же, как и в другом, то всё остаётся на своих местах и ничего не анимируется.
         //Анимирование происходит только в случае, когда значение selectedTextVisibility меняется
-        val tvSelectedBibleVisibility = layTvSelectedBibleText.visibility
-        if (tvSelectedBibleVisibility == selectedTextVisibility) {
+        val tvSelectedBibleTextVisibility = layTvSelectedBibleText.visibility
+        if (tvSelectedBibleTextVisibility == selectedTextVisibility) {
             return
         }
 

@@ -70,6 +70,12 @@
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+                        android:id="@+id/tvSelectedBibleVerse"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
@@ -116,6 +122,58 @@
                     android:src="@drawable/ic_articles_info"
                     android:visibility="invisible" />
 
+                <!-- Ниже блок кнопок для режима выбора нескольких стихов в BibleTextFragment -->
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                    android:id="@+id/btnHighlight"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="2dp"
+                    android:layout_toStartOf="@id/btnAddNote"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/ic_highlight"
+                    android:visibility="gone" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                    android:id="@+id/btnAddNote"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="2dp"
+                    android:layout_toStartOf="@id/btnCopy"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/ic_write_note"
+                    android:visibility="gone" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                    android:id="@+id/btnCopy"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="2dp"
+                    android:layout_toStartOf="@id/btnShare"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/ic_copy"
+                    android:visibility="gone" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                    android:id="@+id/btnShare"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="12dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/ic_share"
+                    android:visibility="gone" />
             </RelativeLayout>
         </com.android.bible.knowbible.mvvm.view.theme_editor.MyToolbar>
 
@@ -141,9 +199,21 @@
         android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
+        android:id="@+id/btnAddNoteFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:src="@drawable/ic_add_note"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorPrimary"
+        app:maxImageSize="30dp"
+        app:tint="@android:color/white" />
+
     <com.android.bible.knowbible.mvvm.view.theme_editor.MyBottomAppBarLayout
         android:id="@+id/appBar"
-        style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+        style="@style/Widget.MaterialComponents.BottomAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -153,8 +223,7 @@
         app:contentInsetRight="0dp"
         app:contentInsetStart="0dp"
         app:fabAlignmentMode="center"
-        app:hideOnScroll="true"
-        app:layout_scrollFlags="scroll|enterAlways|snap">
+        app:hideOnScroll="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -300,15 +369,4 @@
         app:layout_anchor="@id/appBar"
         app:tint="@android:color/white" />
 
-    <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
-        android:id="@+id/btnAddNoteFAB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        android:src="@drawable/ic_add_note"
-        android:visibility="invisible"
-        app:backgroundTint="@color/colorPrimary"
-        app:maxImageSize="30dp"
-        app:tint="@android:color/white" />
 </com.android.bible.knowbible.mvvm.view.theme_editor.MyCoordinatorLayout>

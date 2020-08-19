@@ -54,8 +54,8 @@ class NotesFragment : Fragment(), IThemeChanger, IChangeFragment {
                     recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                             //Если скролл вниз, то FAB скрывается, если вверх, то появляется
-                            if (dy > 0) listener.setShowHideAddNoteButton(View.GONE)
-                            else listener.setShowHideAddNoteButton(View.VISIBLE)
+                            if (dy > 0) listener.setShowHideAddNoteButtonFAB(View.GONE)
+                            else listener.setShowHideAddNoteButtonFAB(View.VISIBLE)
                             super.onScrolled(recyclerView, dx, dy)
                         }
                     })
@@ -83,7 +83,7 @@ class NotesFragment : Fragment(), IThemeChanger, IChangeFragment {
 
     override fun onPause() {
         super.onPause()
-        listener.setShowHideAddNoteButton(View.GONE)
+        listener.setShowHideAddNoteButtonFAB(View.GONE)
     }
 
     override fun onResume() {
@@ -94,7 +94,7 @@ class NotesFragment : Fragment(), IThemeChanger, IChangeFragment {
 
         listener.setBtnSelectTranslationVisibility(View.GONE)
 
-        listener.setShowHideAddNoteButton(View.VISIBLE)
+        listener.setShowHideAddNoteButtonFAB(View.VISIBLE)
         listener.setShowHideToolbarBackButton(View.VISIBLE)
     }
 

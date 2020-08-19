@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MyFloatingActionButton

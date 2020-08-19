@@ -56,6 +56,11 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
         this.themeChanger = themeChanger
     }
 
+    private lateinit var multiSelectionListener: BibleTextRVAdapter.MultiSelectionPanelListener
+    fun setMultiSelectionPanelListener(multiSelectionListener: BibleTextRVAdapter.MultiSelectionPanelListener) {
+        this.multiSelectionListener = multiSelectionListener
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PagerVH {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_view_pager_two, parent, false)
         return PagerVH(view)
@@ -96,6 +101,7 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
                     Utility.log("BibleTextFragment: onBindViewHolder")
                     rvAdapter = BibleTextRVAdapter(context, textList, myFragmentManager)
                     rvAdapter.setRecyclerViewThemeChangerListener(themeChanger) //Для RecyclerView тему нужно обновлять отдельно от смены темы для всего фрагмента. Если менять тему только для всего фрагмента, не меняя при этом тему для списка, то в списке тема не поменяется.
+                    rvAdapter.setMultiSelectionPanelListener(multiSelectionListener)
                     val rvItem = holder.recyclerView
                     rvItem.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
