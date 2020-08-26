@@ -2,6 +2,10 @@ package com.android.bible.knowbible.mvvm.view.activity
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -24,10 +28,12 @@ import com.android.bible.knowbible.R
 import com.android.bible.knowbible.data.local.NotesDBHelper
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.BibleTranslationModel
+import com.android.bible.knowbible.mvvm.view.adapter.BibleTextRVAdapter.Companion.isMultiSelectionEnabled
 import com.android.bible.knowbible.mvvm.view.adapter.BibleTranslationsRVAdapter
 import com.android.bible.knowbible.mvvm.view.adapter.ViewPagerAdapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
+import com.android.bible.knowbible.mvvm.view.dialog.AddNoteDialog
 import com.android.bible.knowbible.mvvm.view.dialog.ArticlesInfoDialog
 import com.android.bible.knowbible.mvvm.view.fragment.articles_section.ArticlesRootFragment
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleRootFragment
@@ -101,7 +107,8 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
 
     private lateinit var multiSelectedTextsList: ArrayList<BibleTextModel> //Список данных необходим для обработки двух и более выбранных текстов Библии в режиме мульти выбора
 
-    private lateinit var articlesInfoDialog: ArticlesInfoDialog
+    private var articlesInfoDialog: ArticlesInfoDialog? = null
+    private var addNoteDialog: AddNoteDialog? = null
 
     private lateinit var saveLoadData: SaveLoadData
 
@@ -135,6 +142,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
 
         setupTabIconsContent()
 
+        //BottomAppBar кнопки
         btnHome.setOnClickListener { bibleTextFragment.btnHomeClicked() }
         btnInterpretation.setOnClickListener { bibleTextFragment.btnInterpretationClicked() }
         btnNotes.setOnClickListener { bibleTextFragment.btnNotesClicked() }
@@ -155,7 +163,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         btnArticlesInfo.setOnClickListener {
             articlesInfoDialog = ArticlesInfoDialog(this)
 //            articlesInfoDialog.isCancelable = false
-            articlesInfoDialog.show(myFragmentManager, "Articles Info Dialog")
+            articlesInfoDialog!!.show(myFragmentManager, "Articles Info Dialog")
         }
 
         btnDeleteNote.setOnClickListener {
@@ -188,6 +196,40 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             transaction.commit()
         }
 
+        //Кнопки панели множественного выбора текстов
+        btnShare.setOnClickListener {
+            val shareBody = getFormattedMultiSelectedText()
+
+            val myIntent = Intent(Intent.ACTION_SEND)
+            myIntent.type = "text/plain"
+            myIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
+            startActivity(Intent.createChooser(myIntent, getString(R.string.toast_share_verse)))
+
+            //Отключаем режим множественного выбора после выполнения метода
+            disableMultiSelection()
+        }
+
+        btnCopy.setOnClickListener {
+            val textForCopy = getFormattedMultiSelectedText()
+
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("label", textForCopy)
+            clipboard.setPrimaryClip(clip)
+
+            Toast.makeText(this, getString(R.string.verse_copied), Toast.LENGTH_SHORT).show()
+
+            //Отключаем режим множественного выбора после выполнения метода
+            disableMultiSelection()
+        }
+
+        btnAddNote.setOnClickListener {
+            addNoteDialog = AddNoteDialog(this)
+            addNoteDialog!!.setVerse(getFormattedMultiSelectedText())
+            addNoteDialog!!.show(myFragmentManager, "Add Note Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
+        }
+
+        btnHighlight.setOnClickListener {}
+
         //Открываем БД с ранее используемым переводом Библии и в кнопку выбора переводов устанавливаем аббревиатуру перевода, который был ранее выбран пользователем
         val jsonBibleInfo = saveLoadData.loadString(TRANSLATION_DB_FILE_JSON_INFO)
         if (jsonBibleInfo != null && jsonBibleInfo.isNotEmpty()) {
@@ -204,6 +246,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
                 btnSelectTranslation.text = bibleTranslationInfo.abbreviationTranslationName
             } else {
                 btnSelectTranslation.visibility = View.GONE //Если не один перевод не выбран и не скачан, то скрываем кнопку выбора перевода
+                btnSelectTranslation.isEnabled = false
             }
         }
 
@@ -212,6 +255,47 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
 //                && checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 //            requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE), 1000)
 //        }
+    }
+
+    override fun disableMultiSelection() {
+        if (isMultiSelectionEnabled) {
+            //Отключаем режим множественного выбора текстов и убираем видимость кнопок
+            isMultiSelectionEnabled = false
+            setShowHideMultiSelectionPanel(false)
+
+            //Устанавливаем параметру isTextSelected значение false, чтобы при обновлении списка снялось выделение с выбранных айтемов
+            for (selectedText in multiSelectedTextsList) selectedText.isTextSelected = false
+            bibleTextFragment.notifyDataSetChanged()
+        }
+    }
+
+    //Этот метод вызывается в случае, если была нажата кнопка btnHome в BottomAppBar. Его отличие от метода disableMultiSelection заключается в том,
+    //что в данном методе вызывается метод closeMultiSelectionPanelIfButtonHomeClicked в отличие от вызова метода setShowHideMultiSelectionPanel(false) в disableMultiSelection.
+    //Вызов метода closeMultiSelectionPanelIfButtonHomeClicked точно так же убирает панель множественного выбора, но, в отличие от вызова метода setShowHideMultiSelectionPanel(false),
+    //метод closeMultiSelectionPanelIfButtonHomeClicked не задаёт кнопке btnSelectTranslation видимость VISIBLE,
+    //потому что нажатие кнопки btnHome обеспечивает переход из BibleTextFragment в SelectTestamentFragment.
+    //А в фрагменте SelectTestamentFragment не должна быть видна кнопка btnSelectTranslation.
+    override fun disableMultiSelectionIfButtonHomeClicked() {
+        if (isMultiSelectionEnabled) {
+            //Отключаем режим множественного выбора текстов и убираем видимость кнопок
+            isMultiSelectionEnabled = false
+            closeMultiSelectionPanelIfButtonHomeClicked()
+
+            //Устанавливаем параметру isTextSelected значение false, чтобы при обновлении списка снялось выделение с выбранных айтемов
+            for (selectedText in multiSelectedTextsList) selectedText.isTextSelected = false
+            bibleTextFragment.notifyDataSetChanged()
+        }
+    }
+
+    //Метод, для форматирования выбранных текстов Библии.
+    //Поскольку этот код используется несколько раз, для предотвращения дубликации кода этот код был вынесен в отдельный метод
+    private fun getFormattedMultiSelectedText(): String {
+        var selectedText = ""
+        for (selectedTextModel in multiSelectedTextsList) {
+            selectedText += selectedTextModel.text
+        }
+
+        return "«" + selectedText + "»" + " (" + tvSelectedBibleBook.text + tvSelectedBibleChapter.text + tvSelectedBibleVerse.text + ")"
     }
 
     //Анимация появления кнопки назад в Toolbar
@@ -231,7 +315,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         val pixels: Float
         if (backButtonVisibility == View.VISIBLE) {
             //Конвертируем db в пиксели, потому что метод анимации на вход принимает пиксели, а нужно устанавливать значение в db
-            pixels = convertDbInPx(this, 60f)
+            pixels = convertDbInPx(this, 55f)
             animationSelectedText = viewAnimatorX(pixels, layTvSelectedBibleText, 250) //Анимируем TextView выбранного текст Библии вместе с title тулбара
             animationTitle = viewAnimatorX(pixels, toolbarTitle, 250)
             animationTitle?.addListener(object : Animator.AnimatorListener {
@@ -283,8 +367,11 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             animationBtnAddNote = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
             animationBtnHighlight = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
 
+            tvSelectedBibleVerse.visibility = View.VISIBLE
+
             btnSelectTranslation.startAnimation(animationBtnSelectTranslation)
             btnSelectTranslation.visibility = View.GONE
+            btnSelectTranslation.isEnabled = false
             animationBtnSelectTranslation?.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationRepeat(animation: Animation?) {}
 
@@ -293,24 +380,28 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
                 override fun onAnimationStart(animation: Animation?) {
                     btnShare.startAnimation(animationBtnShare)
                     btnShare.visibility = View.VISIBLE
+                    btnShare.isEnabled = true
                     animationBtnShare.setAnimationListener(object : Animation.AnimationListener {
                         override fun onAnimationRepeat(animation: Animation?) {}
 
                         override fun onAnimationEnd(animation: Animation?) {
                             btnCopy.startAnimation(animationBtnCopy)
                             btnCopy.visibility = View.VISIBLE
+                            btnCopy.isEnabled = true
                             animationBtnCopy?.setAnimationListener(object : Animation.AnimationListener {
                                 override fun onAnimationRepeat(animation: Animation?) {}
 
                                 override fun onAnimationEnd(animation: Animation?) {
                                     btnAddNote.startAnimation(animationBtnAddNote)
                                     btnAddNote.visibility = View.VISIBLE
+                                    btnAddNote.isEnabled = true
                                     animationBtnAddNote.setAnimationListener(object : Animation.AnimationListener {
                                         override fun onAnimationRepeat(animation: Animation?) {}
 
                                         override fun onAnimationEnd(animation: Animation?) {
                                             btnHighlight.startAnimation(animationBtnHighlight)
                                             btnHighlight.visibility = View.VISIBLE
+                                            btnHighlight.isEnabled = true
                                         }
 
                                         override fun onAnimationStart(animation: Animation?) {}
@@ -333,26 +424,32 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             animationBtnAddNote = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
             animationBtnHighlight = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
 
+            tvSelectedBibleVerse.visibility = View.GONE
+
             btnHighlight.startAnimation(animationBtnHighlight)
             btnHighlight.visibility = View.GONE
+            btnHighlight.isEnabled = false
             animationBtnHighlight?.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationRepeat(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
                     btnAddNote.startAnimation(animationBtnAddNote)
                     btnAddNote.visibility = View.GONE
+                    btnAddNote.isEnabled = false
                     animationBtnAddNote.setAnimationListener(object : Animation.AnimationListener {
                         override fun onAnimationRepeat(animation: Animation?) {}
 
                         override fun onAnimationEnd(animation: Animation?) {
                             btnCopy.startAnimation(animationBtnCopy)
                             btnCopy.visibility = View.GONE
+                            btnCopy.isEnabled = false
                             animationBtnCopy?.setAnimationListener(object : Animation.AnimationListener {
                                 override fun onAnimationRepeat(animation: Animation?) {}
 
                                 override fun onAnimationEnd(animation: Animation?) {
                                     btnShare.startAnimation(animationBtnShare)
                                     btnShare.visibility = View.GONE
+                                    btnShare.isEnabled = false
                                     animationBtnShare.setAnimationListener(object : Animation.AnimationListener {
                                         override fun onAnimationRepeat(animation: Animation?) {}
 
@@ -361,6 +458,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
                                         override fun onAnimationStart(animation: Animation?) {
                                             btnSelectTranslation.startAnimation(animationBtnSelectTranslation)
                                             btnSelectTranslation.visibility = View.VISIBLE
+                                            btnSelectTranslation.isEnabled = true
                                         }
                                     })
                                 }
@@ -376,6 +474,57 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
                 override fun onAnimationStart(animation: Animation?) {}
             })
         }
+    }
+
+    //Метод специально для класса BibleTextFragment. При нажатии на кнопку btnHome в BottomAppBar в случае если активирован режим множественного выбора текстов,
+    //нужно скрыть панель множественного выбора текстов, но при этом не показывать кнопку выбора переводов Библии (как это реализовано в методе setShowHideMultiSelectionPanel),
+    //потому при нажатии на кнопку btnHome идёт возврат в главный фрагмент SelectTestamentFragment где не кнопка выбора переводов не должна отображаться
+    private fun closeMultiSelectionPanelIfButtonHomeClicked() {
+        val animationBtnShare: Animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+        val animationBtnCopy: Animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+        val animationBtnAddNote: Animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+        val animationBtnHighlight: Animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+
+        tvSelectedBibleVerse.visibility = View.GONE
+
+        btnHighlight.startAnimation(animationBtnHighlight)
+        btnHighlight.visibility = View.GONE
+        btnHighlight.isEnabled = false
+        animationBtnHighlight.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationRepeat(animation: Animation?) {}
+
+            override fun onAnimationEnd(animation: Animation?) {
+                btnAddNote.startAnimation(animationBtnAddNote)
+                btnAddNote.visibility = View.GONE
+                btnAddNote.isEnabled = false
+                animationBtnAddNote.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationRepeat(animation: Animation?) {}
+
+                    override fun onAnimationEnd(animation: Animation?) {
+                        btnCopy.startAnimation(animationBtnCopy)
+                        btnCopy.visibility = View.GONE
+                        btnCopy.isEnabled = false
+                        animationBtnCopy.setAnimationListener(object : Animation.AnimationListener {
+                            override fun onAnimationRepeat(animation: Animation?) {}
+
+                            override fun onAnimationEnd(animation: Animation?) {
+                                btnShare.startAnimation(animationBtnShare)
+                                btnShare.visibility = View.GONE
+                                btnShare.isEnabled = false
+
+                            }
+
+                            override fun onAnimationStart(animation: Animation?) {}
+                        })
+                    }
+
+                    override fun onAnimationStart(animation: Animation?) {}
+                })
+            }
+
+            override fun onAnimationStart(animation: Animation?) {}
+        })
+
     }
 
     override fun sendMultiSelectedTextsData(multiSelectedTextsList: ArrayList<BibleTextModel>) {
@@ -661,25 +810,25 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
     }
 
     override fun setBottomAppBarVisibility(visibility: Int) {
+        appBar.visibility = visibility
+        btnFAB.visibility = visibility
         if (visibility == View.VISIBLE) {
-            appBar.visibility = visibility
             appBar.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in))
-
-            btnFAB.show()
+            btnFAB.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_in_slow))
         } else {
-            appBar.visibility = visibility
             appBar.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out))
-
-            btnFAB.hide()
+            btnFAB.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out_slow))
         }
     }
 
     //Метод для установления видимости во время скрола списка
-    override fun setFABVisibility(fabVisibility: Boolean) {
+    override fun setFABVisibilityWhenScroll(fabVisibility: Boolean) {
         if (fabVisibility) {
-            btnFAB.show()
+            btnFAB.visibility = View.VISIBLE
+            btnFAB.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_in_slow))
         } else {
-            btnFAB.hide()
+            btnFAB.visibility = View.GONE
+            btnFAB.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out_slow))
         }
     }
 
@@ -734,10 +883,14 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             Toast.makeText(this, getString(R.string.toast_please_wait), Toast.LENGTH_SHORT).show()
             return
         }
+
         val myFragmentManagerName = myFragmentManager.toString()
         //Вызываем метод contains, потому что помимо имени фрагмента, из которого был взят FragmentManager, там ещё содержатся другая информация, которая не нужна
         if (myFragmentManagerName.contains("BibleRootFragment")) {
-            if (!isTranslationDownloaded) {
+            //Если никакой перевод не скачан или скаченный перевод был удалён, то при нажатии кнопки назад в фрагмент BibleTranslationFragment приложение будет закрыто
+            if (!isTranslationDownloaded || saveLoadData.loadString(TRANSLATION_DB_FILE_JSON_INFO) != null
+                    && saveLoadData.loadString(TRANSLATION_DB_FILE_JSON_INFO)!!.isNotEmpty()
+                    && !Utility.isSelectedTranslationDownloaded(this, Gson().fromJson(saveLoadData.loadString(TRANSLATION_DB_FILE_JSON_INFO), BibleTranslationModel::class.java))) {
                 super.onBackPressed()
                 return
             }
@@ -751,6 +904,13 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         //а не после закрытия приложения через диспетчер задач, то данные о сохранённом скролле очищаются в onPause и при следующем открытии,
         //приложение будет открыто в начальном экране SelectTestamentFragment
         isBackButtonClicked = true
+
+        //Если открыт таб "Библия" и включён режим множественного выбора, то при нажатии кнопки "Назад" сначала а выключается режим множественного выбора,
+        //и только после этого можно как обычно вернуться на предыдущий фрагмент тем же нажатием кнопки "Назад"
+        if (myFragmentManagerName.contains("BibleRootFragment") && isMultiSelectionEnabled) {
+            disableMultiSelection()
+            return
+        }
 
         if (isBackStackNotEmpty) myFragmentManager.popBackStack()
         else super.onBackPressed()
@@ -815,6 +975,15 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
     }
 
     override fun dismissDialog() {
-        articlesInfoDialog.dismiss()
+        //Не смотря на жёлтое выделение оператора if, этот код должен быть именно таким.
+        //Видимо, система предполагает, что если данный метод вызывается из объекта диалога, то объект диалога не может иметь значение null.
+        //Но дело в том, что этот один и тот же метод dismissDialog может быть вызван только в одном из созданных открытых диалогов, в то время как другие диалоги не буду созданы.
+        //И если для одного объекта диалога сработает метод dismiss(), то для другого нет, потому как он даже не будет создан.
+        //Этот код реализован таким образом для того, чтобы не писать для каждого диалога свой обработчик.
+        articlesInfoDialog?.dismiss()
+
+        addNoteDialog?.dismiss()
+        //Отключаем режим множественного выбора после добавления заметки
+        if (isMultiSelectionEnabled) disableMultiSelection()
     }
 }

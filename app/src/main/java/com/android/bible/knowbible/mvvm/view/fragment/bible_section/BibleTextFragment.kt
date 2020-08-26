@@ -19,6 +19,7 @@ import com.android.bible.knowbible.mvvm.model.ChapterModel
 import com.android.bible.knowbible.mvvm.model.DataToRestoreModel
 import com.android.bible.knowbible.mvvm.view.activity.MainActivity.Companion.isBackButtonClicked
 import com.android.bible.knowbible.mvvm.view.adapter.BibleTextRVAdapter
+import com.android.bible.knowbible.mvvm.view.adapter.BibleTextRVAdapter.Companion.isMultiSelectionEnabled
 import com.android.bible.knowbible.mvvm.view.adapter.ViewPager2Adapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
@@ -161,6 +162,11 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         //Показываем BottomAppBar, чтобы он был только в BibleTextFragment
         listener.setBottomAppBarVisibility(View.VISIBLE)
 
+        //Открываем панель множественного выбора текста при возвращении в BibleTextFragment, при этом проверяя,
+        //активирована ли эта панель через проверку значения поля isMultiSelectionEnabled.
+        //Если она неактивирована, то и открывать не нужно (то есть задавать видимость)
+        if (isMultiSelectionEnabled) openMultiSelectionPanel()
+
         listener.setTabNumber(1)
         listener.setMyFragmentManager(myFragmentManager)
         listener.setIsBackStackNotEmpty(true)
@@ -240,10 +246,20 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                 val chapterNumber = position + 1
                 chapterInfo!!.chapterNumber = chapterNumber
                 listener.setTvSelectedBibleText(chapterNumber.toString(), false)
+
+                if (isMultiSelectionEnabled) {
+                    //Отключаем режим множественного выбора при переходе на другую главу
+                    listener.disableMultiSelection()
+
+                    //Обновляем recyclerView предыдущей и предстоящей главы,
+                    //чтобы при отключении режима множественного выбора выбранные(выделенные) айтема обновились на не выбранные(не выделенные)
+                    vpAdapter?.getRecyclerView(chapterInfo!!.chapterNumber - 2)?.adapter?.notifyDataSetChanged()
+                    vpAdapter?.getRecyclerView(chapterInfo!!.chapterNumber)?.adapter?.notifyDataSetChanged()
+                }
             }
         })
 
-        listener.setBtnSelectTranslationVisibility(View.VISIBLE)
+        if (!isMultiSelectionEnabled) listener.setBtnSelectTranslationVisibility(View.VISIBLE)
 
         listener.setShowHideToolbarBackButton(View.VISIBLE)
 
@@ -259,6 +275,11 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 
         //Убираем BottomAppBar, чтобы его не было нигде, кроме BibleTextFragment
         listener.setBottomAppBarVisibility(View.GONE)
+
+        //Закрываем панель множественного выбора текста при переходе уходе из BibleTextFragment, при этом проверяя,
+        //активирована ли эта панель через проверку значения поля isMultiSelectionEnabled.
+        //Если она неактивирована, то и закрывать не нужно (то есть задавать видимость)
+        if (isMultiSelectionEnabled) closeMultiSelectionPanel()
 
         //Если нажата кнопка btnHome, очищающая стэк фрагментов, то просто выходим из этого метода,
         //не выполняя дальнейший код, потому что данные сохранённого стэка уже очищены в методе btnHomeClicked()
@@ -303,8 +324,22 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         saveLoadData.saveString(DATA_TO_RESTORE, dataToRestoreJson)  //Сохранять данные тогда, когда фрагмент выходит из видимости
     }
 
+    fun notifyDataSetChanged() {
+        vpAdapter?.getRecyclerView(chapterInfo!!.chapterNumber - 1)?.adapter?.notifyDataSetChanged()
+    }
+
+
     override fun onStop() {
         super.onStop()
+
+        //Если фрагмент закрывается и режим множественного выбора включён, то отключаем режим множественного выбора текстов
+        //Закрытие режима множественного выбора происходит по разному в случае нажатия кнопки btnHome в BottomAppBar и в других случаях,
+        //потому и вызываются 2 разных метода в разных случаях. В случае, когда нажата кнопки btnHome, вызывается метод disableMultiSelectionIfButtonHomeClicked(),
+        //а если фрагмент закрывается любым другим способом, то вызывается просто disableMultiSelection()
+        if (isBtnHomeClicked && isMultiSelectionEnabled) {
+            listener.disableMultiSelectionIfButtonHomeClicked()
+        } else if (isMultiSelectionEnabled) listener.disableMultiSelection()
+
         Utility.log("BibleTextFragment: onStop")
     }
 
@@ -370,11 +405,11 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     override fun setBottomAppBarFABVisibility(isMakeVisible: Boolean) {
         if (isMakeVisible) {
             if (!listener.isFabShown()) {
-                listener.setFABVisibility(true)
+                listener.setFABVisibilityWhenScroll(true)
             }
         } else {
             if (listener.isFabShown()) {
-                listener.setFABVisibility(false)
+                listener.setFABVisibilityWhenScroll(false)
             }
         }
     }

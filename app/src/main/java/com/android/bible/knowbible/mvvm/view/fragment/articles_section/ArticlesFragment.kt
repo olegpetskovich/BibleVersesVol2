@@ -2,6 +2,7 @@ package com.android.bible.knowbible.mvvm.view.fragment.articles_section
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +17,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.bible.knowbible.App
 import com.android.bible.knowbible.R
-import com.android.bible.knowbible.data.local.ArticlesDBHelper.Companion.ARTICLES_DATA_BASE_NAME
 import com.android.bible.knowbible.mvvm.model.ArticleModel
 import com.android.bible.knowbible.mvvm.view.adapter.ArticlesRVAdapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
@@ -29,7 +29,11 @@ import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import io.grpc.Status
 import kotlinx.android.synthetic.main.fragment_articles.*
+import java.net.ConnectException
+import javax.net.ssl.SSLHandshakeException
+
 
 class ArticlesFragment : Fragment(), IThemeChanger, IChangeFragment {
     private lateinit var listener: IActivityCommunicationListener
@@ -149,6 +153,15 @@ class ArticlesFragment : Fragment(), IThemeChanger, IChangeFragment {
 //                    })
         }
     }
+
+    private fun isSslHandshakeError(status: Status): Boolean {
+        val code: Status.Code = status.code
+        val t: Throwable? = status.cause
+        return (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP && code == Status.Code.UNAVAILABLE
+                && (t is SSLHandshakeException
+                || t is ConnectException && t.message!!.contains("EHOSTUNREACH")))
+    }
+
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)

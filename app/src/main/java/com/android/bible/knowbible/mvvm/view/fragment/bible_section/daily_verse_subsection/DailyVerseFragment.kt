@@ -45,7 +45,7 @@ class DailyVerseFragment : Fragment() {
     private lateinit var bibleDataViewModel: BibleDataViewModel
     private lateinit var bibleTextInfoDBHelper: BibleTextInfoDBHelper
 
-    private lateinit var dailyVersesDBHelper: DailyVersesDBHelper
+//    private lateinit var dailyVersesDBHelper: DailyVersesDBHelper
 
     private lateinit var progressBar: ProgressBar
     private lateinit var ivBook: ImageView
@@ -81,18 +81,18 @@ class DailyVerseFragment : Fragment() {
 
             bibleTextInfoDBHelper = BibleTextInfoDBHelper.getInstance(context)!! //DBHelper для работы с БД информации текста
 
-            dailyVersesDBHelper = DailyVersesDBHelper(context!!)
-            dailyVersesDBHelper
-                    .loadDailyVersesList()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { dailyVersesList ->
-                        dailyVersesListInfo = dailyVersesList
+//            dailyVersesDBHelper = DailyVersesDBHelper(context!!)
+//            dailyVersesDBHelper
+//                    .loadDailyVersesList()
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe { dailyVersesList ->
+//                        dailyVersesListInfo = dailyVersesList
 
                         tvVerse.visibility = View.VISIBLE
                         val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
                         tvVerse.startAnimation(animation)
-                    }
+//                    }
         }
 
         btnFind = myView.findViewById(R.id.btnFind)
@@ -107,20 +107,21 @@ class DailyVerseFragment : Fragment() {
             tvVerse.startAnimation(animation)
         }
 
-        btnList = myView.findViewById(R.id.btnList)
-        btnList.setOnClickListener {
-            myFragmentManager.let {
-                val dailyVersesListFragment = DailyVersesListFragment()
-                dailyVersesListFragment.setRootFragmentManager(myFragmentManager)
-                dailyVersesListFragment.setDailyVersesListInfo(dailyVersesListInfo)
-
-                val transaction: FragmentTransaction = it.beginTransaction()
-                transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-                transaction.addToBackStack(null)
-                transaction.replace(R.id.fragment_container_bible, dailyVersesListFragment)
-                transaction.commit()
-            }
-        }
+        //Функция добавления и удаления стиха в Стих Дня не будет добавлена в рабочий вариант приложения, потому как сочтена не совсем удобной и подходящей для пользователя
+//        btnList = myView.findViewById(R.id.btnList)
+//        btnList.setOnClickListener {
+//            myFragmentManager.let {
+//                val dailyVersesListFragment = DailyVersesListFragment()
+//                dailyVersesListFragment.setRootFragmentManager(myFragmentManager)
+//                dailyVersesListFragment.setDailyVersesListInfo(dailyVersesListInfo)
+//
+//                val transaction: FragmentTransaction = it.beginTransaction()
+//                transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+//                transaction.addToBackStack(null)
+//                transaction.replace(R.id.fragment_container_bible, dailyVersesListFragment)
+//                transaction.commit()
+//            }
+//        }
 
         btnShare = myView.findViewById(R.id.btnShare)
         btnShare.setOnClickListener {
@@ -183,26 +184,17 @@ class DailyVerseFragment : Fragment() {
             ThemeManager.Theme.LIGHT -> {
                 ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconLightTheme), PorterDuff.Mode.SRC_IN)
 
-                btnList.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconLightTheme)
-                btnList.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextLightTheme))
-
                 btnShare.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconLightTheme)
                 btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextLightTheme))
             }
             ThemeManager.Theme.DARK -> {
                 ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconDarkTheme), PorterDuff.Mode.SRC_IN)
 
-                btnList.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconLightTheme)
-                btnList.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextDarkTheme))
-
                 btnShare.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconLightTheme)
                 btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextDarkTheme))
             }
             ThemeManager.Theme.BOOK -> {
                 ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconBookTheme), PorterDuff.Mode.SRC_IN)
-
-                btnList.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconBookTheme)
-                btnList.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextBookTheme))
 
                 btnShare.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconBookTheme)
                 btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextBookTheme))

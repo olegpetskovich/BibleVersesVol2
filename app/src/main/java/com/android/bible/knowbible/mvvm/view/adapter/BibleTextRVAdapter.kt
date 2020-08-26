@@ -36,7 +36,11 @@ import kotlin.collections.ArrayList
 class BibleTextRVAdapter(private val context: Context, private val models: ArrayList<BibleTextModel>, private val myFragmentManager: FragmentManager) : RecyclerView.Adapter<BibleTextRVAdapter.MyViewHolder>() {
     private var verseDialog: VerseDialog? = null
 
-    private var isMultiSelectionEnabled: Boolean = false
+    //Есть нужда, чтобы это поле было static, потому что доступ к нему должен быть из разных классов
+    //для обеспечения отключения режима множественного выбора текстов
+    companion object {
+        var isMultiSelectionEnabled: Boolean = false
+    }
 
     private lateinit var multiSelectedTextsList: ArrayList<BibleTextModel>
 
@@ -264,7 +268,7 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
             anim.duration = 300
             anim.start()
 
-            //Если не выбран ни один текст, то отключаем режим мульти выбора текстов
+            //Если не выбран ни один текст, то отключаем режим мульти(множественного) выбора текстов
             if (multiSelectedTextsList.size == 0) {
                 isMultiSelectionEnabled = false
                 multiSelectionListener.closeMultiSelectionPanel()
@@ -272,13 +276,13 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
             }
 
             Collections.sort(multiSelectedTextsList, Comparator { obj1, obj2 ->
-                // ## Ascending order
-                return@Comparator Integer.valueOf(obj1.verse_number).compareTo(obj2.verse_number) // To compare string values
-                // return Integer.valueOf(obj1.empId).compareTo(Integer.valueOf(obj2.empId)); // To compare integer values
+                //По возрастанию
+                return@Comparator Integer.valueOf(obj1.verse_number).compareTo(obj2.verse_number) //Для сравнения строковых значений
+                // return Integer.valueOf(obj1.empId).compareTo(Integer.valueOf(obj2.empId)); //Для сравнения целочисленных значений
 
-                // ## Descending order
-                // return obj2.firstName.compareToIgnoreCase(obj1.firstName); // To compare string values
-                // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); // To compare integer values
+                //В порядке убывания
+                // return obj2.firstName.compareToIgnoreCase(obj1.firstName); //Для сравнения строковых значений
+                // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); //Для сравнения целочисленных значений
             })
 
 

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.android.bible.knowbible.R
+import com.android.bible.knowbible.mvvm.view.fragment.more_section.MoreFragment
 
 class MoreRootFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

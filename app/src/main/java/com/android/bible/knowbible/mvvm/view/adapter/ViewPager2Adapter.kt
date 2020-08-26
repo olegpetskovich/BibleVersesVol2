@@ -140,7 +140,7 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
     }
 
     fun getRecyclerView(posPage: Int): RecyclerView? {
-        return if (mapRV[posPage]?.layoutManager != null) mapRV[posPage]
+        return if (mapRV.contains(posPage) && mapRV[posPage]?.layoutManager != null) mapRV[posPage]
         else null
     }
 

@@ -46,7 +46,7 @@ class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFr
     private lateinit var verseData: BibleTextModel
     private lateinit var verseShortName: String
 
-    private lateinit var dailyVersesDBHelper: DailyVersesDBHelper
+//    private lateinit var dailyVersesDBHelper: DailyVersesDBHelper
 
     private lateinit var myFragmentManager: FragmentManager
 
@@ -143,26 +143,32 @@ class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFr
             listener.dismissDialog()
         }
 
-        val tvAddToDailyVerse: TextView = view.findViewById(R.id.tvAddToDailyVerse)
-        tvAddToDailyVerse.setOnClickListener {
-            dailyVersesDBHelper.addDailyVerse(DailyVerseModel(-1/*Тут это заглушка*/, verseData.book_number, verseData.chapter_number, verseData.verse_number))
-            listener.dismissDialog()
-        }
+        //Функция добавления и удаления стиха в Стих Дня не будет добавлена в рабочий вариант приложения, потому как сочтена не совсем удобной и подходящей для пользователя
+        //Список стихов дня будет добавляться разработчиком и предоставляться пользователю как готовый вариант.
+        //Чтобы пользователь, во-первых, не "игрался" с добавлением текстов в стих дня,
+        //и, во-вторых, чтобы пользователю было интереснее от того, что ему буду попадаться те тексты Библии, которые им заведомо не были добавлены,
+        //то есть потенциально он не будет знать о всём списке текстом и от этого интерес к функции Стих дня будет больше
+        //Но пока код будет просто закомментирован, вдруг пригодится
 
-        val tvRemoveFromDailyVerse: TextView = view.findViewById(R.id.tvRemoveFromDailyVerse)
-        tvRemoveFromDailyVerse.setOnClickListener {
-            dailyVersesDBHelper.deleteDailyVerse(verseData.book_number, verseData.chapter_number, verseData.verse_number)
-            listener.dismissDialog()
-        }
-
-        dailyVersesDBHelper = DailyVersesDBHelper(context!!) //DBHelper для работы с БД информации раздела "Стих дня"
-        if (dailyVersesDBHelper.isBibleTextInfoInDB(verseData.book_number, verseData.chapter_number, verseData.verse_number)) {
-            tvAddToDailyVerse.visibility = View.GONE
-            tvRemoveFromDailyVerse.visibility = View.VISIBLE
-        } else {
-            tvAddToDailyVerse.visibility = View.VISIBLE
-            tvRemoveFromDailyVerse.visibility = View.GONE
-        }
+//        val tvAddToDailyVerse: TextView = view.findViewById(R.id.tvAddToDailyVerse)
+//        tvAddToDailyVerse.setOnClickListener {
+//            dailyVersesDBHelper.addDailyVerse(DailyVerseModel(-1/*Тут это заглушка*/, verseData.book_number, verseData.chapter_number, verseData.verse_number))
+//            listener.dismissDialog()
+//        }
+//
+//        val tvRemoveFromDailyVerse: TextView = view.findViewById(R.id.tvRemoveFromDailyVerse)
+//        tvRemoveFromDailyVerse.setOnClickListener {
+//            dailyVersesDBHelper.deleteDailyVerse(verseData.book_number, verseData.chapter_number, verseData.verse_number)
+//            listener.dismissDialog()
+//        }
+//        dailyVersesDBHelper = DailyVersesDBHelper(context!!) //DBHelper для работы с БД информации раздела "Стих дня"
+//        if (dailyVersesDBHelper.isBibleTextInfoInDB(verseData.book_number, verseData.chapter_number, verseData.verse_number)) {
+//            tvAddToDailyVerse.visibility = View.GONE
+//            tvRemoveFromDailyVerse.visibility = View.VISIBLE
+//        } else {
+//            tvAddToDailyVerse.visibility = View.VISIBLE
+//            tvRemoveFromDailyVerse.visibility = View.GONE
+//        }
 
 
         val tvAddToNotes: TextView = view.findViewById(R.id.tvAddToNotes)

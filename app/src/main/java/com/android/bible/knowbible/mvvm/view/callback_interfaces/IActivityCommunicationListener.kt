@@ -8,12 +8,15 @@ import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 interface IActivityCommunicationListener {
     fun setTabNumber(tabNumber: Int)
 
+    fun disableMultiSelection()
+    fun disableMultiSelectionIfButtonHomeClicked()
+
     //Это нужно для управления BottomAppBar в BibleTextFragment
     fun setBibleTextFragment(bibleTextFragment: BibleTextFragment)
 
     fun setBottomAppBarVisibility(visibility: Int)
 
-    fun setFABVisibility(fabVisibility: Boolean)
+    fun setFABVisibilityWhenScroll(fabVisibility: Boolean)
     fun isFabShown(): Boolean
 
     fun setTheme(theme: ThemeManager.Theme, animate: Boolean = true)

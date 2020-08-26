@@ -12,7 +12,7 @@ import com.android.bible.knowbible.mvvm.view.callback_interfaces.ISelectBibleTex
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTextFragment
 
-class ChaptersRVAdapter(private val models: ArrayList<ChapterModel>) : RecyclerView.Adapter<ChaptersRVAdapter.MyViewHolder>() {
+class ChaptersRVAdapter(private val models: ArrayList<Int>) : RecyclerView.Adapter<ChaptersRVAdapter.MyViewHolder>() {
     private lateinit var fragmentChanger: IChangeFragment
     fun setFragmentChangerListener(fragmentChanger: IChangeFragment) {
         this.fragmentChanger = fragmentChanger
@@ -39,7 +39,7 @@ class ChaptersRVAdapter(private val models: ArrayList<ChapterModel>) : RecyclerV
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.tvBookName.text = models[position].chapterNumber.toString()
+        holder.tvBookName.text = models[position].toString()
     }
 
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -49,10 +49,14 @@ class ChaptersRVAdapter(private val models: ArrayList<ChapterModel>) : RecyclerV
             themeChanger.changeItemTheme() //Смена темы для айтемов
 
             itemView.setOnClickListener {
-                selectBibleTextListener.setSelectedBibleText(models[adapterPosition].chapterNumber.toString(), false)
+                selectBibleTextListener.setSelectedBibleText(models[adapterPosition].toString(), false)
 
                 val bibleTextFragment = BibleTextFragment()
-                bibleTextFragment.chapterInfo = models[adapterPosition]
+                //Немного костыльно приходится присваивать значение в ChapterModel
+                //Тут через конструктор присваем значение полю chapterNumber,
+                //а потом вызовом поля bookNumber присваиваем значение и ему в коллбэке changeFragment в SelectBookChapterFragment
+                //Но это обеспечивает хорошую производиельность при загрузке количества глав выбранной книги
+                bibleTextFragment.chapterInfo = ChapterModel(-1, models[adapterPosition])
                 fragmentChanger.changeFragment(bibleTextFragment)
             }
         }

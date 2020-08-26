@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.BookModel
 import com.android.bible.knowbible.mvvm.model.ChapterModel
+import com.android.bible.knowbible.mvvm.model.EnumBooksChapters
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.search_subsection.SearchFragment.Companion.NEW_TESTAMENT_SECTION
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.search_subsection.SearchFragment.Companion.OLD_TESTAMENT_SECTION
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
@@ -40,7 +41,8 @@ class BibleTextDBHelper {
 //            dataBase.query(tableName, null, "book_number >= ?", arrayOf(matthewBookNumber.toString()), null, null, null)
 //        }
         val cursor = dataBase.query(tableName, null, null, null, null, null, null)
-        val collection = ArrayList<BookModel>()
+        val mainCollection = ArrayList<BookModel>()
+        val secondCollection = ArrayList<BookModel>()
         if (cursor.moveToFirst()) {
             do {
                 val bookNumber = cursor.getInt(cursor.getColumnIndex("book_number"))
@@ -53,17 +55,31 @@ class BibleTextDBHelper {
 
                 val bookInfo = BookModel(bookNumber, bookShortName, bookLongName)
 
-                collection.add(bookInfo)
+                //В Новом Завете меняем порядок расположения книг, потому что в БД он не такой, как стандартно принятно.
+                //В БД после Деяний идут послания Павла, а в привычном варианте сначала идут соборные послания, а потом уже послания Павла
+                if (!isOldTestament) {
+                    //Если номер книги идет в промежутке от 660 до 720 включительно(то есть от книги Иакова до книги Иуды),
+                    //то добавляем их в отдельную коллекцию, чтобы потом добавить в главную коллекцию в нужное место ради стандартного порядка расопложения книг Библии
+                    if (bookNumber in 660..720) secondCollection.add(bookInfo)
+                    else mainCollection.add(bookInfo)
+                } else
+                    mainCollection.add(bookInfo)
 
             } while (cursor.moveToNext())
         }
+
+        if (!isOldTestament)
+            //Индекс 5 это индекс, идущий по счёту после книги Деяний. Добавляем после Деяний соборные послания, а потом уже идут послания Павла и остальное
+            mainCollection.addAll(5, secondCollection)
+
         cursor.close()
-        return Single.fromCallable<ArrayList<BookModel>> { collection }
+        return Single.fromCallable<ArrayList<BookModel>> { mainCollection }
     }
 
     fun loadAllBooksList(tableName: String): Single<ArrayList<BookModel>> {
         val cursor = dataBase.query(tableName, null, null, null, null, null, null)
-        val collection = ArrayList<BookModel>()
+        val mainCollection = ArrayList<BookModel>()
+        val secondCollection = ArrayList<BookModel>()
         if (cursor.moveToFirst()) {
             do {
                 val bookNumber = cursor.getInt(cursor.getColumnIndex("book_number"))
@@ -72,12 +88,23 @@ class BibleTextDBHelper {
 
                 val bookInfo = BookModel(bookNumber, bookShortName, bookLongName)
 
-                collection.add(bookInfo)
-
+                //Если номер книги идет в промежутке от 660 до 720 включительно(то есть от книги Иакова до книги Иуды),
+                //то добавляем их в отдельную коллекцию, чтобы потом добавить в главную коллекцию в нужное место ради стандартного порядка расопложения книг Библии
+                if (bookNumber in 660..720) secondCollection.add(bookInfo)
+                else mainCollection.add(bookInfo)
             } while (cursor.moveToNext())
         }
+
+        //Индекс 44 это индекс, идущий по счёту после книги Деяний. Добавляем после Деяний соборные послания, а потом уже идут послания Павла и остальное
+        mainCollection.addAll(44, secondCollection)
+
+        //Добавляем в каждый объект коллекции mainCollection информации о количестве глав для каждой книги
+        EnumBooksChapters.values().forEachIndexed { index, enumBookChapters ->
+            mainCollection[index].number_of_chapters = enumBookChapters.numberOfChapters
+        }
+
         cursor.close()
-        return Single.fromCallable<ArrayList<BookModel>> { collection }
+        return Single.fromCallable<ArrayList<BookModel>> { mainCollection }
     }
 
     fun loadChaptersList(tableName: String, bookNumber: Int): Single<ArrayList<ChapterModel>> {

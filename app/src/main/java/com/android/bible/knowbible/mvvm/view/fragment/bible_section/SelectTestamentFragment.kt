@@ -43,7 +43,7 @@ open class SelectTestamentFragment : Fragment() {
 
         saveLoadData = SaveLoadData(context!!)
 
-        //Получаем данные, которые будут использованы для восстановления стека фрагментов то ли после поворота экрана, то ли в случае, когда человек закрыл приложение из диспетчера задача
+        //Получаем данные, которые будут использованы для восстановления стека фрагментов в случае, когда человек закрыл приложение из диспетчера задача
         dataToRestoreModel = null
         if (saveLoadData.loadString(BibleTextFragment.DATA_TO_RESTORE) != null && saveLoadData.loadString(BibleTextFragment.DATA_TO_RESTORE)!!.isNotEmpty()) {
             val gson = Gson()
@@ -51,7 +51,7 @@ open class SelectTestamentFragment : Fragment() {
         }
 
         //!Utility.isTranslationsDownloaded() - Проверяем, если в папке, которая содержит БД с переводами Библии, пусто, то открываем фрагмент, в котором будет представлен список переводов. Пользователь должен скачать как минмум один перевод Библии, чтобы пользоваться приложением полноценно.
-        //Если же хотя бы один перевод скачан, то в последующие разы будет открываться фрагмент выбора заветов.
+        //Если же хотя бы один перевод скачан, то в последующие разы будет открываться фрагмент выбора заветов (SelectTestamentFragment).
         if (!Utility.isTranslationsDownloaded(context!!)) {
             openBibleTranslationsFragment()
         }
@@ -165,7 +165,6 @@ open class SelectTestamentFragment : Fragment() {
         val transaction: FragmentTransaction = myFragmentManager.beginTransaction()
         transaction.setReorderingAllowed(false)
         transaction.detach(this).attach(this).commitAllowingStateLoss()
-
     }
 
 

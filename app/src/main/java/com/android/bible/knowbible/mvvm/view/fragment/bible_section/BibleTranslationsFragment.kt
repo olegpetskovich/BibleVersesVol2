@@ -141,9 +141,16 @@ class BibleTranslationsFragment : Fragment(), BibleTranslationsRVAdapter.IFragme
         listener.setBtnSelectTranslationClickableState(false) //Отключаем возможность нажимать на кнопку выбора переводов, чтобы нельзя было открывать фрагмент постоянно. Устанавливать нужно именно в методе onResume, чтобы в случае, когда приложение выводится из свёрнутого, кнопка снова отключилась.
 
         //Поскольку кнопку перевода нужно показывать только в том случае, когда какой-то перевод уже выбран, проводится такая проверка:
+        //Проверяем, сохранена ли информация о ранее выбранном переводе, если нет, то не показываем кнопку, если да, то прооисходит след. проверка
+        //Если ранее выбранный перевод не удалён, то показывает кнопку, если удалён, то не показываем
         val jsonBibleInfo = saveLoadData.loadString(TRANSLATION_DB_FILE_JSON_INFO)
         if (jsonBibleInfo != null && jsonBibleInfo.isNotEmpty()) {
-            listener.setBtnSelectTranslationVisibility(View.VISIBLE)
+            val bibleTranslationInfo: BibleTranslationModel = Gson().fromJson(jsonBibleInfo, BibleTranslationModel::class.java)
+            if (Utility.isSelectedTranslationDownloaded(context!!, bibleTranslationInfo)) {
+                listener.setBtnSelectTranslationVisibility(View.VISIBLE)
+            } else {
+                listener.setBtnSelectTranslationVisibility(View.GONE)
+            }
         } else {
             listener.setBtnSelectTranslationVisibility(View.GONE)
         }

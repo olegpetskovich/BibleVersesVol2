@@ -17,7 +17,10 @@ import com.android.bible.knowbible.mvvm.view.fragment.bible_section.SelectBookCh
 
 
 class BooksRVAdapter(private val models: ArrayList<BookModel>) : RecyclerView.Adapter<BooksRVAdapter.MyViewHolder>() {
-    interface BookInfoDialogListener { fun createInfoDialog() }
+    interface BookInfoDialogListener {
+        fun createInfoDialog()
+    }
+
     private lateinit var bookInfoDialogListener: BookInfoDialogListener
     fun setBookInfoDialogListener(bookInfoDialogListener: BookInfoDialogListener) {
         this.bookInfoDialogListener = bookInfoDialogListener
@@ -54,7 +57,7 @@ class BooksRVAdapter(private val models: ArrayList<BookModel>) : RecyclerView.Ad
 
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvBookName: TextView = itemView.findViewById(R.id.tvBookName)
-        val btnBookInfo: ImageView = itemView.findViewById(R.id.btnBookInfo)
+        private val btnBookInfo: ImageView = itemView.findViewById(R.id.btnBookInfo)
 
         init {
             themeChanger.changeItemTheme() //Смена темы для айтемов
@@ -68,6 +71,15 @@ class BooksRVAdapter(private val models: ArrayList<BookModel>) : RecyclerView.Ad
 
                 val selectBookChapterFragment = SelectBookChapterFragment()
                 selectBookChapterFragment.bookNumber = models[adapterPosition].book_number
+
+                val chaptersList = ArrayList<Int>()
+                var x = 0
+                while (chaptersList.size < models[adapterPosition].number_of_chapters) {
+                    chaptersList.add(x + 1)
+                    x++
+                }
+                selectBookChapterFragment.chaptersList = chaptersList
+
                 fragmentChanger.changeFragment(selectBookChapterFragment)
             }
         }

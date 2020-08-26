@@ -1,4 +1,4 @@
-package com.apps.oleg.bibleverses.mvvm.view.fragment.more_section
+package com.android.bible.knowbible.mvvm.view.fragment.more_section
 
 import android.content.Context
 import android.os.Bundle

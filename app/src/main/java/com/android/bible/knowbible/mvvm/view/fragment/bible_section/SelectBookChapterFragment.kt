@@ -35,6 +35,8 @@ class SelectBookChapterFragment : Fragment(), IChangeFragment, IThemeChanger, IS
     var chapterNumber: Int = -1 //Переменная, предназначенная для восстановления стэка фрагментов
     var bookNumber: Int = -1
 
+    lateinit var chaptersList: ArrayList<Int>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true //Без этого кода не будет срабатывать поворот экрана
@@ -70,22 +72,36 @@ class SelectBookChapterFragment : Fragment(), IChangeFragment, IThemeChanger, IS
         val progressBar: ProgressBar = myView.findViewById(R.id.downloadProgressBar)
         progressBar.visibility = View.VISIBLE
 
+//        bibleDataViewModel
+//                .getChaptersList(BibleDataViewModel.TABLE_VERSES, bookNumber)
+//                .observe(viewLifecycleOwner, Observer { list ->
+//                    val rvAdapter = ChaptersRVAdapter(list)
+//                    rvAdapter.setFragmentChangerListener(this)
+//                    rvAdapter.setRecyclerViewThemeChangerListener(this) //Для RecyclerView тему нужно обновлять отдельно от смены темы для всего фрагмента. Если менять тему только для всего фрагмента, не меняя при этом тему для списка, то в списке тема не поменяется.
+//                    rvAdapter.setSelectedBibleTextListener(this)
+//
+//                    recyclerView.adapter = rvAdapter
+//
+//                    bibleDataViewModel
+//                            .getBookShortName(BibleDataViewModel.TABLE_BOOKS, bookNumber)
+//                            .observe(viewLifecycleOwner, Observer { shortName ->
+//                                listener.setTvSelectedBibleText("$shortName.", true)
+//                            })
+//                })
+
+        val rvAdapter = ChaptersRVAdapter(chaptersList)
+        rvAdapter.setFragmentChangerListener(this)
+        rvAdapter.setRecyclerViewThemeChangerListener(this) //Для RecyclerView тему нужно обновлять отдельно от смены темы для всего фрагмента. Если менять тему только для всего фрагмента, не меняя при этом тему для списка, то в списке тема не поменяется.
+        rvAdapter.setSelectedBibleTextListener(this)
+
+        recyclerView.adapter = rvAdapter
+
         bibleDataViewModel
-                .getChaptersList(BibleDataViewModel.TABLE_VERSES, bookNumber)
-                .observe(viewLifecycleOwner, Observer { list ->
-                    val rvAdapter = ChaptersRVAdapter(list)
-                    rvAdapter.setFragmentChangerListener(this)
-                    rvAdapter.setRecyclerViewThemeChangerListener(this) //Для RecyclerView тему нужно обновлять отдельно от смены темы для всего фрагмента. Если менять тему только для всего фрагмента, не меняя при этом тему для списка, то в списке тема не поменяется.
-                    rvAdapter.setSelectedBibleTextListener(this)
-
-                    recyclerView.adapter = rvAdapter
-
-                    bibleDataViewModel
-                            .getBookShortName(BibleDataViewModel.TABLE_BOOKS, bookNumber)
-                            .observe(viewLifecycleOwner, Observer { shortName ->
-                                listener.setTvSelectedBibleText("$shortName.", true)
-                            })
+                .getBookShortName(BibleDataViewModel.TABLE_BOOKS, bookNumber)
+                .observe(viewLifecycleOwner, Observer { shortName ->
+                    listener.setTvSelectedBibleText("$shortName.", true)
                 })
+
         recyclerView.layoutManager = GridLayoutManager(context, 4)
         recyclerView.itemAnimator = DefaultItemAnimator()
 
@@ -96,6 +112,7 @@ class SelectBookChapterFragment : Fragment(), IChangeFragment, IThemeChanger, IS
     override fun changeFragment(fragment: Fragment) {
         myFragmentManager.let {
             val myFragment = fragment as BibleTextFragment
+            myFragment.chapterInfo!!.bookNumber = bookNumber
             myFragment.setRootFragmentManager(myFragmentManager)
 
             val transaction: FragmentTransaction = it.beginTransaction()

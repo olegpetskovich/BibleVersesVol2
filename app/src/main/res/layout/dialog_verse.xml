@@ -79,42 +79,42 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
-            android:id="@+id/tvAddToDailyVerse"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="start"
-            android:paddingStart="18dp"
-            android:paddingTop="14dp"
-            android:paddingEnd="18dp"
-            android:paddingBottom="14dp"
-            android:text="@string/tv_add_to_daily_verse"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--        <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView-->
+<!--            android:id="@+id/tvAddToDailyVerse"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="?attr/selectableItemBackground"-->
+<!--            android:clickable="true"-->
+<!--            android:focusable="true"-->
+<!--            android:gravity="start"-->
+<!--            android:paddingStart="18dp"-->
+<!--            android:paddingTop="14dp"-->
+<!--            android:paddingEnd="18dp"-->
+<!--            android:paddingBottom="14dp"-->
+<!--            android:text="@string/tv_add_to_daily_verse"-->
+<!--            android:textSize="18sp"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
-        <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
-            android:id="@+id/tvRemoveFromDailyVerse"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="start"
-            android:paddingStart="18dp"
-            android:paddingTop="14dp"
-            android:paddingEnd="18dp"
-            android:paddingBottom="14dp"
-            android:text="@string/tv_remove_from_daily_verse"
-            android:textSize="18sp"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--        <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView-->
+<!--            android:id="@+id/tvRemoveFromDailyVerse"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="?attr/selectableItemBackground"-->
+<!--            android:clickable="true"-->
+<!--            android:focusable="true"-->
+<!--            android:gravity="start"-->
+<!--            android:paddingStart="18dp"-->
+<!--            android:paddingTop="14dp"-->
+<!--            android:paddingEnd="18dp"-->
+<!--            android:paddingBottom="14dp"-->
+<!--            android:text="@string/tv_remove_from_daily_verse"-->
+<!--            android:textSize="18sp"-->
+<!--            android:visibility="visible"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
         <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
             android:id="@+id/tvAddToNotes"

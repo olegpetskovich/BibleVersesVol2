@@ -1,4 +1,4 @@
-package com.apps.oleg.bibleverses.mvvm.view.fragment.more_section
+package com.android.bible.knowbible.mvvm.view.fragment.more_section
 
 import android.content.Context
 import android.os.Bundle
@@ -11,8 +11,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
-import com.android.bible.knowbible.mvvm.view.fragment.more_section.AppLanguageFragment
-import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.utility.SaveLoadData
 
