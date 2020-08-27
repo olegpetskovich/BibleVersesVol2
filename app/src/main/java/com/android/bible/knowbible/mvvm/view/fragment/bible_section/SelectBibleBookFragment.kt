@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.bible.knowbible.R
+import com.android.bible.knowbible.mvvm.model.BibleTranslationModel
 import com.android.bible.knowbible.mvvm.model.BookModel
 import com.android.bible.knowbible.mvvm.model.DataToRestoreModel
-import com.android.bible.knowbible.mvvm.view.activity.SplashScreenActivity
 import com.android.bible.knowbible.mvvm.view.adapter.BooksRVAdapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.*
 import com.android.bible.knowbible.mvvm.view.dialog.BookInfoDialog
@@ -25,12 +25,12 @@ import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 
 class SelectBibleBookFragment : Fragment(), IChangeFragment, IThemeChanger, ISelectBibleText, BooksRVAdapter.BookInfoDialogListener, DialogListener {
     var bookNumber: Int = -1 //Переменная, предназначенная для восстановления стэка фрагментов
     var isOldTestament: Boolean = false //Переменная, предназначенная для определения того, данные какого завета нужно предоставить. true - Ветхий Завет, false - Новый завет. На данный момент присвоено значение по умолчанию - false
+    var abbreviationTranslationName: String = "" //Переменная, предназначенная для определения того, какой перевод выбран
 
     private lateinit var saveLoadData: SaveLoadData
     private lateinit var bibleDataViewModel: BibleDataViewModel
@@ -39,6 +39,8 @@ class SelectBibleBookFragment : Fragment(), IChangeFragment, IThemeChanger, ISel
 
     private lateinit var myFragmentManager: FragmentManager
     private lateinit var recyclerView: RecyclerView
+    private lateinit var booksList: ArrayList<BookModel>
+
 
     private lateinit var bookInfoDialog: BookInfoDialog //Диалог краткого описания книги
 
@@ -90,42 +92,34 @@ class SelectBibleBookFragment : Fragment(), IChangeFragment, IThemeChanger, ISel
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.itemAnimator = DefaultItemAnimator()
 
-        //Получаем список книг, полученных с помощью предзагрузки данных в SplashScreenActivity. Это обеспечивает более быструю загрузку фрагмента с данными
-        val gson = Gson()
-        val booksList: ArrayList<BookModel>
-        booksList = if (isOldTestament) {
-            val oldTestamentBooksListJson = activity!!.intent.getStringExtra(SplashScreenActivity.OLD_TESTAMENT_LIST_KEY)
-            val oldTestamentList: ArrayList<BookModel> = gson.fromJson(oldTestamentBooksListJson, object : TypeToken<ArrayList<BookModel>>() {}.type)
-            oldTestamentList
-        } else {
-            val newTestamentBooksListJson = activity!!.intent.getStringExtra(SplashScreenActivity.NEW_TESTAMENT_LIST_KEY)
-            val newTestamentList: ArrayList<BookModel> = gson.fromJson(newTestamentBooksListJson, object : TypeToken<ArrayList<BookModel>>() {}.type)
-            newTestamentList
+        val jsonBibleTranslationInfo = saveLoadData.loadString(BibleTranslationsFragment.TRANSLATION_DB_FILE_JSON_INFO)
+        if (jsonBibleTranslationInfo != null && jsonBibleTranslationInfo.isNotEmpty()) {
+            val gson = Gson()
+            val bibleTranslationInfo: BibleTranslationModel = gson.fromJson(jsonBibleTranslationInfo, BibleTranslationModel::class.java)
+            if (bibleTranslationInfo.abbreviationTranslationName != abbreviationTranslationName) {
+                bibleDataViewModel
+                        .getTestamentBooksList(BibleDataViewModel.TABLE_BOOKS, isOldTestament)
+                        .observe(viewLifecycleOwner, Observer { list ->
+                            val rvAdapter = BooksRVAdapter(list)
+                            rvAdapter.setFragmentChangerListener(this@SelectBibleBookFragment)
+                            rvAdapter.setRecyclerViewThemeChangerListener(this@SelectBibleBookFragment) //Для RecyclerView тему нужно обновлять отдельно от смены темы для всего фрагмента. Если менять тему только для всего фрагмента, не меняя при этом тему для списка, то в списке тема не поменяется.
+                            rvAdapter.setSelectedBibleTextListener(this@SelectBibleBookFragment)
+                            rvAdapter.setBookInfoDialogListener(this@SelectBibleBookFragment)
+
+                            recyclerView.adapter = rvAdapter
+                            progressBar.visibility = View.GONE
+                        })
+            } else {
+                val rvAdapter = BooksRVAdapter(booksList)
+                rvAdapter.setFragmentChangerListener(this@SelectBibleBookFragment)
+                rvAdapter.setRecyclerViewThemeChangerListener(this@SelectBibleBookFragment) //Для RecyclerView тему нужно обновлять отдельно от смены темы для всего фрагмента. Если менять тему только для всего фрагмента, не меняя при этом тему для списка, то в списке тема не поменяется.
+                rvAdapter.setSelectedBibleTextListener(this@SelectBibleBookFragment)
+                rvAdapter.setBookInfoDialogListener(this@SelectBibleBookFragment)
+
+                recyclerView.adapter = rvAdapter
+                progressBar.visibility = View.GONE
+            }
         }
-
-        val rvAdapter = BooksRVAdapter(booksList)
-        rvAdapter.setFragmentChangerListener(this@SelectBibleBookFragment)
-        rvAdapter.setRecyclerViewThemeChangerListener(this@SelectBibleBookFragment) //Для RecyclerView тему нужно обновлять отдельно от смены темы для всего фрагмента. Если менять тему только для всего фрагмента, не меняя при этом тему для списка, то в списке тема не поменяется.
-        rvAdapter.setSelectedBibleTextListener(this@SelectBibleBookFragment)
-        rvAdapter.setBookInfoDialogListener(this@SelectBibleBookFragment)
-
-        recyclerView.adapter = rvAdapter
-        progressBar.visibility = View.GONE
-
-//        var rvAdapter: BooksRVAdapter
-//        bibleDataViewModel
-//                .getTestamentBooksList(BibleDataViewModel.TABLE_BOOKS, isOldTestament)
-//                .observe(viewLifecycleOwner, Observer { list ->
-//
-//                    rvAdapter = BooksRVAdapter(list)
-//                    rvAdapter.setFragmentChangerListener(this@SelectBibleBookFragment)
-//                    rvAdapter.setRecyclerViewThemeChangerListener(this@SelectBibleBookFragment) //Для RecyclerView тему нужно обновлять отдельно от смены темы для всего фрагмента. Если менять тему только для всего фрагмента, не меняя при этом тему для списка, то в списке тема не поменяется.
-//                    rvAdapter.setSelectedBibleTextListener(this@SelectBibleBookFragment)
-//                    rvAdapter.setBookInfoDialogListener(this@SelectBibleBookFragment)
-//
-//                    recyclerView.adapter = rvAdapter
-//                    progressBar.visibility = View.GONE
-//                })
         return myView
     }
 
@@ -148,6 +142,10 @@ class SelectBibleBookFragment : Fragment(), IChangeFragment, IThemeChanger, ISel
 
     fun setRootFragmentManager(myFragmentManager: FragmentManager) {
         this.myFragmentManager = myFragmentManager
+    }
+
+    fun setBooksList(booksList: ArrayList<BookModel>) {
+        this.booksList = booksList
     }
 
     override fun onAttach(context: Context) {

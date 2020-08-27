@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.mvvm.model.ChapterModel
+import com.android.bible.knowbible.mvvm.model.EnumBooksList
 import com.android.bible.knowbible.mvvm.view.adapter.ChaptersRVAdapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
@@ -54,6 +55,19 @@ class SelectBookChapterFragment : Fragment(), IChangeFragment, IThemeChanger, IS
                 transaction.addToBackStack(null)
                 transaction.replace(R.id.fragment_container_bible, bibleTextFragment)
                 transaction.commit()
+
+                //В случае восстановления стэка фрагментов данные списка глав не инициализируются, потому что тот код не срабатывает при восстановлении стэка.
+                //Поэтому список глав формируем таким образом:
+                chaptersList = ArrayList()
+                for (book in EnumBooksList.values())
+                    if (bookNumber == book.bookNumber) {
+                        var x = 0
+                        while (chaptersList.size < book.numberOfChapters) {
+                            chaptersList.add(x + 1)
+                            x++
+                        }
+                        break
+                    }
 
                 chapterNumber = -1 //Устанавливаем значение -1, чтобы при попытке вернуться на прежний фрагмент, пользователя снова не перебрасывало на уже открытый
             }

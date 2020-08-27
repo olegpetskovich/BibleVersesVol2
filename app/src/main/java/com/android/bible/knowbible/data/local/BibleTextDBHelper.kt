@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.BookModel
 import com.android.bible.knowbible.mvvm.model.ChapterModel
-import com.android.bible.knowbible.mvvm.model.EnumBooksChapters
+import com.android.bible.knowbible.mvvm.model.EnumBooksList
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.search_subsection.SearchFragment.Companion.NEW_TESTAMENT_SECTION
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.search_subsection.SearchFragment.Companion.OLD_TESTAMENT_SECTION
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
@@ -69,8 +69,26 @@ class BibleTextDBHelper {
         }
 
         if (!isOldTestament)
-            //Индекс 5 это индекс, идущий по счёту после книги Деяний. Добавляем после Деяний соборные послания, а потом уже идут послания Павла и остальное
+        //Индекс 5 это индекс, идущий по счёту после книги Деяний. Добавляем после Деяний соборные послания, а потом уже идут послания Павла и остальное
             mainCollection.addAll(5, secondCollection)
+
+        val booksList = ArrayList<EnumBooksList>()
+        if (isOldTestament) {
+            for (element in EnumBooksList.values()) {
+                if (element.bookNumber == matthewBookNumber) break
+                booksList.add(element)
+            }
+        } else {
+            for (element in EnumBooksList.values()) {
+                if (element.bookNumber < matthewBookNumber) continue
+                booksList.add(element)
+            }
+        }
+
+        //Добавляем в каждый объект коллекции mainCollection информацию о количестве глав для каждой книги
+        booksList.forEachIndexed { index, enumBookChapters ->
+            mainCollection[index].number_of_chapters = enumBookChapters.numberOfChapters
+        }
 
         cursor.close()
         return Single.fromCallable<ArrayList<BookModel>> { mainCollection }
@@ -98,8 +116,8 @@ class BibleTextDBHelper {
         //Индекс 44 это индекс, идущий по счёту после книги Деяний. Добавляем после Деяний соборные послания, а потом уже идут послания Павла и остальное
         mainCollection.addAll(44, secondCollection)
 
-        //Добавляем в каждый объект коллекции mainCollection информации о количестве глав для каждой книги
-        EnumBooksChapters.values().forEachIndexed { index, enumBookChapters ->
+        //Добавляем в каждый объект коллекции mainCollection информацию о количестве глав для каждой книги
+        EnumBooksList.values().forEachIndexed { index, enumBookChapters ->
             mainCollection[index].number_of_chapters = enumBookChapters.numberOfChapters
         }
 

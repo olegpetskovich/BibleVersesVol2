@@ -10,8 +10,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.mvvm.model.BibleTranslationModel
+import com.android.bible.knowbible.mvvm.model.BookModel
 import com.android.bible.knowbible.mvvm.model.DataToRestoreModel
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTranslationsFragment.Companion.TRANSLATION_DB_FILE_JSON_INFO
@@ -19,6 +22,7 @@ import com.android.bible.knowbible.mvvm.view.fragment.bible_section.daily_verse_
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.notes_subsection.NotesFragment
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.search_subsection.SearchFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
+import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
 import com.google.android.material.button.MaterialButton
@@ -86,36 +90,58 @@ open class SelectTestamentFragment : Fragment() {
                 val transaction: FragmentTransaction = it.beginTransaction()
                 transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
 
-                val selectBibleBookFragment = SelectBibleBookFragment()
-                selectBibleBookFragment.setRootFragmentManager(myFragmentManager)
+                //Открываем БД с ранее используемым переводом Библии и в кнопку выбора переводов устанавливаем аббревиатуру перевода, который был ранее выбран пользователем
+                var oldTestamentBooksList: ArrayList<BookModel>
+                var newTestamentBooksList: ArrayList<BookModel>
 
-                //В случае если перевод скачан, но не выбран, при нажатии на кнопки завета отрывается фрагмент списка переводов, чтобы пользователь всё-таки выбрал перевод.
-                val translation = saveLoadData.loadString(TRANSLATION_DB_FILE_JSON_INFO)
+                val jsonBibleTranslationInfo = saveLoadData.loadString(TRANSLATION_DB_FILE_JSON_INFO)
+                if (jsonBibleTranslationInfo != null && jsonBibleTranslationInfo.isNotEmpty()) {
+                    val gson = Gson()
+                    val bibleTranslationInfo: BibleTranslationModel = gson.fromJson(jsonBibleTranslationInfo, BibleTranslationModel::class.java)
 
-                val btnOldTestament: MaterialButton = myView.findViewById(R.id.btnOldTestament)
-                btnOldTestament.setOnClickListener {
-                    if (translation == null || translation.isEmpty()) {
+                    //Проверка на то, скачан ли перевод, выбранный ранее, или же перевод удалён и в saveLoadData хранится имя скачанного файла, но его самого не существует.
+                    //Если эту проверку не осуществлять, то в случае удаления выбранного перевода, программа будет пытаться открыть его, но не сможет,
+                    //потому что в действительности он будет удалён
+                    if (Utility.isSelectedTranslationDownloaded(context!!, bibleTranslationInfo)) {
+                        val bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
+                        //Осуществляем предазгрузку книг Библии для большей производительности
+                        bibleDataViewModel
+                                .getAllBooksList(BibleDataViewModel.TABLE_BOOKS)
+                                .observe(viewLifecycleOwner, Observer { list ->
+                                    oldTestamentBooksList = ArrayList(list.subList(0, 39)) //Отрезок с 1-й по 39-ую книги - это ВЗ
+                                    newTestamentBooksList = ArrayList(list.subList(39, 66)) //Отрезок с 1-й по 39-ую книги - это НЗ
+
+                                    val selectBibleBookFragment = SelectBibleBookFragment()
+                                    selectBibleBookFragment.setRootFragmentManager(myFragmentManager)
+
+                                    //В случае если перевод скачан, но не выбран, при нажатии на кнопки завета отрывается фрагмент списка переводов, чтобы пользователь всё-таки выбрал перевод.
+                                    val btnOldTestament: MaterialButton = myView.findViewById(R.id.btnOldTestament)
+                                    btnOldTestament.setOnClickListener {
+                                        selectBibleBookFragment.isOldTestament = true
+                                        selectBibleBookFragment.abbreviationTranslationName = bibleTranslationInfo.abbreviationTranslationName
+                                        oldTestamentBooksList.let { booksList -> selectBibleBookFragment.setBooksList(booksList) }
+                                        transaction.replace(R.id.fragment_container_bible, selectBibleBookFragment)
+                                        transaction.addToBackStack(null)
+                                        transaction.commit()
+                                    }
+
+                                    val btnNewTestament: MaterialButton = myView.findViewById(R.id.btnNewTestament)
+                                    btnNewTestament.setOnClickListener {
+                                        selectBibleBookFragment.isOldTestament = false
+                                        selectBibleBookFragment.abbreviationTranslationName = bibleTranslationInfo.abbreviationTranslationName
+                                        newTestamentBooksList.let { booksList -> selectBibleBookFragment.setBooksList(booksList) }
+                                        transaction.replace(R.id.fragment_container_bible, selectBibleBookFragment)
+                                        transaction.addToBackStack(null)
+                                        transaction.commit()
+                                    }
+                                })
+                    } else {
                         openBibleTranslationsFragment()
                         Toast.makeText(context, context!!.getString(R.string.toast_select_translation), Toast.LENGTH_SHORT).show()
-                    } else {
-                        selectBibleBookFragment.isOldTestament = true
-                        transaction.replace(R.id.fragment_container_bible, selectBibleBookFragment)
-                        transaction.addToBackStack(null)
-                        transaction.commit()
                     }
-                }
-
-                val btnNewTestament: MaterialButton = myView.findViewById(R.id.btnNewTestament)
-                btnNewTestament.setOnClickListener {
-                    if (translation == null || translation.isEmpty()) {
-                        openBibleTranslationsFragment()
-                        Toast.makeText(context, context!!.getString(R.string.toast_select_translation), Toast.LENGTH_SHORT).show()
-                    } else {
-                        selectBibleBookFragment.isOldTestament = false
-                        transaction.replace(R.id.fragment_container_bible, selectBibleBookFragment)
-                        transaction.addToBackStack(null)
-                        transaction.commit()
-                    }
+                } else {
+                    openBibleTranslationsFragment()
+                    Toast.makeText(context, context!!.getString(R.string.toast_select_translation), Toast.LENGTH_SHORT).show()
                 }
 
                 val btnNotes: MaterialButton = myView.findViewById(R.id.btnNotes)

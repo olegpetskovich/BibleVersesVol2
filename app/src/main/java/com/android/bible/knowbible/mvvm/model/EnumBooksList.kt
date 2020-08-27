@@ -1,6 +1,6 @@
 package com.android.bible.knowbible.mvvm.model
 
-enum class EnumBooksChapters(val bookNumber: Int, val numberOfChapters: Int) {
+enum class EnumBooksList(val bookNumber: Int, val numberOfChapters: Int) {
     //ВЕТХИЙ ЗАВЕТ
     GENESIS(10, 50),
     EXODUS(20, 40),

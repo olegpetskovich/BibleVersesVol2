@@ -26,7 +26,8 @@ class BibleDataViewModel : ViewModel() {
 
     private val dataBaseLiveData = MutableLiveData<SQLiteDatabase>()
 
-    private val booksListLiveData = MutableLiveData<ArrayList<BookModel>>()
+    private val testamentBooksListLiveData = MutableLiveData<ArrayList<BookModel>>()
+    private val allBooksListLiveData = MutableLiveData<ArrayList<BookModel>>()
     private val chaptersListLiveData = MutableLiveData<ArrayList<ChapterModel>>()
     private val bibleTextOfChapterLiveData = MutableLiveData<ArrayList<BibleTextModel>>()
     private val searchedBibleVersesLiveData = MutableLiveData<ArrayList<BibleTextModel>>()
@@ -49,12 +50,12 @@ class BibleDataViewModel : ViewModel() {
 
     fun getTestamentBooksList(tableName: String, isOldTestament: Boolean): LiveData<ArrayList<BookModel>> {
         getTestamentBooksListData(tableName, isOldTestament)
-        return booksListLiveData
+        return testamentBooksListLiveData
     }
 
     fun getAllBooksList(tableName: String): LiveData<ArrayList<BookModel>> {
         getAllBooksListData(tableName)
-        return booksListLiveData
+        return allBooksListLiveData
     }
 
     fun getChaptersList(tableName: String, bookNumber: Int): LiveData<ArrayList<ChapterModel>> {
@@ -108,7 +109,7 @@ class BibleDataViewModel : ViewModel() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Consumer {
-                    booksListLiveData.value = it
+                    testamentBooksListLiveData.value = it
                 })
     }
 
@@ -119,7 +120,7 @@ class BibleDataViewModel : ViewModel() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Consumer {
-                    booksListLiveData.value = it
+                    allBooksListLiveData.value = it
                 })
     }
 
