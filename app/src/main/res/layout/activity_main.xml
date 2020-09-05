@@ -82,50 +82,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
-                    android:id="@+id/btnSelectTranslation"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="10dp"
-                    android:enabled="false"
-                    android:layoutDirection="rtl"
-                    android:textSize="17sp"
-                    android:visibility="invisible"
-                    app:cornerRadius="20dp"
-                    app:icon="@drawable/ic_keyboard_arrow"
-                    app:iconPadding="-8dp"
-                    app:iconSize="17dp" />
-
-                <!-- Не менять расположение кнопок btnDeleteNote и btnArticlesInfo -->
-                <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
-                    android:id="@+id/btnDeleteNote"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="14dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:src="@drawable/ic_delete_note"
-                    android:visibility="gone" />
-
-                <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
-                    android:id="@+id/btnArticlesInfo"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="12dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:src="@drawable/ic_articles_info"
-                    android:visibility="invisible" />
-
                 <!-- Ниже блок кнопок для режима выбора нескольких стихов в BibleTextFragment -->
                 <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
                     android:id="@+id/btnHighlight"
@@ -175,6 +131,51 @@
                     android:focusable="true"
                     android:src="@drawable/ic_share"
                     android:visibility="gone" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
+                    android:id="@+id/btnSelectTranslation"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="10dp"
+                    android:enabled="false"
+                    android:layoutDirection="rtl"
+                    android:textSize="17sp"
+                    android:visibility="invisible"
+                    app:cornerRadius="20dp"
+                    app:icon="@drawable/ic_keyboard_arrow"
+                    app:iconPadding="-8dp"
+                    app:iconSize="17dp" />
+
+                <!-- Не менять расположение кнопок btnDeleteNote и btnArticlesInfo -->
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                    android:id="@+id/btnDeleteNote"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="14dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/ic_delete_note"
+                    android:visibility="gone" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                    android:id="@+id/btnArticlesInfo"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="12dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/ic_articles_info"
+                    android:visibility="invisible" />
+
             </RelativeLayout>
         </com.android.bible.knowbible.mvvm.view.theme_editor.MyToolbar>
 
@@ -223,8 +224,7 @@
         app:contentInsetLeft="0dp"
         app:contentInsetRight="0dp"
         app:contentInsetStart="0dp"
-        app:fabAlignmentMode="center"
-        app:hideOnScroll="true">
+        app:fabAlignmentMode="center">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -359,15 +359,36 @@
         </LinearLayout>
     </com.android.bible.knowbible.mvvm.view.theme_editor.MyBottomAppBarLayout>
 
+    <!-- Чтобы обеспечить нормальное появление и исчезновение FAB,
+    приходится выходить из положения, создав 2 FAB: первый - невидимый - для того,
+    чтобы сделать углубление в BottomAppBar,
+    а второй - основной - не прикреплённый к BottomAppBar, который появляется и исчезает так,
+    как нужно. Выходить из данного положения приходится таким образом потому, что код,
+    написанный в MainActivity для appBarLayout будет срабатывать так,
+    как надо, именно с таким описанием xml. Если сделать только один FAB,
+    то он будет появляться не так, как нужно, выходя за рамки BottomAppBar -->
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
+        android:id="@+id/btnFABPlug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0"
+        android:visibility="visible"
+        app:backgroundTint="@android:color/transparent"
+        app:elevation="0dp"
+        app:fabSize="mini"
+        app:layout_anchor="@id/appBar"
+        app:pressedTranslationZ="0dp" />
+
     <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
         android:id="@+id/btnFAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="36dp"
         android:src="@drawable/ic_add_note"
         android:visibility="gone"
         app:backgroundTint="@color/colorPrimary"
         app:fabSize="mini"
-        app:layout_anchor="@id/appBar"
         app:tint="@android:color/white" />
 
 </com.android.bible.knowbible.mvvm.view.theme_editor.MyCoordinatorLayout>

@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -26,11 +27,13 @@ import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
 import com.android.bible.knowbible.mvvm.view.dialog.VerseDialog
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
+import com.android.bible.knowbible.utility.FontCache
 import com.android.bible.knowbible.utility.Utility
 import com.android.bible.knowbible.utility.Utility.Companion.convertDbInPx
 import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
+
 
 //FragmentManager нужен здесь для открытия диалога
 class BibleTextRVAdapter(private val context: Context, private val models: ArrayList<BibleTextModel>, private val myFragmentManager: FragmentManager) : RecyclerView.Adapter<BibleTextRVAdapter.MyViewHolder>() {
@@ -149,6 +152,8 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
                 holder.itemView.setBackgroundColor(if (models[position].isTextSelected) ContextCompat.getColor(context, R.color.colorMultiSelectionBackgroundBookTheme) else ContextCompat.getColor(context, android.R.color.transparent))
             }
         }
+
+//        holder.tvVerse.typeface = FontCache["alexandra_script_regular_cyr.ttf", context]
     }
 
     private fun createIndentedText(text: String, marginFirstLine: Int, marginNextLines: Int): SpannableString? {

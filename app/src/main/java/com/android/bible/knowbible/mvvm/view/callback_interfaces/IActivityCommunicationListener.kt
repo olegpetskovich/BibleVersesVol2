@@ -9,15 +9,12 @@ interface IActivityCommunicationListener {
     fun setTabNumber(tabNumber: Int)
 
     fun disableMultiSelection()
-    fun disableMultiSelectionIfButtonHomeClicked()
+    fun disableMultiSelectionIfBottomAppBarBtnClicked()
 
     //Это нужно для управления BottomAppBar в BibleTextFragment
     fun setBibleTextFragment(bibleTextFragment: BibleTextFragment)
 
-    fun setBottomAppBarVisibility(visibility: Int)
-
-    fun setFABVisibilityWhenScroll(fabVisibility: Boolean)
-    fun isFabShown(): Boolean
+    fun setIsBibleTextFragmentOpened(isBibleTextFragmentOpened: Boolean)
 
     fun setTheme(theme: ThemeManager.Theme, animate: Boolean = true)
     fun setShowHideToolbarBackButton(backButtonVisibility: Int)

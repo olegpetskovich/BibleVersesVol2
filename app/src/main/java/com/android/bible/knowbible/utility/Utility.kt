@@ -73,6 +73,7 @@ class Utility {
             str = str.replace(reg2, "")
             str = str.replace(reg3, "")
             str = str.replace("<pb/>", "")
+            str = str.replace("<br/>", "")
 
             return str
         }

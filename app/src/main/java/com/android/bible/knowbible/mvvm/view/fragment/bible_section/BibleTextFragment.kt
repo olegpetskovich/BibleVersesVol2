@@ -36,7 +36,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.reflect.Field
 
-class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragmentCommunication, ViewPager2Adapter.IBottomAppBarListener, BibleTextRVAdapter.MultiSelectionPanelListener {
+class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragmentCommunication, BibleTextRVAdapter.MultiSelectionPanelListener {
     companion object {
         const val DATA_TO_RESTORE = "DATA_TO_RESTORE"
     }
@@ -44,6 +44,10 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     //Поле нужно в случае, когда была нажата кнопки btnHome в BottomAppBar и нам нужно очистить данные сохранённого скролла,
     //чтобы при очищении стэка фрагментов не открывался снова BibleTextFragment с ранее сохранёнными данными
     private var isBtnHomeClicked: Boolean = false
+    private var isBtnNotesClicked: Boolean = false
+    private var isBtnSearchClicked: Boolean = false
+
+    var isBibleTextFragmentOpenedFromSearchFragment: Boolean = false
 
     private lateinit var swipeListener: OnViewPagerSwipeStateListener
     private lateinit var listener: IActivityCommunicationListener
@@ -159,8 +163,8 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         //Включаем свайп для листания глав Библии, отключая при этом свайп для навигации между табами
         swipeListener.setViewPagerSwipeState(false)
 
-        //Показываем BottomAppBar, чтобы он был только в BibleTextFragment
-        listener.setBottomAppBarVisibility(View.VISIBLE)
+        //Сообщаем, что BibleTextFragment открыт, а это значит, что BottomAppBar можно показывать
+        listener.setIsBibleTextFragmentOpened(true)
 
         //Открываем панель множественного выбора текста при возвращении в BibleTextFragment, при этом проверяя,
         //активирована ли эта панель через проверку значения поля isMultiSelectionEnabled.
@@ -187,13 +191,13 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
             //потому что с анимацией в таком случае глава открывается будто бы с пролагом.
             //Анимируется только когда пользователь делает слайд влево или вправо, чтобы листать главы
 
-            val page = chapterInfo?.chapterNumber!! - 1
+            val vpPage = chapterInfo?.chapterNumber!! - 1
             //Обновляем адаптер, чтобы при смене темы все айтемы обновились и устаналивалась нужная позиция скролла
             if (currentTheme != ThemeManager.theme) {
                 viewPager2.adapter!!.notifyDataSetChanged()
                 currentTheme = ThemeManager.theme
-                setScroll(page, false)
-            } else setScroll(page, false)
+                setScroll(vpPage,false)
+            } else setScroll(vpPage, false)
         } else {
             //Код для преобразования текстов в БД НИ В КОЕМ СЛУЧАЕ НЕ УДАЛЯТЬ!
 //            bibleDataViewModel
@@ -219,7 +223,6 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                     .observe(viewLifecycleOwner, Observer { bookTexts ->
 
                         vpAdapter = ViewPager2Adapter(context!!, bookTexts, myFragmentManager)
-                        vpAdapter!!.setIBottomAppBarListener(this)
                         vpAdapter!!.setRecyclerViewThemeChangerListener(this)
                         vpAdapter!!.setIFragmentCommunicationListener(this)
                         vpAdapter!!.setMultiSelectionPanelListener(this)
@@ -227,12 +230,17 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                         vpAdapter!!.dataToRestoreData = DataToRestoreModel(chapterInfo?.bookNumber!!, chapterInfo?.chapterNumber!! - 1) //Поскольку счёт в коллекции начинается с 0, а главы начинаются с 1, то нужно номер главы минусовать. Также тут отправляем данные, чтобы сравнить и выяснить, тот ли отображён текст, данные скролла которого были сохранены ранее
 
                         viewPager2.adapter = vpAdapter
-                        val page = chapterInfo?.chapterNumber!! - 1
-                        viewPager2.setCurrentItem(page, false) //Отключаем анимацию слайда именно при выборе главы, чтобы она сразу включалась без анимации,
+                        val vpPage = chapterInfo?.chapterNumber!! - 1
+                        viewPager2.setCurrentItem(vpPage, false) //Отключаем анимацию слайда именно при выборе главы, чтобы она сразу включалась без анимации,
                         //потому что с анимацией в таком случае глава открывается будто бы с пролагом.
                         //Анимируется только когда пользователь делает слайд влево или вправо, чтобы листать главы
 
-                        setScroll(page, false)
+                        if (!isBibleTextFragmentOpenedFromSearchFragment)
+                            setScroll(vpPage, false)
+                        else {
+                            val verseNumberForScroll = chapterInfo?.verseNumber
+                            setScroll(vpPage, verseNumberForScroll!!, true)
+                        }
                     })
         }
 
@@ -259,6 +267,9 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
             }
         })
 
+        //Задаём видимость кнопке только в случае включённого режима множественного выбора, потому что при включенном режиме,
+        //при открытии этого фрагмента в 170 строке срабатывает метод openMultiSelectionPanel(),
+        //в котором кнопке выбора переводов задаётся видимость
         if (!isMultiSelectionEnabled) listener.setBtnSelectTranslationVisibility(View.VISIBLE)
 
         listener.setShowHideToolbarBackButton(View.VISIBLE)
@@ -273,8 +284,8 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         //Включаем свайп для навигации между табами, отключая при этом свайп для листания глав Библии
         swipeListener.setViewPagerSwipeState(true)
 
-        //Убираем BottomAppBar, чтобы его не было нигде, кроме BibleTextFragment
-        listener.setBottomAppBarVisibility(View.GONE)
+        //Сообщаем, что BibleTextFragment закрыт, а это значит, что BottomAppBar нельзя показывать
+        listener.setIsBibleTextFragmentOpened(false)
 
         //Закрываем панель множественного выбора текста при переходе уходе из BibleTextFragment, при этом проверяя,
         //активирована ли эта панель через проверку значения поля isMultiSelectionEnabled.
@@ -285,43 +296,47 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         //не выполняя дальнейший код, потому что данные сохранённого стэка уже очищены в методе btnHomeClicked()
         if (isBtnHomeClicked) return
 
-        val jsonScrollData = saveLoadData.loadString(DATA_TO_RESTORE)
+        //Если BibleTextFragment открыт из SearchFragment с целью просто открыть текст с выбранным найденным в SearchFragment текстом,
+        //то при возврате назад нет нужды очищать данные скролла и вообще производить какую-либо работу по сохранению данных скролла
+        if (!isBibleTextFragmentOpenedFromSearchFragment) {
+            val jsonScrollData = saveLoadData.loadString(DATA_TO_RESTORE)
 
-        val dataToRestoreJson =
-                //Если кнопка "Назад" нажата, то очищаем сохранённые данные скролла
-                if (isBackButtonClicked) {
-                    //Очищаем сохранённые данные скролла, чтобы они не восстанавливались после того, как пользователь сам закрыл страницу текста кнопкой "Назад".
-                    //Данные сохраняются только в том случае, когда человек вышел из приложения, будучи до этого в фрагменте текста Библии,
-                    //чтобы потом, когда он войдёт снова, ему отобразились данные на том скролле, на котором они были до выхода приложения.
-                    Gson().toJson(DataToRestoreModel(
-                            -1,
-                            -1,
-                            -1))
-                } else if (dataToRestore.bookNumber != -1 &&
-                        dataToRestore.chapterNumber != -1 &&
-                        dataToRestore.scrollPosition != -1) {
-                    Gson().toJson(DataToRestoreModel(
-                            dataToRestore.bookNumber,
-                            dataToRestore.chapterNumber + 1, //Возвращаем исходный номер главы, который при восстановлении стэка снова отминусуется, чтобы установить нужную главу
-                            dataToRestore.scrollPosition))
-                }
-                //Если пользователь ничего не скроллил, но экран открыт уже на какой-то ранее сохранённое позиции,
-                //и пользователь захотел сразу перейти куда-то в другой фрагмент(например BibleTranslationsFragment),
-                //то сохраняем ныне восстановленные данные скролла, чтобы отобразить при возврате на этот фрагмент
-                else if (jsonScrollData != null && jsonScrollData.isNotEmpty() && Gson().fromJson(jsonScrollData, DataToRestoreModel::class.java).scrollPosition != -1) {
-                    Gson().toJson(DataToRestoreModel(
-                            chapterInfo!!.bookNumber,
-                            chapterInfo!!.chapterNumber, //Если данные скролла не меняются и всё остаётся без изменений, то увеличивать номер главы на 1 не нужно, потому что всё уже как надо.
-                            vpAdapter!!.getScrollPosition(chapterInfo!!.chapterNumber - 1))) //Получаем нынешнюю позицию скролла
-                }
-                //Если пользователь ничего не скроллил, то просто сохраняем выбранную книгу и главу, чтобы при повороте отобразить
-                else {
-                    Gson().toJson(DataToRestoreModel(
-                            chapterInfo!!.bookNumber,
-                            chapterInfo!!.chapterNumber, //Если данные скролла не меняются и всё остаётся без изменений, то увеличивать номер главы на 1 не нужно, потому что всё уже как надо.
-                            0))
-                }
-        saveLoadData.saveString(DATA_TO_RESTORE, dataToRestoreJson)  //Сохранять данные тогда, когда фрагмент выходит из видимости
+            val dataToRestoreJson =
+                    //Если кнопка "Назад" нажата, то очищаем сохранённые данные скролла
+                    if (isBackButtonClicked) {
+                        //Очищаем сохранённые данные скролла, чтобы они не восстанавливались после того, как пользователь сам закрыл страницу текста кнопкой "Назад".
+                        //Данные сохраняются только в том случае, когда человек вышел из приложения, будучи до этого в фрагменте текста Библии,
+                        //чтобы потом, когда он войдёт снова, ему отобразились данные на том скролле, на котором они были до выхода приложения.
+                        Gson().toJson(DataToRestoreModel(
+                                -1,
+                                -1,
+                                -1))
+                    } else if (dataToRestore.bookNumber != -1 &&
+                            dataToRestore.chapterNumber != -1 &&
+                            dataToRestore.scrollPosition != -1) {
+                        Gson().toJson(DataToRestoreModel(
+                                dataToRestore.bookNumber,
+                                dataToRestore.chapterNumber + 1, //Возвращаем исходный номер главы, который при восстановлении стэка снова отминусуется, чтобы установить нужную главу
+                                dataToRestore.scrollPosition))
+                    }
+                    //Если пользователь ничего не скроллил, но экран открыт уже на какой-то ранее сохранённое позиции,
+                    //и пользователь захотел сразу перейти куда-то в другой фрагмент(например BibleTranslationsFragment),
+                    //то сохраняем ныне восстановленные данные скролла, чтобы отобразить при возврате на этот фрагмент
+                    else if (jsonScrollData != null && jsonScrollData.isNotEmpty() && Gson().fromJson(jsonScrollData, DataToRestoreModel::class.java).scrollPosition != -1) {
+                        Gson().toJson(DataToRestoreModel(
+                                chapterInfo!!.bookNumber,
+                                chapterInfo!!.chapterNumber, //Если данные скролла не меняются и всё остаётся без изменений, то увеличивать номер главы на 1 не нужно, потому что всё уже как надо.
+                                vpAdapter!!.getScrollPosition(chapterInfo!!.chapterNumber - 1))) //Получаем нынешнюю позицию скролла
+                    }
+                    //Если пользователь ничего не скроллил, то просто сохраняем выбранную книгу и главу, чтобы при повороте отобразить
+                    else {
+                        Gson().toJson(DataToRestoreModel(
+                                chapterInfo!!.bookNumber,
+                                chapterInfo!!.chapterNumber, //Если данные скролла не меняются и всё остаётся без изменений, то увеличивать номер главы на 1 не нужно, потому что всё уже как надо.
+                                0))
+                    }
+            saveLoadData.saveString(DATA_TO_RESTORE, dataToRestoreJson)  //Сохранять данные тогда, когда фрагмент выходит из видимости
+        }
     }
 
     fun notifyDataSetChanged() {
@@ -333,11 +348,12 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         super.onStop()
 
         //Если фрагмент закрывается и режим множественного выбора включён, то отключаем режим множественного выбора текстов
-        //Закрытие режима множественного выбора происходит по разному в случае нажатия кнопки btnHome в BottomAppBar и в других случаях,
-        //потому и вызываются 2 разных метода в разных случаях. В случае, когда нажата кнопки btnHome, вызывается метод disableMultiSelectionIfButtonHomeClicked(),
-        //а если фрагмент закрывается любым другим способом, то вызывается просто disableMultiSelection()
-        if (isBtnHomeClicked && isMultiSelectionEnabled) {
-            listener.disableMultiSelectionIfButtonHomeClicked()
+        //Закрытие режима множественного выбора происходит по разному в случае нажатия кнопок btnHome, btnNotes, btnSearch в BottomAppBar и в других случаях,
+        //потому и вызываются 2 разных метода в разных случаях. В случае, когда нажаты кнопки btnHome, btnNotes, btnSearch,
+        //вызывается метод disableMultiSelectionIfBottomAppBarBtnClicked(), а если фрагмент закрывается любым другим способом, то вызывается просто disableMultiSelection()
+        //P.S. Более точный комментарий дан в самом методе disableMultiSelectionIfBottomAppBarBtnClicked
+        if ((isBtnHomeClicked && isMultiSelectionEnabled) || (isBtnNotesClicked && isMultiSelectionEnabled) || (isBtnSearchClicked && isMultiSelectionEnabled)) {
+            listener.disableMultiSelectionIfBottomAppBarBtnClicked()
         } else if (isMultiSelectionEnabled) listener.disableMultiSelection()
 
         Utility.log("BibleTextFragment: onStop")
@@ -363,7 +379,16 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     private fun setScroll(page: Int, smoothScroll: Boolean) {
         GlobalScope.launch(Dispatchers.Main) {
             delay(50)
+
             vpAdapter!!.scrollTo(page, smoothScroll)
+        }
+    }
+
+    //Перегруженный метод, предназначенный для скролла к выбранному найденному стиху, когда BibleTextFragment был открыт из SearchFragment
+    private fun setScroll(page: Int, verseNumberForScroll: Int, smoothScroll: Boolean) {
+        GlobalScope.launch(Dispatchers.Main) {
+            delay(50)
+            vpAdapter!!.scrollTo(page, verseNumberForScroll, smoothScroll)
         }
     }
 
@@ -402,18 +427,6 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         dataToRestore.scrollPosition = scrollPosition
     }
 
-    override fun setBottomAppBarFABVisibility(isMakeVisible: Boolean) {
-        if (isMakeVisible) {
-            if (!listener.isFabShown()) {
-                listener.setFABVisibilityWhenScroll(true)
-            }
-        } else {
-            if (listener.isFabShown()) {
-                listener.setFABVisibilityWhenScroll(false)
-            }
-        }
-    }
-
     fun btnHomeClicked() {
         isBtnHomeClicked = true
 
@@ -428,6 +441,8 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     }
 
     fun btnNotesClicked() {
+        isBtnNotesClicked = true
+
         val transaction: FragmentTransaction = myFragmentManager.beginTransaction()
         transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
 
@@ -439,6 +454,15 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     }
 
     fun btnSearchClicked() {
+        isBtnSearchClicked = true
+
+        //Если BibleTextFragment открыт из SearchFragment, то при повторном нажатии на btnSearch произойдёт возврат назад на экран поиска,
+        //вместо того, чтобы открывать SearchFragment по новой
+        if (isBibleTextFragmentOpenedFromSearchFragment) {
+            activity?.onBackPressed()
+            return
+        }
+
         val transaction: FragmentTransaction = myFragmentManager.beginTransaction()
         transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
 

@@ -122,12 +122,13 @@ class SearchedVersesListRVAdapter(internal val context: Context, private val sea
             }
 
             itemView.setOnClickListener {
-//                selectBibleTextListener.setSelectedBibleText(searchedVersesList[adapterPosition].chapter_number.toString(), false)
-//
-//                val bibleTextFragment = BibleTextFragment()
-//                val chapterModel = ChapterModel(searchedVersesList[adapterPosition].book_number, searchedVersesList[adapterPosition].chapter_number)
-//                bibleTextFragment.chapterInfo = chapterModel
-//                fragmentChanger.changeFragment(bibleTextFragment)
+                selectBibleTextListener.setSelectedBibleText(searchedVersesList[adapterPosition].chapter_number.toString(), false)
+
+                val bibleTextFragment = BibleTextFragment()
+                bibleTextFragment.isBibleTextFragmentOpenedFromSearchFragment = true
+                val chapterModel = ChapterModel(searchedVersesList[adapterPosition].book_number, searchedVersesList[adapterPosition].chapter_number, searchedVersesList[adapterPosition].verse_number - 1)
+                bibleTextFragment.chapterInfo = chapterModel
+                fragmentChanger.changeFragment(bibleTextFragment)
             }
         }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import com.android.bible.knowbible.utility.FontCache
 
 class MyTextView
 @JvmOverloads

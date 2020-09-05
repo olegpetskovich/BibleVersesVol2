@@ -94,6 +94,8 @@ class NotesFragment : Fragment(), IThemeChanger, IChangeFragment {
 
         listener.setBtnSelectTranslationVisibility(View.GONE)
 
+        listener.setTvSelectedBibleTextVisibility(View.GONE)
+
         listener.setShowHideAddNoteButtonFAB(View.VISIBLE)
         listener.setShowHideToolbarBackButton(View.VISIBLE)
     }

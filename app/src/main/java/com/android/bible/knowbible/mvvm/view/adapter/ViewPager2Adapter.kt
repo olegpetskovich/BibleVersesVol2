@@ -33,18 +33,10 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
 
     private var mapRV = hashMapOf<Int, RecyclerView>()
 
-    interface IBottomAppBarListener {
-        fun setBottomAppBarFABVisibility(isMakeVisible: Boolean)
-    }
-
-    private lateinit var bottomAppBarListener: IBottomAppBarListener
-    fun setIBottomAppBarListener(bottomAppBarListener: IBottomAppBarListener) {
-        this.bottomAppBarListener = bottomAppBarListener
-    }
-
     interface IFragmentCommunication {
         fun saveScrollPosition(bookNumber: Int, chapterNumber: Int, scrollPosition: Int)
     }
+
 
     private lateinit var fragmentCommunication: IFragmentCommunication
     fun setIFragmentCommunicationListener(fragmentCommunication: IFragmentCommunication) {
@@ -103,18 +95,6 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
                     rvAdapter.setRecyclerViewThemeChangerListener(themeChanger) //Для RecyclerView тему нужно обновлять отдельно от смены темы для всего фрагмента. Если менять тему только для всего фрагмента, не меняя при этом тему для списка, то в списке тема не поменяется.
                     rvAdapter.setMultiSelectionPanelListener(multiSelectionListener)
                     val rvItem = holder.recyclerView
-                    rvItem.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                            super.onScrolled(recyclerView, dx, dy)
-                            if (dy > 0) {
-                                Utility.log("Scrolled down")
-                                bottomAppBarListener.setBottomAppBarFABVisibility(false)
-                            } else if (dy < 0) {
-                                Utility.log("Scrolled up")
-                                bottomAppBarListener.setBottomAppBarFABVisibility(true)
-                            }
-                        }
-                    })
 
                     rvItem.adapter = rvAdapter
 
@@ -146,7 +126,7 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
 
     //Ничего не менять
     fun scrollTo(posPage: Int, smoothScroll: Boolean) {
-        //Тут выставляется позиция скролла для RecyclerView, которая была сохранена
+        //Тут выставляется позиция скролла для RecyclerView, которая была сохранена для восстновления текста, на котором ранее остановился пользователь
         //__________________________________________________________________________________________
         val jsonScrollData = saveLoadData.loadString(DATA_TO_RESTORE)
         if (jsonScrollData != null && jsonScrollData.isNotEmpty()) {
@@ -172,6 +152,25 @@ class ViewPager2Adapter(private val context: Context, private val chaptersTextLi
                 } else linearLayoutManager.scrollToPositionWithOffset(dataToRestoreModel.scrollPosition, 0) //Резкий скролл
             }
         }
+        //__________________________________________________________________________________________
+    }
+
+    //Ничего не менять, это перегруженный метод предназначенный просто для установления нужной позиции скролла. Используется при открытии найденного текста в SearchFragment
+    fun scrollTo(posPage: Int, posVerse: Int, smoothScroll: Boolean) {
+        //Тут выставляется позиция скролла для RecyclerView
+        //__________________________________________________________________________________________
+        val linearLayoutManager = mapRV[posPage]!!.layoutManager as LinearLayoutManager
+        //Плавный скролл
+        if (smoothScroll) {
+            val smoothScroller: SmoothScroller = object : LinearSmoothScroller(context) {
+                override fun getVerticalSnapPreference(): Int {
+                    return SNAP_TO_START
+                }
+            }
+            smoothScroller.targetPosition = posVerse
+            linearLayoutManager.startSmoothScroll(smoothScroller)
+        } else linearLayoutManager.scrollToPositionWithOffset(posVerse, 0) //Резкий скролл
+
         //__________________________________________________________________________________________
     }
 
