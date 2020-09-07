@@ -66,7 +66,7 @@
     <!-- Tab Unselected text color -->
     <color name="colorUnselectedTabTextDarkTheme">#919191</color>
     <color name="colorUnselectedTabTextLightTheme">#919191</color>
-    <color name="colorUnselectedTabTextBookTheme">#686868</color>
+    <color name="colorUnselectedTabTextBookTheme">#656565</color>
 
     <!-- Tab indicator color -->
     <color name="colorTabIndicatorDarkTheme">#006EFF</color>

@@ -211,14 +211,18 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
             itemView.setOnClickListener {
                 if (isMultiSelectionEnabled) {
                     changeBackgroundOfSelectedItem(itemView)
-                } else {
-                    selectedItem = adapterPosition
-
-                    verseDialog = VerseDialog(this)
-                    verseDialog!!.setVerseData(models[adapterPosition])
-                    verseDialog!!.setFragmentManager(myFragmentManager)
-                    verseDialog!!.show(myFragmentManager, "Verse Dialog") //Тут должен быть именно childFragmentManager
                 }
+                //Пока что этот код будет закомментирован, на данный момент роль этого функционал будет играть контекстное меню, вместо диалога
+                //А в дальнейшем, если Бог усмотрит, будет сделано так, чтобы при нажатии на конкретный текст, открывался диалог,
+                //в котором можно будет подробнее рассмотреть его значение на языке оригинала и с паралельными местами
+//                else {
+//                    selectedItem = adapterPosition
+//
+//                    verseDialog = VerseDialog(this)
+//                    verseDialog!!.setVerseData(models[adapterPosition])
+//                    verseDialog!!.setFragmentManager(myFragmentManager)
+//                    verseDialog!!.show(myFragmentManager, "Verse Dialog") //Тут должен быть именно childFragmentManager
+//                }
             }
         }
 

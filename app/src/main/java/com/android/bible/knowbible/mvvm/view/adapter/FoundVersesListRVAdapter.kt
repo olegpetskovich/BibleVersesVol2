@@ -24,13 +24,12 @@ import com.android.bible.knowbible.mvvm.model.ChapterModel
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.ISelectBibleText
-import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
 import com.android.bible.knowbible.mvvm.view.dialog.AddNoteDialog
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTextFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import java.util.*
 
-class SearchedVersesListRVAdapter(internal val context: Context, private val searchedVersesList: ArrayList<BibleTextModel>, private val myFragmentManager: FragmentManager) : RecyclerView.Adapter<SearchedVersesListRVAdapter.MyViewHolder>() {
+class FoundVersesListRVAdapter(internal val context: Context, private val searchedVersesList: ArrayList<BibleTextModel>, private val myFragmentManager: FragmentManager) : RecyclerView.Adapter<FoundVersesListRVAdapter.MyViewHolder>() {
     private lateinit var fragmentChanger: IChangeFragment
     fun setFragmentChangerListener(fragmentChanger: IChangeFragment) { this.fragmentChanger = fragmentChanger }
 

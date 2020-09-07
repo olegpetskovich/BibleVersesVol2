@@ -43,6 +43,5 @@ class LoadingDialog : AppCompatDialogFragment() {
         super.onResume()
         //Устанавливаем закругленные края диалогу, ещё одна обязательная строка находится перед вызовом super.onCreate(savedInstanceState)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog?.window?.setBackgroundDrawableResource(R.drawable.dialog_rounded_corners)
     }
 }

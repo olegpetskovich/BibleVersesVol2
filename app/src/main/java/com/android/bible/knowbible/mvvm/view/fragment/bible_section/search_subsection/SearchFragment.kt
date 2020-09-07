@@ -8,9 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -29,12 +27,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.bible.knowbible.R
-import com.android.bible.knowbible.mvvm.view.adapter.SearchedVersesListRVAdapter
+import com.android.bible.knowbible.mvvm.model.BibleTextModel
+import com.android.bible.knowbible.mvvm.view.adapter.FoundVersesListRVAdapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.ISelectBibleText
 import com.android.bible.knowbible.mvvm.view.dialog.LoadingDialog
-import com.android.bible.knowbible.mvvm.view.dialog.VerseDialog
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTextFragment
 import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
@@ -62,7 +60,7 @@ class SearchFragment : Fragment(), IChangeFragment, ISelectBibleText {
 
     private lateinit var bibleDataViewModel: BibleDataViewModel
 
-    private var rvAdapter: SearchedVersesListRVAdapter? = null
+    private var rvAdapter: FoundVersesListRVAdapter? = null
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
 
@@ -70,11 +68,12 @@ class SearchFragment : Fragment(), IChangeFragment, ISelectBibleText {
     private lateinit var btnCleanText: ImageView
     private lateinit var tvCount: TextView
 
-    private lateinit var radioGroupSearch: RadioGroup
-
     private lateinit var rbAllBible: MaterialRadioButton
     private lateinit var rbOldTestament: MaterialRadioButton
     private lateinit var rbNewTestament: MaterialRadioButton
+
+    private lateinit var foundVerses: ArrayList<BibleTextModel>
+    private lateinit var previousTextForSearch: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,15 +94,45 @@ class SearchFragment : Fragment(), IChangeFragment, ISelectBibleText {
 
         tvCount = myView.findViewById(R.id.tvCount)
 
-        radioGroupSearch = myView.findViewById(R.id.radioGroupSearch)
+        //Для radio buttons подходит именно так логика, которая описана здесь, с использованием setOnClickListener
+        //Использование setOnCheckedChangeListener здесь не подходит
         rbAllBible = myView.findViewById(R.id.rbAllBible)
-        rbOldTestament = myView.findViewById(R.id.rbOldTestament)
-        rbNewTestament = myView.findViewById(R.id.rbNewTestament)
+        rbAllBible.setOnClickListener {
+            if (rbAllBible.isChecked) {
+                clearFoundVersesList() //Очищаем коллекцию ранее найденных текстов, чтобы можно было начать новый поиск
+                searchText(etSearch.text.toString())
+            }
+        }
 
-        Utility.log("etSearch: " + etSearch.text.toString())
-        //При переключении RadioButtons поиск будет сразу начинаться, если в поле поиска больше двух букв
-        radioGroupSearch.setOnCheckedChangeListener { _, _ ->
-            searchText(etSearch.text.toString())
+        rbOldTestament = myView.findViewById(R.id.rbOldTestament)
+        rbOldTestament.setOnClickListener {
+            if (rbOldTestament.isChecked) {
+                clearFoundVersesList() //Очищаем коллекцию ранее найденных текстов, чтобы можно было начать новый поиск
+                searchText(etSearch.text.toString())
+            }
+        }
+
+        rbNewTestament = myView.findViewById(R.id.rbNewTestament)
+        rbNewTestament.setOnClickListener {
+            if (rbNewTestament.isChecked) {
+                clearFoundVersesList() //Очищаем коллекцию ранее найденных текстов, чтобы можно было начать новый поиск
+                searchText(etSearch.text.toString())
+            }
+        }
+
+        //Выставляем ранее нажатую radioButton, если фрагмент открывается после открытого фрагмента BibleTextFragment при нажатии на найденный стих
+        //Делаем это именно таким образом, чтобы при возвращении на этот фрагмент был показан нажатым нужный radioButton, а не переключался из rbAllBible на нужный нам
+        //Без этого кода так бы и происходило и была бы видна анимация переключения, и выглядит это коряво
+        when (searchingSection) {
+            ALL_BIBLE_SECTION -> {
+                rbAllBible.isChecked = true
+            }
+            OLD_TESTAMENT_SECTION -> {
+                rbOldTestament.isChecked = true
+            }
+            NEW_TESTAMENT_SECTION -> {
+                rbNewTestament.isChecked = true
+            }
         }
 
         recyclerView = myView.findViewById(R.id.recyclerView)
@@ -131,9 +160,18 @@ class SearchFragment : Fragment(), IChangeFragment, ISelectBibleText {
 
         etSearch.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                if (etSearch.length() > 2)
+                if (etSearch.length() > 2) {
+                    //Если нынешний текст, который ищет пользователь, совпадает с тем, который уже вписан в поле ввода,
+                    //то просто закрывается клавиатура и метод поиска не выполняется, чтобы не выполнять его лишний раз, если резльутаты поиска и так есть
+                    if (previousTextForSearch == etSearch.text.toString()) {
+                        Utility.hideKeyboard(activity!!)
+                        return@OnEditorActionListener true
+                    }
+                    previousTextForSearch = etSearch.text.toString()
+
+                    clearFoundVersesList() //Очищаем коллекцию ранее найденных текстов, чтобы можно было начать новый поиск
                     searchText(etSearch.text.toString())
-                else Toast.makeText(context, getString(R.string.toast_at_least_three_letters), Toast.LENGTH_SHORT).show()
+                } else Toast.makeText(context, getString(R.string.toast_at_least_three_letters), Toast.LENGTH_SHORT).show()
                 return@OnEditorActionListener true
             }
             false
@@ -142,9 +180,17 @@ class SearchFragment : Fragment(), IChangeFragment, ISelectBibleText {
         return myView
     }
 
+    private fun clearFoundVersesList() {
+        if (foundVerses.size != 0) foundVerses.clear()
+        Utility.log("clearFoundVersesList")
+    }
+
     private fun searchText(searchText: String) {
+        if (!::foundVerses.isInitialized)
+            foundVerses = ArrayList()
+
         //Вводимый текст для поиска должен состоять как минимум из 3х букв
-        if (etSearch.length() > 2) {
+        if (etSearch.length() > 2 && foundVerses.size == 0) {
             val loadingDialog = LoadingDialog()
             loadingDialog.isCancelable = false
             loadingDialog.show(myFragmentManager, "Loading Dialog")
@@ -164,20 +210,31 @@ class SearchFragment : Fragment(), IChangeFragment, ISelectBibleText {
                     bibleDataViewModel                                                                 //Перед отправкой текста для поиска, очищаем его от лишний пробелов, если такие имеются
                             //Метод trim() не нужен, потому что пользователь может захотеть найти слово с пробелом до или после него
                             .getSearchedBibleVerses(BibleDataViewModel.TABLE_VERSES, searchingSection, searchText.replace("\\s+".toRegex(), " "))
-                            .observe(viewLifecycleOwner, Observer { searchedVerses ->
-                                tvCount.text = searchedVerses.size.toString()
+                            .observe(viewLifecycleOwner, Observer { foundVerses ->
+                                this@SearchFragment.foundVerses = foundVerses
 
-                                rvAdapter = SearchedVersesListRVAdapter(context!!, searchedVerses, myFragmentManager)
+                                rvAdapter = FoundVersesListRVAdapter(context!!, foundVerses, myFragmentManager)
                                 rvAdapter!!.setFragmentChangerListener(this@SearchFragment)
                                 rvAdapter!!.setSelectedBibleTextListener(this@SearchFragment)
 
                                 recyclerView.layoutManager = LinearLayoutManager(context)
                                 recyclerView.adapter = rvAdapter
+
+                                tvCount.text = foundVerses.size.toString()
                                 loadingDialog.dismiss()
                             })
                 }
             }
             mainHandler.post(myRunnable)
+        } else if (foundVerses.size != 0) {
+            tvCount.text = foundVerses.size.toString()
+
+            rvAdapter = FoundVersesListRVAdapter(context!!, foundVerses, myFragmentManager)
+            rvAdapter!!.setFragmentChangerListener(this@SearchFragment)
+            rvAdapter!!.setSelectedBibleTextListener(this@SearchFragment)
+
+            recyclerView.layoutManager = LinearLayoutManager(context)
+            recyclerView.adapter = rvAdapter
         }
     }
 
@@ -293,11 +350,9 @@ class SearchFragment : Fragment(), IChangeFragment, ISelectBibleText {
     override fun onStart() {
         super.onStart()
         //При возвращении в SearchFragment(после того, как пользователь нажал на найденный стих и перешёл в BibleTextFragment)
-        //Эта проверка обеспечит автоматическое возобновление поиска, чтобы при возврате на данный фрагмент снова сразу был отображён список найдённых текстов
-        //Эта проверка нужна только для rbAllBible, потому что для остульных двух radioButton поиск срабатывает автоматически
-        if (rbAllBible.isChecked) {
-            searchText(etSearch.text.toString())
-        }
+        //Этот код обеспечит автоматическое возобновление поиска, чтобы при возврате на данный фрагмент снова сразу был отображён список найдённых текстов
+        previousTextForSearch = etSearch.text.toString()
+        searchText(etSearch.text.toString())
     }
 
     override fun onPause() {
