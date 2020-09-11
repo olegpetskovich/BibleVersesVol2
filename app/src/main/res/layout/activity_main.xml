@@ -84,6 +84,19 @@
 
                 <!-- Ниже блок кнопок для режима выбора нескольких стихов в BibleTextFragment -->
                 <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                    android:id="@+id/btnRemoveHighlight"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/btnHighlight"
+                    android:layout_marginEnd="-5dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/ic_rubber"
+                    android:visibility="gone" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
                     android:id="@+id/btnHighlight"
                     android:layout_width="34dp"
                     android:layout_height="34dp"
@@ -372,7 +385,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:alpha="0"
-        android:visibility="visible"
+        android:visibility="gone"
         app:backgroundTint="@android:color/transparent"
         app:elevation="0dp"
         app:fabSize="mini"

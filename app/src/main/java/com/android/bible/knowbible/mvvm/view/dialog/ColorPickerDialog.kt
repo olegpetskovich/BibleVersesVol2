@@ -3,10 +3,12 @@ package com.android.bible.knowbible.mvvm.view.dialog
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
@@ -16,13 +18,16 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import androidx.core.widget.CompoundButtonCompat
+import androidx.fragment.app.FragmentTransaction
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.data.local.BibleTextInfoDBHelper
 import com.android.bible.knowbible.mvvm.model.BibleTextInfoModel
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
+import com.android.bible.knowbible.mvvm.view.activity.MainActivity
+import com.android.bible.knowbible.mvvm.view.fragment.articles_section.ArticlesFragment
+import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.utility.SaveLoadData
-import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.skydoves.colorpickerview.ColorPickerView
@@ -31,7 +36,7 @@ import com.skydoves.colorpickerview.preference.ColorPickerPreferenceManager
 import java.lang.reflect.Field
 
 class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCompatDialogFragment() {
-    private lateinit var verseData: BibleTextModel
+    private lateinit var versesData: ArrayList<BibleTextModel>
     private lateinit var bibleTextInfoDBHelper: BibleTextInfoDBHelper
 
     private lateinit var colorPickerView: ColorPickerView
@@ -42,6 +47,11 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
     private var point: Point = Point(250, 500) //Дефолтные значения
 
     interface ColorPickerDialogListener {
+        fun updateItemsColor(bibleTextsForHighlighting: ArrayList<BibleTextModel>)
+        fun dismissColorPickerDialog(isColorSelected: Boolean)
+    }
+
+    interface ColorPickerDialogListener2 {
         fun dismissDialog(isColorSelected: Boolean)
         fun updateItemColor(bibleTextInfo: BibleTextInfoModel)
     }
@@ -115,15 +125,25 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
 
         val selectedColorView: MaterialCardView = view.findViewById(R.id.selectedColorView)
         val tvColoredVerse: TextView = view.findViewById(R.id.tvColoredVerse)
-        tvColoredVerse.text = verseData.text
-        if (verseData.isTextBold) {
-            addBoldText.isChecked = verseData.isTextBold
-            tvColoredVerse.setTypeface(tvColoredVerse.typeface, Typeface.BOLD)
+        tvColoredVerse.movementMethod = ScrollingMovementMethod()
+
+        var selectedText = ""
+        versesData.forEachIndexed { index, selectedTextModel ->
+            //Добавляем пробел перед каждым стихом, кроме первого
+            selectedText += if (index == 0) selectedTextModel.text
+            else " " + selectedTextModel.text
+
+            if (selectedTextModel.isTextBold) {
+                addBoldText.isChecked = selectedTextModel.isTextBold
+                tvColoredVerse.setTypeface(tvColoredVerse.typeface, Typeface.BOLD)
+            }
+            if (selectedTextModel.isTextUnderline) {
+                addUnderline.isChecked = selectedTextModel.isTextUnderline
+                tvColoredVerse.paintFlags = tvColoredVerse.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+            }
         }
-        if (verseData.isTextUnderline) {
-            addUnderline.isChecked = verseData.isTextUnderline
-            tvColoredVerse.paintFlags = tvColoredVerse.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        }
+
+        tvColoredVerse.text = selectedText
 
         addBoldText.setOnCheckedChangeListener { _, isChecked ->
             //Устанавливаем и отключаем жирный шрифт именно таким образом. Установка через параметр Typeface не подходит
@@ -141,6 +161,7 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
                 }
             }
         }
+
         addUnderline.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) tvColoredVerse.paintFlags = tvColoredVerse.paintFlags or Paint.UNDERLINE_TEXT_FLAG
             else tvColoredVerse.paintFlags = tvColoredVerse.paintFlags and Paint.UNDERLINE_TEXT_FLAG.inv() //Убираем подчёркивание
@@ -174,7 +195,7 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
 
         val btnCancel: TextView = view.findViewById(R.id.btnCancel)
         btnCancel.setOnClickListener {
-            listener.dismissDialog(false)
+            listener.dismissColorPickerDialog(false)
         }
 
         val btnSelect: TextView = view.findViewById(R.id.btnSelect)
@@ -184,20 +205,30 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
             saveLoadData.saveInt("colorPickerX", point.x)
             saveLoadData.saveInt("colorPickerY", point.y)
 
-            //Проверяем, есть ли эти данные в БД, смотря на то, какое значение в поле id.
-            //Если id == -1, то данные ещё не добавлены, потому что у добавленных данных о стихе в поле id у объекта verseData будет значение id этих данных в БД.
-            if (verseData.id != -1L) {
-                bibleTextInfoDBHelper.updateBibleTextInfo(BibleTextInfoModel(verseData.id, verseData.book_number, verseData.chapter_number, verseData.verse_number, hexColor, addBoldText.isChecked, addUnderline.isChecked))
-                listener.updateItemColor(BibleTextInfoModel(verseData.id, verseData.book_number, verseData.chapter_number, verseData.verse_number, hexColor, addBoldText.isChecked, addUnderline.isChecked))
-            } else {
-                //Сохраняем в БД hex код выбранного цвета, чтобы при загрузке текстов Библии потом отобразить текст с выбранном цветом
-                val idOfAddedData = bibleTextInfoDBHelper.addBibleTextInfo(BibleTextInfoModel(
-                        -1/*-1 здесь как заглушка, этот параметр нужен не при добавлении, а при получении данных, потому что там id создаётся автоматически*/,
-                        verseData.book_number, verseData.chapter_number, verseData.verse_number, hexColor, addBoldText.isChecked, addUnderline.isChecked))
-                listener.updateItemColor(BibleTextInfoModel(idOfAddedData, verseData.book_number, verseData.chapter_number, verseData.verse_number, hexColor, addBoldText.isChecked, addUnderline.isChecked))
+
+            versesData.forEachIndexed { _, selectedTextModel ->
+                //Проверяем, есть ли эти данные в БД, смотря на то, какое значение в поле id.
+                //Если id == -1, то данные ещё не добавлены, потому что у добавленных данных о стихе в поле id у объекта verseData будет значение id этих данных в БД.
+                if (selectedTextModel.id != -1L) {
+                    bibleTextInfoDBHelper.updateBibleTextInfo(BibleTextInfoModel(selectedTextModel.id, selectedTextModel.book_number, selectedTextModel.chapter_number, selectedTextModel.verse_number, hexColor, addBoldText.isChecked, addUnderline.isChecked))
+                    selectedTextModel.textColorHex = hexColor
+                    selectedTextModel.isTextBold = addBoldText.isChecked
+                    selectedTextModel.isTextUnderline = addUnderline.isChecked
+                } else {
+                    //Сохраняем в БД hex код выбранного цвета, чтобы при загрузке текстов Библии потом отобразить текст с выбранном цветом
+                    val idOfAddedData = bibleTextInfoDBHelper.addBibleTextInfo(BibleTextInfoModel(
+                            -1/*-1 здесь как заглушка, этот параметр нужен не при добавлении, а при получении данных, потому что там id создаётся автоматически*/,
+                            selectedTextModel.book_number, selectedTextModel.chapter_number, selectedTextModel.verse_number, hexColor, addBoldText.isChecked, addUnderline.isChecked))
+
+                    selectedTextModel.id = idOfAddedData
+                    selectedTextModel.textColorHex = hexColor
+                    selectedTextModel.isTextBold = addBoldText.isChecked
+                    selectedTextModel.isTextUnderline = addUnderline.isChecked
+                }
             }
 
-            listener.dismissDialog(true)
+            listener.updateItemsColor(versesData)
+            listener.dismissColorPickerDialog(true)
         }
 
         builder.setView(view)
@@ -246,8 +277,8 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
         }
     }
 
-    fun setVerseData(verseData: BibleTextModel) {
-        this.verseData = verseData
+    fun setVersesData(versesData: ArrayList<BibleTextModel>) {
+        this.versesData = versesData
     }
 
     override fun onResume() {
@@ -261,7 +292,6 @@ class ColorPickerDialog(private val listener: ColorPickerDialogListener) : AppCo
         super.onDestroy()
         manager.clearSavedAllData() //На свякий случай очищаем данные, которые могут невольно сохраняться
     }
-
 
     //Метод для связи с активити
 //    override fun onAttach(context: Context) {

@@ -34,7 +34,7 @@ import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment
 
-class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFragment(), ColorPickerDialog.ColorPickerDialogListener, DialogListener {
+class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFragment(), ColorPickerDialog.ColorPickerDialogListener2, DialogListener {
     interface VerseDialogListener {
         fun dismissDialog()
         fun updateItemColor(bibleTextInfo: BibleTextInfoModel)
@@ -125,9 +125,9 @@ class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFr
         //чтобы при последующем отображении стиха в разных языках, выделять его основываясь именно на номере книги, главы и стиха
         val tvHighlight: TextView = view.findViewById(R.id.tvHighlight)
         tvHighlight.setOnClickListener {
-            colorPickerDialog = ColorPickerDialog(this)
-            colorPickerDialog.setVerseData(verseData)
-            colorPickerDialog.show(myFragmentManager, "Color Picker Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
+//            colorPickerDialog = ColorPickerDialog(this)
+//            colorPickerDialog.setVersesData(verseData)
+//            colorPickerDialog.show(myFragmentManager, "Color Picker Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
         }
 
         val tvRemoveHighlighting: TextView = view.findViewById(R.id.tvRemoveHighlighting)

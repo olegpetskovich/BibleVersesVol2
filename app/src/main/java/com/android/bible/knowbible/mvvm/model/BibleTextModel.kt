@@ -8,4 +8,5 @@ data class BibleTextModel(var id: Long = -1,
                           var textColorHex: String?,
                           var isTextBold: Boolean,
                           var isTextUnderline: Boolean,
-                          var isTextSelected: Boolean = false /*Поле сугубо для BibleTextRVAdapter, чтобы можно было отметить выбранный текст в режиме MultiSelection*/)
+                          var isTextSelected: Boolean = false /*Поле сугубо для BibleTextRVAdapter, чтобы можно было отметить выбранный текст в режиме MultiSelection*/,
+                          var selectedItem: Int = -1)

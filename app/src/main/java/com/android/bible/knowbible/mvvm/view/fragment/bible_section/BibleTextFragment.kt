@@ -1,11 +1,13 @@
 package com.android.bible.knowbible.mvvm.view.fragment.bible_section
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
+import android.view.animation.AnimationUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -30,6 +32,7 @@ import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_bible_text.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -47,6 +50,8 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     private var isBtnNotesClicked: Boolean = false
     private var isBtnSearchClicked: Boolean = false
 
+    private var isInterpretationOpened: Boolean = false
+
     var isBibleTextFragmentOpenedFromSearchFragment: Boolean = false
 
     private lateinit var swipeListener: OnViewPagerSwipeStateListener
@@ -54,9 +59,6 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 
     private lateinit var saveLoadData: SaveLoadData
     private lateinit var bibleDataViewModel: BibleDataViewModel
-
-    private lateinit var progressBar: ProgressBar
-
 
     private lateinit var myFragmentManager: FragmentManager
 
@@ -81,8 +83,6 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 
         bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
 //        bibleDataViewModel.setDatabase() //Вызов этого метода не нужен скорее всего
-
-        progressBar = myView.findViewById(R.id.progressBar)
 
         viewPager2 = myView.findViewById(R.id.viewPager2)
 //        viewPager2.offscreenPageLimit = 10 //Потестировать этот метод, чтобы не было мелкого пролага при перелистывании
@@ -196,7 +196,7 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
             if (currentTheme != ThemeManager.theme) {
                 viewPager2.adapter!!.notifyDataSetChanged()
                 currentTheme = ThemeManager.theme
-                setScroll(vpPage,false)
+                setScroll(vpPage, false)
             } else setScroll(vpPage, false)
         } else {
             //Код для преобразования текстов в БД НИ В КОЕМ СЛУЧАЕ НЕ УДАЛЯТЬ!
@@ -343,6 +343,10 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         vpAdapter?.getRecyclerView(chapterInfo!!.chapterNumber - 1)?.adapter?.notifyDataSetChanged()
     }
 
+    fun getCurrentRecyclerViewAdapter(): BibleTextRVAdapter {
+        return vpAdapter?.getRecyclerView(chapterInfo!!.chapterNumber - 1)?.adapter as BibleTextRVAdapter
+    }
+
 
     override fun onStop() {
         super.onStop()
@@ -437,7 +441,15 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     }
 
     fun btnInterpretationClicked() {
-
+        val anim: ValueAnimator?
+        if (!isInterpretationOpened) {
+            anim = Utility.expand(fragmentContainerInterpretation, 300, Utility.convertDbInPx(context!!, coordinatorLayout.height / 3f).toInt())
+            isInterpretationOpened = true
+        } else {
+            anim = Utility.collapse(fragmentContainerInterpretation, 300, Utility.convertDbInPx(context!!, 0f).toInt())
+            isInterpretationOpened = false
+        }
+        anim!!.start()
     }
 
     fun btnNotesClicked() {

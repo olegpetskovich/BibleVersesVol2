@@ -6,7 +6,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Typeface
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -27,7 +26,6 @@ import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
 import com.android.bible.knowbible.mvvm.view.dialog.VerseDialog
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
-import com.android.bible.knowbible.utility.FontCache
 import com.android.bible.knowbible.utility.Utility
 import com.android.bible.knowbible.utility.Utility.Companion.convertDbInPx
 import java.util.*
@@ -232,6 +230,7 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
 
             if (!models[adapterPosition].isTextSelected) {
                 models[adapterPosition].isTextSelected = true
+                models[adapterPosition].selectedItem = adapterPosition
                 multiSelectedTextsList.add(models[adapterPosition])
 
                 when (ThemeManager.theme) {
@@ -251,6 +250,7 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
 
             } else {
                 models[adapterPosition].isTextSelected = false
+                models[adapterPosition].selectedItem = -1
                 multiSelectedTextsList.remove(models[adapterPosition])
 
                 when (ThemeManager.theme) {
@@ -307,19 +307,30 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
         }
 
         override fun updateItemColor(bibleTextInfo: BibleTextInfoModel) {
-            val model = models[selectedItem]
-            if (selectedItem != -1) {
-                //Проверка на сходство на всякий случай
-                if (model.book_number == bibleTextInfo.bookNumber
-                        && model.chapter_number == bibleTextInfo.chapterNumber
-                        && model.verse_number == bibleTextInfo.verseNumber) {
-                    model.id = bibleTextInfo.id
-                    model.textColorHex = bibleTextInfo.textColorHex
-                    model.isTextBold = bibleTextInfo.isTextBold
-                    model.isTextUnderline = bibleTextInfo.isTextUnderline
-                    notifyItemChanged(selectedItem, Unit)
-                    selectedItem = -1
-                }
+//            val model = models[selectedItem]
+//            if (selectedItem != -1) {
+//                //Проверка на сходство на всякий случай
+//                if (model.book_number == bibleTextInfo.bookNumber
+//                        && model.chapter_number == bibleTextInfo.chapterNumber
+//                        && model.verse_number == bibleTextInfo.verseNumber) {
+//                    model.id = bibleTextInfo.id
+//                    model.textColorHex = bibleTextInfo.textColorHex
+//                    model.isTextBold = bibleTextInfo.isTextBold
+//                    model.isTextUnderline = bibleTextInfo.isTextUnderline
+//                    notifyItemChanged(selectedItem, Unit)
+//                    selectedItem = -1
+//                }
+//            }
+        }
+    }
+
+    fun updateItemColor(bibleTextsForHighlighting: ArrayList<BibleTextModel>) {
+        for (modelForHighlighting in bibleTextsForHighlighting) {
+            if (modelForHighlighting.selectedItem != -1) {
+                val model: BibleTextModel = modelForHighlighting
+                models[model.selectedItem] = model
+                notifyItemChanged(model.selectedItem, Unit)
+                model.selectedItem = -1
             }
         }
     }
