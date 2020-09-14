@@ -1,13 +1,14 @@
 package com.android.bible.knowbible.mvvm.view.fragment.bible_section
 
-import android.animation.Animator
-import android.animation.ValueAnimator
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -441,16 +442,48 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     }
 
     fun btnInterpretationClicked() {
-        val anim: ValueAnimator?
+        val centerOfLayout = coordinatorLayout.height / 2
+
         if (!isInterpretationOpened) {
-            anim = Utility.expand(fragmentContainerInterpretation, 300, Utility.convertDbInPx(context!!, coordinatorLayout.height / 3f).toInt())
+            myFragmentManager.let {
+                val myFragment = BibleInterpretationFragment()
+                myFragment.setRootFragmentManager(myFragmentManager)
+
+                val transaction: FragmentTransaction = it.beginTransaction()
+                transaction.replace(R.id.fragmentContainerInterpretation, myFragment)
+                transaction.commit()
+            }
+
+            Utility.slideView(fragmentContainerInterpretation, 500, 0, centerOfLayout, true)
+
             isInterpretationOpened = true
         } else {
-            anim = Utility.collapse(fragmentContainerInterpretation, 300, Utility.convertDbInPx(context!!, 0f).toInt())
+            Utility.slideView(fragmentContainerInterpretation, 500, centerOfLayout, 0, false)
+
             isInterpretationOpened = false
         }
-        anim!!.start()
     }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        //Поскольку высота лейаута меняется в зависимости от ориентации экрана, нужно задавать обновлённые данные для правильного расположения экрана толкования
+        //А задержка нужна по той причине, что именно после неё мы получаем данные длины лейаута уже отображённой ориентации экрана,
+        //а не той, которая была до поворота экрана, как это происходит если не делать задержку
+        val mainHandler = Handler(context!!.mainLooper)
+        val myRunnable = Runnable {
+            GlobalScope.launch(Dispatchers.Main) {
+                delay(100)
+                if (isInterpretationOpened) {
+                    val centerOfLayout = coordinatorLayout.height / 2
+                    val layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, centerOfLayout)
+                    fragmentContainerInterpretation.layoutParams = layoutParams
+                    fragmentContainerInterpretation.requestLayout()
+                }
+            }
+        }
+        mainHandler.post(myRunnable)
+    }
+
 
     fun btnNotesClicked() {
         isBtnNotesClicked = true

@@ -28,7 +28,6 @@ import com.android.bible.knowbible.App
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.data.local.BibleTextInfoDBHelper
 import com.android.bible.knowbible.data.local.NotesDBHelper
-import com.android.bible.knowbible.mvvm.model.BibleTextInfoModel
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.BibleTranslationModel
 import com.android.bible.knowbible.mvvm.view.adapter.BibleTextRVAdapter.Companion.isMultiSelectionEnabled
@@ -113,8 +112,8 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
 
     private var noteId: Int = -1
     private var isTabBibleSelected = true //Значение по умолчанию должно быть true, так как приложение в любом случае открывается в табе "Библия".
-                                          //При этом по непонятной причине при запуске приложения не срабатывает addOnTabSelectedListener, а только после переключения по табам, потому,
-                                          //опять же, выходом является установать значение true, а уже при переключении по табам значение этого поля будет меняться
+    //При этом по непонятной причине при запуске приложения не срабатывает addOnTabSelectedListener, а только после переключения по табам, потому,
+    //опять же, выходом является установать значение true, а уже при переключении по табам значение этого поля будет меняться
 
     private lateinit var bibleTextFragment: BibleTextFragment //Объект необходим для управления BottomAppBar в BibleTextFragment
     private var isBibleTextFragmentOpened: Boolean = false
@@ -151,9 +150,9 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         appBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val a = abs(verticalOffset) - appBarLayout.totalScrollRange
+            Utility.log("Offset: $a")
             if (isBibleTextFragmentOpened) {
-                val a = abs(verticalOffset) - appBarLayout.totalScrollRange
-                Utility.log("Offset: $a")
                 if (a != 0) {
                     //Expanded
                     setBottomAppBarVisibility(View.VISIBLE)
@@ -450,6 +449,10 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         val animationBtnRemoveHighlight: Animation
 
         if (isVisible) {
+            //Открываем appBarLayout при включении режима множественного выбора
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) appBarLayout.setExpanded(true, false)
+            else appBarLayout.setExpanded(true, true) //Открываем appBarLayout при включении режима множественного выбора
+
             animationBtnSelectTranslation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
 
             animationBtnShare = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
@@ -611,10 +614,10 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
     }
 
     //Метод, форматирующий текст нужным образом при выделении стихов.
-//Например, если выделены несколько текстов, идущих подряд друг за другом (например, 4,5,6,7),
-//то отрезок будет отформатирован с помощью дефиза, вот так: 4-7 , то есть с 4 по 7 стихи.
-//Если же выбираются тексты на следующий друг за другом, то они буду разделяться запятой.
-//К примеру, пользователь выделил 4 стих, а потом 7 стих, на выходе будет выглядеть вот так: 4,7, то есть отдельно 4 стих и отдельно 7 стих
+    //Например, если выделены несколько текстов, идущих подряд друг за другом (например, 4,5,6,7),
+    //то отрезок будет отформатирован с помощью дефиза, вот так: 4-7 , то есть с 4 по 7 стихи.
+    //Если же выбираются тексты на следующий друг за другом, то они буду разделяться запятой.
+    //К примеру, пользователь выделил 4 стих, а потом 7 стих, на выходе будет выглядеть вот так: 4,7, то есть отдельно 4 стих и отдельно 7 стих
     private fun setSelectedVerses(multiSelectedTextsList: ArrayList<BibleTextModel>) {
         var selectedVerses = ":" + multiSelectedTextsList[0].verse_number
         for ((index, bibleTextModel) in multiSelectedTextsList.withIndex()) {

@@ -1,14 +1,16 @@
 package com.android.bible.knowbible.utility
 
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.animation.ValueAnimator.ofInt
 import android.app.Activity
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
-import android.view.animation.DecelerateInterpolator
+import android.view.animation.*
 import android.view.inputmethod.InputMethodManager
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.mvvm.model.BibleTranslationModel
@@ -93,30 +95,20 @@ class Utility {
             }
         }
 
-        fun expand(v: View, duration: Int, targetHeight: Int): ValueAnimator? {
-            val prevHeight = v.height
-            v.visibility = View.VISIBLE
-            val valueAnimator = ValueAnimator.ofInt(prevHeight, targetHeight)
-            valueAnimator.addUpdateListener { animation: ValueAnimator ->
-                v.layoutParams.height = animation.animatedValue as Int
-                v.requestLayout()
-            }
-            valueAnimator.interpolator = DecelerateInterpolator()
-            valueAnimator.duration = duration.toLong()
-            return valueAnimator
-        }
+        fun slideView(view: View, duration: Int, currentHeight: Int, newHeight: Int, isExpand: Boolean) {
+            val slideAnimator = ofInt(currentHeight, newHeight).setDuration(duration.toLong())
 
-        fun collapse(v: View, duration: Int, targetHeight: Int): ValueAnimator? {
-            val prevHeight = v.height
-            val valueAnimator = ValueAnimator.ofInt(prevHeight, targetHeight)
-            valueAnimator.interpolator = DecelerateInterpolator()
-            valueAnimator.addUpdateListener { animation: ValueAnimator ->
-                v.layoutParams.height = animation.animatedValue as Int
-                v.requestLayout()
+            slideAnimator.addUpdateListener { animation1: ValueAnimator ->
+                val value = animation1.animatedValue
+                view.layoutParams.height = value as Int
+                view.requestLayout()
             }
-            valueAnimator.interpolator = DecelerateInterpolator()
-            valueAnimator.duration = duration.toLong()
-            return valueAnimator
+
+            val animationSet = AnimatorSet()
+            if (isExpand) animationSet.interpolator = AccelerateInterpolator()
+            else animationSet.interpolator = DecelerateInterpolator()
+            animationSet.play(slideAnimator)
+            animationSet.start()
         }
     }
 }
