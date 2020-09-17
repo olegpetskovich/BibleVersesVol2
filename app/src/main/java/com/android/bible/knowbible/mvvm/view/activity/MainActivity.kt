@@ -622,13 +622,13 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         var selectedVerses = ":" + multiSelectedTextsList[0].verse_number
         for ((index, bibleTextModel) in multiSelectedTextsList.withIndex()) {
             if (multiSelectedTextsList.size > 1 && index != 0) {
-                selectedVerses = if ((bibleTextModel.verse_number - multiSelectedTextsList[index - 1].verse_number) == 1) {
+                selectedVerses += if ((bibleTextModel.verse_number - multiSelectedTextsList[index - 1].verse_number) == 1) {
                     if (index + 1 != multiSelectedTextsList.size && (multiSelectedTextsList[index + 1].verse_number - bibleTextModel.verse_number) == 1) {
                         continue
                     }
-                    selectedVerses + "-" + bibleTextModel.verse_number
+                    "-" + bibleTextModel.verse_number
                 } else {
-                    selectedVerses + "," + bibleTextModel.verse_number
+                    "," + bibleTextModel.verse_number
                 }
             }
         }
@@ -677,6 +677,13 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             btnAddNoteFAB.isEnabled = false //Нужно отключать кнопку, потому что в противном случае по какой-то причине кнопка продолжает нажиматься даже с видимостью GONE
             animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
         }
+        animation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationEnd(animation: Animation?) {
+                btnAddNoteFAB.clearAnimation()
+            }
+            override fun onAnimationRepeat(animation: Animation?) {}
+        })
         btnAddNoteFAB.startAnimation(animation)
     }
 
@@ -772,6 +779,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
     }
 
     override fun setTvSelectedBibleText(selectedText: String, isBook: Boolean) {
+        //Здесь проихводится проверка на то, название книги сюда приходит, или же номер выбранной главы. Если книга, то устанавливаем в нужный TextView, если номер, то соответственно
         //Здесь проихводится проверка на то, название книги сюда приходит, или же номер выбранной главы. Если книга, то устанавливаем в нужный TextView, если номер, то соответственно
         if (isBook) tvSelectedBibleBook.text = selectedText
         else tvSelectedBibleChapter.text = selectedText

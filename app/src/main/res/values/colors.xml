@@ -7,7 +7,7 @@
     <!-- Status bar color -->
     <color name="colorStatusBarLightTheme">#0D47A1</color>
     <color name="colorStatusBarDarkTheme">#172029</color>
-    <color name="colorStatusBarBookTheme">#916C31</color>
+    <color name="colorStatusBarBookTheme">#AF8135</color>
 
     <!-- Line separator color -->
     <color name="colorLineLightTheme">#E2E2E2</color>
@@ -30,23 +30,23 @@
     <!-- Button color -->
     <color name="colorButtonDarkTheme">#1d2731</color>
     <color name="colorButtonLightTheme">#FFFFFF</color>
-    <color name="colorButtonBookTheme">#C59342</color>
+    <color name="colorButtonBookTheme">#D8A758</color>
+<!--    <color name="colorButtonBookTheme">#C59342</color>-->
 
     <!-- Button ripple color -->
     <color name="colorButtonRippleDarkTheme">#1a232c</color>
     <color name="colorButtonRippleLightTheme">#F0EFEF</color>
-    <color name="colorButtonRippleBookTheme">#916C31</color>
+    <color name="colorButtonRippleBookTheme">#C59342</color>
 
     <!-- Button stroke color -->
     <color name="colorButtonStrokeDarkTheme">#1a232c</color>
     <color name="colorButtonStrokeLightTheme">#FAFAFA</color>
-    <color name="colorButtonStrokeBookTheme">#A27938</color>
+    <color name="colorButtonStrokeBookTheme">#C59342</color>
 
     <!-- Button icon color -->
     <color name="colorButtonIconDarkTheme">#006EFF</color>
     <color name="colorButtonIconLightTheme">#006EFF</color>
     <color name="colorButtonIconBookTheme">#181818</color>
-<!--    <color name="colorButtonIconBookTheme">#805C1E</color>-->
 
     <!-- EditText cursor color -->
     <color name="colorIconCursorDarkTheme">#006EFF</color>
@@ -84,12 +84,12 @@
     <!-- Background color -->
     <color name="colorBackgroundDarkTheme">#1d2731</color>
     <color name="colorBackgroundLightTheme">#FFFFFF</color>
-    <color name="colorBackgroundBookTheme">#C59342</color>
+    <color name="colorBackgroundBookTheme">#D8A758</color>
 
     <!-- Multi Selection Background color -->
     <color name="colorMultiSelectionBackgroundDarkTheme">#3E4E5E</color>
     <color name="colorMultiSelectionBackgroundLightTheme">#CCECFF</color>
-    <color name="colorMultiSelectionBackgroundBookTheme">#C59342</color>
+    <color name="colorMultiSelectionBackgroundBookTheme">#D8A758</color>
 
     <!-- Button "Apply" color -->
     <color name="colorButtonApplyLightTheme">#006EFF</color>
@@ -104,5 +104,5 @@
     <!-- FAB icon color -->
     <color name="colorIconFABDarkTheme">#FFFFFF</color>
     <color name="colorIconFABLightTheme">#FFFFFF</color>
-    <color name="colorIconFABBookTheme">#C59342</color>
+    <color name="colorIconFABBookTheme">#D8A758</color>
 </resources>

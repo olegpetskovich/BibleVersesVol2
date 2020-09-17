@@ -95,7 +95,7 @@ class Utility {
             }
         }
 
-        fun slideView(view: View, duration: Int, currentHeight: Int, newHeight: Int, isExpand: Boolean) {
+        fun slideView(view: View, duration: Int, currentHeight: Int, newHeight: Int, isExpand: Boolean): AnimatorSet {
             val slideAnimator = ofInt(currentHeight, newHeight).setDuration(duration.toLong())
 
             slideAnimator.addUpdateListener { animation1: ValueAnimator ->
@@ -108,7 +108,7 @@ class Utility {
             if (isExpand) animationSet.interpolator = AccelerateInterpolator()
             else animationSet.interpolator = DecelerateInterpolator()
             animationSet.play(slideAnimator)
-            animationSet.start()
+            return animationSet
         }
     }
 }

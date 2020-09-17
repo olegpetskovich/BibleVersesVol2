@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteDatabase
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.BookModel
 import com.android.bible.knowbible.mvvm.model.ChapterModel
+import com.android.bible.knowbible.mvvm.model.DailyVerseModel
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel.Companion.TABLE_BOOKS
 import com.android.bible.knowbible.utility.Utility
 import io.reactivex.Single
@@ -113,19 +114,12 @@ class RepositoryLocal {
                 }
     }
 
-    fun getBibleVerseForDailyVerse(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int): Single<BibleTextModel> {
+    fun getBibleVerseForDailyVerse(tableName: String, bookNumber: Int, chapterNumber: Int, versesNumbers: ArrayList<Int>): Single<DailyVerseModel> {
         return dbBibleHelper
-                .loadBibleVerse(tableName, bookNumber, chapterNumber, verseNumber)
-                .flatMap { response: BibleTextModel ->
+                .loadDailyVerse(tableName, bookNumber, chapterNumber, versesNumbers)
+                .flatMap { response: DailyVerseModel ->
                     //flatMap здесь используется, чтобы показать, что при получении данных, их можно сначала отредактировать как надо, а потом отправить дальше
-                    dbBibleHelper.loadBookShortName(TABLE_BOOKS, response.book_number)
-                            .map { shortName ->
-                                //Очищаем текст от ненужных тегов, а также знаков в конце и в начале
-                                val str = Utility.getClearedText(StringBuilder(response.text))
-
-                                response.text = "«" + str + "»" + " (" + shortName + ". " + response.chapter_number + ":" + response.verse_number + ")"
-                                return@map response
-                            }
+                    return@flatMap Single.fromCallable<DailyVerseModel> { return@fromCallable response }
                 }
     }
 

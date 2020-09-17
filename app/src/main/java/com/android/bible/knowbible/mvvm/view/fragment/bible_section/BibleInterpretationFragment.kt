@@ -1,6 +1,8 @@
 package com.android.bible.knowbible.mvvm.view.fragment.bible_section
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
@@ -28,9 +30,6 @@ class BibleInterpretationFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val myView: View = inflater.inflate(R.layout.fragment_bible_interpretation, container, false)
         listener.setTheme(ThemeManager.theme, false) //Если не устанавливать тему каждый раз при открытии фрагмента, то по какой-то причине внешний вид View не обновляется, поэтому на данный момент только такое решение
-
-        myTextView = myView.findViewById(R.id.myTextView)
-        myTextView.movementMethod = ScrollingMovementMethod()
 
         return myView
     }

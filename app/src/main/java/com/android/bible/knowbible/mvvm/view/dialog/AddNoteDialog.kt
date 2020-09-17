@@ -4,9 +4,16 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -21,6 +28,7 @@ import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment
 import com.android.bible.knowbible.utility.Utility
 import com.google.android.material.button.MaterialButton
+import kotlinx.android.synthetic.main.fragment_bible_text.*
 import java.lang.StringBuilder
 
 class AddNoteDialog(private val listener: DialogListener) : AppCompatDialogFragment() {
@@ -29,6 +37,7 @@ class AddNoteDialog(private val listener: DialogListener) : AppCompatDialogFragm
     private lateinit var verseText: String
 
     private lateinit var tvVerseForNote: TextView
+    private lateinit var mainLayout: LinearLayout
     private lateinit var editTextNote: AppCompatEditText
     private lateinit var btnSave: MaterialButton
 
@@ -54,7 +63,17 @@ class AddNoteDialog(private val listener: DialogListener) : AppCompatDialogFragm
         tvVerseForNote = view.findViewById(R.id.tvVerseForNote)
         tvVerseForNote.text = verseText
 
+        mainLayout = view.findViewById(R.id.mainLayout)
+
         editTextNote = view.findViewById(R.id.editTextNote)
+//        editTextNote.addTextChangedListener(object : TextWatcher {
+//            override fun afterTextChanged(s: Editable?) {}
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                mainLayout.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, tvVerseForNote.height + editTextNote.height + btnSave.height)
+//                mainLayout.requestLayout()
+//            }
+//        })
 
         btnSave = view.findViewById(R.id.btnSave)
         btnSave.setOnClickListener {
@@ -68,6 +87,9 @@ class AddNoteDialog(private val listener: DialogListener) : AppCompatDialogFragm
                 listener.dismissDialog()
             } else Toast.makeText(context, getString(R.string.toast_field_cant_be_empty), Toast.LENGTH_SHORT).show()
         }
+
+//        mainLayout.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, tvVerseForNote.height + editTextNote.height + btnSave.height)
+//        mainLayout.requestLayout()
 
         builder.setView(view)
         return builder.create()

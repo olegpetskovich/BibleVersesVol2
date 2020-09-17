@@ -24,10 +24,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.data.local.BibleTextInfoDBHelper
-import com.android.bible.knowbible.data.local.DailyVersesDBHelper
 import com.android.bible.knowbible.mvvm.model.BibleTextInfoModel
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
-import com.android.bible.knowbible.mvvm.model.DailyVerseModel
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel

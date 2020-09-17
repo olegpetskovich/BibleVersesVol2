@@ -9,6 +9,7 @@ import com.android.bible.knowbible.data.local.RepositoryLocal
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.BookModel
 import com.android.bible.knowbible.mvvm.model.ChapterModel
+import com.android.bible.knowbible.mvvm.model.DailyVerseModel
 import com.android.bible.knowbible.utility.SingleLiveEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
@@ -26,14 +27,17 @@ class BibleDataViewModel : ViewModel() {
 
     private val dataBaseLiveData = MutableLiveData<SQLiteDatabase>()
 
-    private val testamentBooksListLiveData = MutableLiveData<ArrayList<BookModel>>()
     private val allBooksListLiveData = MutableLiveData<ArrayList<BookModel>>()
+    private val testamentBooksListLiveData = MutableLiveData<ArrayList<BookModel>>()
     private val chaptersListLiveData = MutableLiveData<ArrayList<ChapterModel>>()
-    private val bibleTextOfChapterLiveData = MutableLiveData<ArrayList<BibleTextModel>>()
-    private val searchedBibleVersesLiveData = MutableLiveData<ArrayList<BibleTextModel>>()
-    private val bibleTextOfBookLiveData = MutableLiveData<ArrayList<ArrayList<BibleTextModel>>>()
+
     private val bibleTextOfAllBibleLiveData = SingleLiveEvent<ArrayList<BibleTextModel>>()
+    private val bibleTextOfBookLiveData = MutableLiveData<ArrayList<ArrayList<BibleTextModel>>>()
+    private val bibleTextOfChapterLiveData = MutableLiveData<ArrayList<BibleTextModel>>()
+
+    private val searchedBibleVersesLiveData = MutableLiveData<ArrayList<BibleTextModel>>()
     private val bibleVerseLiveData = SingleLiveEvent<BibleTextModel>() //Здесь используется кастомный класс SingleLiveEvent. Потому что MutableLiveData вызывается много раз, а SingleLiveEvent один раз, как мне и надо.
+    private val dailyVerseLiveData = SingleLiveEvent<DailyVerseModel>() //Здесь используется кастомный класс SingleLiveEvent. Потому что MutableLiveData вызывается много раз, а SingleLiveEvent один раз, как мне и надо.
     private val bookShortNameLiveData = MutableLiveData<String>()
 
     fun openDatabase(dbPath: String) {
@@ -83,9 +87,9 @@ class BibleDataViewModel : ViewModel() {
         return bibleVerseLiveData
     }
 
-    fun getBibleVerseForDailyVerse(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int): SingleLiveEvent<BibleTextModel> {
-        getBibleVerseForDailyVerseData(tableName, bookNumber, chapterNumber, verseNumber)
-        return bibleVerseLiveData
+    fun getBibleVerseForDailyVerse(tableName: String, bookNumber: Int, chapterNumber: Int, versesNumbers: ArrayList<Int>): SingleLiveEvent<DailyVerseModel> {
+        getBibleVerseForDailyVerseData(tableName, bookNumber, chapterNumber, versesNumbers)
+        return dailyVerseLiveData
     }
 
     fun getSearchedBibleVerses(tableName: String, searchingSection: Int, searchingText: String): LiveData<ArrayList<BibleTextModel>> {
@@ -174,10 +178,9 @@ class BibleDataViewModel : ViewModel() {
                 .getBibleVerse(tableName, bookNumber, chapterNumber, verseNumber)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Consumer {
+                .subscribe({
                     bibleVerseLiveData.value = it
-                })
-
+                }, { it.printStackTrace() })
     }
 
     @SuppressLint("CheckResult")
@@ -192,13 +195,13 @@ class BibleDataViewModel : ViewModel() {
     }
 
     @SuppressLint("CheckResult")
-    private fun getBibleVerseForDailyVerseData(tableName: String, bookNumber: Int, chapterNumber: Int, verseNumber: Int) {
+    private fun getBibleVerseForDailyVerseData(tableName: String, bookNumber: Int, chapterNumber: Int, versesNumbers: ArrayList<Int>) {
         localRepository
-                .getBibleVerseForDailyVerse(tableName, bookNumber, chapterNumber, verseNumber)
+                .getBibleVerseForDailyVerse(tableName, bookNumber, chapterNumber, versesNumbers)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Consumer {
-                    bibleVerseLiveData.value = it
+                    dailyVerseLiveData.value = it
                 })
     }
 

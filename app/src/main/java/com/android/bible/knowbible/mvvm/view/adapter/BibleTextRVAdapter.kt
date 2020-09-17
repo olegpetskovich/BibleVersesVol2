@@ -207,6 +207,10 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
             }
 
             itemView.setOnClickListener {
+                Utility.log("{\"book_number\":" + models[adapterPosition].book_number + ", "
+                        + "\"chapter_number\":" + models[adapterPosition].chapter_number + ", "
+                        + "\"verse_number\":" + models[adapterPosition].verse_number + "}")
+
                 if (isMultiSelectionEnabled) {
                     changeBackgroundOfSelectedItem(itemView)
                 }

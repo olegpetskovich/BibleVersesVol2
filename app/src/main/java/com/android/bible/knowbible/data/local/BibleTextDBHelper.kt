@@ -2,11 +2,9 @@ package com.android.bible.knowbible.data.local
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import com.android.bible.knowbible.mvvm.model.BibleTextModel
-import com.android.bible.knowbible.mvvm.model.BookModel
-import com.android.bible.knowbible.mvvm.model.ChapterModel
-import com.android.bible.knowbible.mvvm.model.EnumBooksList
+import com.android.bible.knowbible.mvvm.model.*
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.search_subsection.SearchFragment.Companion.NEW_TESTAMENT_SECTION
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.search_subsection.SearchFragment.Companion.OLD_TESTAMENT_SECTION
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
@@ -32,6 +30,37 @@ class BibleTextDBHelper {
 
     fun closeDatabase() {
         dataBase.close()
+    }
+
+    fun loadAllBooksList(tableName: String): Single<ArrayList<BookModel>> {
+        val cursor = dataBase.query(tableName, null, null, null, null, null, null)
+        val mainCollection = ArrayList<BookModel>()
+        val secondCollection = ArrayList<BookModel>()
+        if (cursor.moveToFirst()) {
+            do {
+                val bookNumber = cursor.getInt(cursor.getColumnIndex("book_number"))
+                val bookShortName = cursor.getString(cursor.getColumnIndex("short_name"))
+                val bookLongName = cursor.getString(cursor.getColumnIndex("long_name"))
+
+                val bookInfo = BookModel(bookNumber, bookShortName, bookLongName)
+
+                //Если номер книги идет в промежутке от 660 до 720 включительно(то есть от книги Иакова до книги Иуды),
+                //то добавляем их в отдельную коллекцию, чтобы потом добавить в главную коллекцию в нужное место ради стандартного порядка расопложения книг Библии
+                if (bookNumber in 660..720) secondCollection.add(bookInfo)
+                else mainCollection.add(bookInfo)
+            } while (cursor.moveToNext())
+        }
+
+        //Индекс 44 это индекс, идущий по счёту после книги Деяний. Добавляем после Деяний соборные послания, а потом уже идут послания Павла и остальное
+        mainCollection.addAll(44, secondCollection)
+
+        //Добавляем в каждый объект коллекции mainCollection информацию о количестве глав для каждой книги
+        EnumBooksList.values().forEachIndexed { index, enumBookChapters ->
+            mainCollection[index].number_of_chapters = enumBookChapters.numberOfChapters
+        }
+
+        cursor.close()
+        return Single.fromCallable<ArrayList<BookModel>> { mainCollection }
     }
 
     fun loadTestamentBooksList(tableName: String, isOldTestament: Boolean): Single<ArrayList<BookModel>> {
@@ -94,37 +123,6 @@ class BibleTextDBHelper {
         return Single.fromCallable<ArrayList<BookModel>> { mainCollection }
     }
 
-    fun loadAllBooksList(tableName: String): Single<ArrayList<BookModel>> {
-        val cursor = dataBase.query(tableName, null, null, null, null, null, null)
-        val mainCollection = ArrayList<BookModel>()
-        val secondCollection = ArrayList<BookModel>()
-        if (cursor.moveToFirst()) {
-            do {
-                val bookNumber = cursor.getInt(cursor.getColumnIndex("book_number"))
-                val bookShortName = cursor.getString(cursor.getColumnIndex("short_name"))
-                val bookLongName = cursor.getString(cursor.getColumnIndex("long_name"))
-
-                val bookInfo = BookModel(bookNumber, bookShortName, bookLongName)
-
-                //Если номер книги идет в промежутке от 660 до 720 включительно(то есть от книги Иакова до книги Иуды),
-                //то добавляем их в отдельную коллекцию, чтобы потом добавить в главную коллекцию в нужное место ради стандартного порядка расопложения книг Библии
-                if (bookNumber in 660..720) secondCollection.add(bookInfo)
-                else mainCollection.add(bookInfo)
-            } while (cursor.moveToNext())
-        }
-
-        //Индекс 44 это индекс, идущий по счёту после книги Деяний. Добавляем после Деяний соборные послания, а потом уже идут послания Павла и остальное
-        mainCollection.addAll(44, secondCollection)
-
-        //Добавляем в каждый объект коллекции mainCollection информацию о количестве глав для каждой книги
-        EnumBooksList.values().forEachIndexed { index, enumBookChapters ->
-            mainCollection[index].number_of_chapters = enumBookChapters.numberOfChapters
-        }
-
-        cursor.close()
-        return Single.fromCallable<ArrayList<BookModel>> { mainCollection }
-    }
-
     fun loadChaptersList(tableName: String, bookNumber: Int): Single<ArrayList<ChapterModel>> {
         val cursor = dataBase.query(tableName, arrayOf("book_number", "chapter"), "book_number == ?", arrayOf(bookNumber.toString()), null, null, null)
         val collection = ArrayList<ChapterModel>()
@@ -144,32 +142,6 @@ class BibleTextDBHelper {
         }
         cursor.close()
         return Single.fromCallable<ArrayList<ChapterModel>> { collection }
-    }
-
-    fun loadBibleTextOfChapter(tableName: String, myBookNumber: Int, myChapterNumber: Int): Single<ArrayList<BibleTextModel>> {
-        val cursor = dataBase.query(tableName,
-                null,
-                "book_number == ? AND chapter = ?",
-                arrayOf(myBookNumber.toString(), myChapterNumber.toString()),
-                null,
-                null,
-                null)
-
-        val collection = ArrayList<BibleTextModel>()
-
-        if (cursor.moveToFirst()) {
-            do {
-                val bookNumber = cursor.getInt(cursor.getColumnIndex("book_number"))
-                val chapterNumber = cursor.getInt(cursor.getColumnIndex("chapter"))
-                val verseNumber = cursor.getInt(cursor.getColumnIndex("verse"))
-                val text = cursor.getString(cursor.getColumnIndex("text"))
-
-                collection.add(BibleTextModel(-1/*Тут это заглушка*/, bookNumber, chapterNumber, verseNumber, text, null, isTextBold = false/*Тут это заглушка*/, isTextUnderline = false/*Тут это заглушка*/))
-
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        return Single.fromCallable<ArrayList<BibleTextModel>> { collection }
     }
 
     fun loadAllBibleTexts(tableName: String): Single<ArrayList<BibleTextModel>> {
@@ -233,6 +205,32 @@ class BibleTextDBHelper {
         return Single.fromCallable<ArrayList<ArrayList<BibleTextModel>>> { collectionOfChaptersText }
     }
 
+    fun loadBibleTextOfChapter(tableName: String, myBookNumber: Int, myChapterNumber: Int): Single<ArrayList<BibleTextModel>> {
+        val cursor = dataBase.query(tableName,
+                null,
+                "book_number == ? AND chapter = ?",
+                arrayOf(myBookNumber.toString(), myChapterNumber.toString()),
+                null,
+                null,
+                null)
+
+        val collection = ArrayList<BibleTextModel>()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val bookNumber = cursor.getInt(cursor.getColumnIndex("book_number"))
+                val chapterNumber = cursor.getInt(cursor.getColumnIndex("chapter"))
+                val verseNumber = cursor.getInt(cursor.getColumnIndex("verse"))
+                val text = cursor.getString(cursor.getColumnIndex("text"))
+
+                collection.add(BibleTextModel(-1/*Тут это заглушка*/, bookNumber, chapterNumber, verseNumber, text, null, isTextBold = false/*Тут это заглушка*/, isTextUnderline = false/*Тут это заглушка*/))
+
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return Single.fromCallable<ArrayList<BibleTextModel>> { collection }
+    }
+
     fun loadBibleVerse(tableName: String, myBookNumber: Int, myChapterNumber: Int, myVerseNumber: Int): Single<BibleTextModel> {
         val cursor = dataBase.query(tableName,
                 null,
@@ -257,6 +255,52 @@ class BibleTextDBHelper {
         }
         cursor.close()
         return Single.fromCallable<BibleTextModel> { verse }
+    }
+
+    @SuppressLint("CheckResult")
+    fun loadDailyVerse(tableName: String, myBookNumber: Int, myChapterNumber: Int, myVersesNumbers: ArrayList<Int>): Single<DailyVerseModel> {
+        val cursor: Cursor? =
+                if (myVersesNumbers.size == 1)
+                    dataBase.query(tableName,
+                            null,
+                            "book_number == ? AND chapter = ? AND verse = ?",
+                            arrayOf(myBookNumber.toString(), myChapterNumber.toString(), myVersesNumbers[0].toString()),
+                            null,
+                            null,
+                            null)
+                else
+                    dataBase.query(tableName,
+                            null,
+                            "book_number == ? AND chapter = ?",
+                            arrayOf(myBookNumber.toString(), myChapterNumber.toString()),
+                            null,
+                            null,
+                            null)
+
+        var bookNumber: Int = -1
+        var chapterNumber: Int = -1
+
+        val versesNumbers = ArrayList<Int>()
+        var verseText = ""
+        if (cursor!!.moveToFirst()) {
+            do {
+                bookNumber = cursor.getInt(cursor.getColumnIndex("book_number"))
+                chapterNumber = cursor.getInt(cursor.getColumnIndex("chapter"))
+
+                val verseNumber = cursor.getInt(cursor.getColumnIndex("verse"))
+                val text = cursor.getString(cursor.getColumnIndex("text"))
+
+                for (number in myVersesNumbers)
+                    if (verseNumber == number) {
+                        versesNumbers.add(verseNumber)
+                        verseText += text
+                    }
+
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        return Single.fromCallable<DailyVerseModel> { DailyVerseModel(bookNumber, chapterNumber, -1, versesNumbers, verseText) }
     }
 
     @SuppressLint("CheckResult")
@@ -291,8 +335,8 @@ class BibleTextDBHelper {
                             while (matcher.find()) {
                                 val foundedWord = matcher.group()
                                 if (str.contains(foundedWord, true)) {
-                                    str = str.replace("\\s{2,}".toRegex(), " ").trim();
-                                    str = str.replace(foundedWord, "<b>$foundedWord</b>")
+                                    str = str.replace("\\s{2,}".toRegex(), " ").trim()
+                                    str = str.replace(foundedWord, "<b>$foundedWord</b>") //Выделяем найденное слово
                                 }
                             }
 

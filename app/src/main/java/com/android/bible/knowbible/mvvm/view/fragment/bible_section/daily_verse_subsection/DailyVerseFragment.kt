@@ -1,10 +1,15 @@
 package com.android.bible.knowbible.mvvm.view.fragment.bible_section.daily_verse_subsection
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,48 +19,48 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.bible.knowbible.R
-import com.android.bible.knowbible.data.local.BibleTextInfoDBHelper
-import com.android.bible.knowbible.data.local.DailyVersesDBHelper
 import com.android.bible.knowbible.mvvm.model.DailyVerseModel
+import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
+import com.android.bible.knowbible.mvvm.view.dialog.AddNoteDialog
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.Utility
 import com.google.android.material.button.MaterialButton
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.lang.StringBuilder
+import java.io.InputStream
+import java.io.StringReader
 import java.util.*
+import kotlin.collections.ArrayList
 
-class DailyVerseFragment : Fragment() {
+class DailyVerseFragment : Fragment(), DialogListener {
     lateinit var myFragmentManager: FragmentManager
 
     private lateinit var listener: IActivityCommunicationListener
 
     private lateinit var bibleDataViewModel: BibleDataViewModel
-    private lateinit var bibleTextInfoDBHelper: BibleTextInfoDBHelper
-
-//    private lateinit var dailyVersesDBHelper: DailyVersesDBHelper
 
     private lateinit var progressBar: ProgressBar
     private lateinit var ivBook: ImageView
     private lateinit var tvVerse: TextView
     private lateinit var btnFind: MaterialButton
 
-    private lateinit var btnList: MaterialButton
-    private lateinit var btnShare: MaterialButton
+    private lateinit var btnAddNote: ImageView
+    private lateinit var btnShare: ImageView
+    private lateinit var btnCopy: ImageView
 
-    private lateinit var dailyVersesListInfo: ArrayList<DailyVerseModel>
+    private lateinit var versesInfoList: ArrayList<DailyVerseModel>
+    private lateinit var addNoteDialog: AddNoteDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,54 +79,45 @@ class DailyVerseFragment : Fragment() {
         //При открытии фрагмента сразу получаем, форматируем и добавляем готовые тексты для "Стих дня" в коллекцию.
         tvVerse.visibility = View.GONE
 
-        GlobalScope.launch(Dispatchers.Main) {
-            delay(300)
-            //ViewModel для получения конкретного текста для Стих дня
-            bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
+        val jsonFileContent: String = readJSONFromAsset("verses.txt")!!
+        versesInfoList = fromJSON(jsonFileContent)
 
-            bibleTextInfoDBHelper = BibleTextInfoDBHelper.getInstance(context)!! //DBHelper для работы с БД информации текста
+        val mainHandler = Handler(context!!.mainLooper)
+        val myRunnable = Runnable {
+            GlobalScope.launch(Dispatchers.Main) {
+                delay(300)
+                //ViewModel для получения конкретного текста для Стих дня
+                bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
 
-//            dailyVersesDBHelper = DailyVersesDBHelper(context!!)
-//            dailyVersesDBHelper
-//                    .loadDailyVersesList()
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe { dailyVersesList ->
-//                        dailyVersesListInfo = dailyVersesList
-
-                        tvVerse.visibility = View.VISIBLE
-                        val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
-                        tvVerse.startAnimation(animation)
-//                    }
+                tvVerse.visibility = View.VISIBLE
+                val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
+                tvVerse.startAnimation(animation)
+            }
         }
+        mainHandler.post(myRunnable)
 
         btnFind = myView.findViewById(R.id.btnFind)
         btnFind.setOnClickListener {
-            if (dailyVersesListInfo.size == 0) {
-                Toast.makeText(context!!, getString(R.string.toast_no_verses_in_daily_verse), Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            val randomDailyVerse = getRandomObject(versesInfoList)
+            setRandomVerse(randomDailyVerse)
 
-            setRandomVerse(dailyVersesListInfo)
             val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
             tvVerse.startAnimation(animation)
         }
 
-        //Функция добавления и удаления стиха в Стих Дня не будет добавлена в рабочий вариант приложения, потому как сочтена не совсем удобной и подходящей для пользователя
-//        btnList = myView.findViewById(R.id.btnList)
-//        btnList.setOnClickListener {
-//            myFragmentManager.let {
-//                val dailyVersesListFragment = DailyVersesListFragment()
-//                dailyVersesListFragment.setRootFragmentManager(myFragmentManager)
-//                dailyVersesListFragment.setDailyVersesListInfo(dailyVersesListInfo)
-//
-//                val transaction: FragmentTransaction = it.beginTransaction()
-//                transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-//                transaction.addToBackStack(null)
-//                transaction.replace(R.id.fragment_container_bible, dailyVersesListFragment)
-//                transaction.commit()
-//            }
-//        }
+        btnAddNote = myView.findViewById(R.id.btnAddNote)
+        btnAddNote.setOnClickListener {
+            if (tvVerse.text.toString() == getString(R.string.tv_find_your_daily_verse)) {
+                Toast.makeText(context, getString(R.string.toast_find_verse), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            addNoteDialog = AddNoteDialog(this)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) addNoteDialog.setVerse(Html.fromHtml(tvVerse.text.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY).toString())
+            else addNoteDialog.setVerse(Html.fromHtml(tvVerse.text.toString()).toString())
+
+            addNoteDialog.show(myFragmentManager, "Add Note Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
+        }
 
         btnShare = myView.findViewById(R.id.btnShare)
         btnShare.setOnClickListener {
@@ -136,6 +132,25 @@ class DailyVerseFragment : Fragment() {
             myIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
             startActivity(Intent.createChooser(myIntent, getString(R.string.toast_share_verse)))
         }
+
+        btnCopy = myView.findViewById(R.id.btnCopy)
+        btnCopy.setOnClickListener {
+            if (tvVerse.text.toString() == getString(R.string.tv_find_your_daily_verse)) {
+                Toast.makeText(context, getString(R.string.toast_find_verse), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            //Код для копирования текста
+            val clipboard = context!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) ClipData.newPlainText("label", Html.fromHtml(tvVerse.text.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY))
+                    else ClipData.newPlainText("label", Html.fromHtml(tvVerse.text.toString()))
+
+            clipboard.setPrimaryClip(clip)
+
+            Toast.makeText(context, context!!.getString(R.string.verse_copied), Toast.LENGTH_SHORT).show()
+        }
+
         return myView
     }
 
@@ -144,31 +159,67 @@ class DailyVerseFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setRandomVerse(dailyVerses: ArrayList<DailyVerseModel>) {
-        val random = Random()
-        val randomNumber = random.nextInt(dailyVerses.size)
-        val dailyVerse: DailyVerseModel = dailyVerses[randomNumber]
+    private fun setRandomVerse(dailyVerse: DailyVerseModel) {
+        //Используем коллекцию для удобного управления данными для формирования стиха дня
+        var verses: ArrayList<Int>? = null
+        //Если Стих дня состоит только из одного текста Библии, то добавляем в verses номер стиха из поля verse_number
+        //Если же Стих дня состоит из двух и более текстов, то добавляем в verses номера стихов из коллекции verses_numbers
+        if (dailyVerse.verse_number != -1) {
+            verses = ArrayList()
+            verses.add(dailyVerse.verse_number)
+        } else if (dailyVerse.verses_numbers.isNotEmpty())
+            verses = dailyVerse.verses_numbers
 
+        //Именно в таком порядке вызовов всё работает должным образом
         bibleDataViewModel
-                .getBibleVerse(BibleDataViewModel.TABLE_VERSES, dailyVerse.bookNumber, dailyVerse.chapterNumber, dailyVerse.verseNumber)
-                .observe(viewLifecycleOwner, Observer { verseModel ->
-
-                    //По непонятной причине метод observe с каждым нажатием кнопки "Стих" начинается срабатывать всё больше раз по количеству, вместо одного раза постоянно.
-                    //Поэтому пришлось написать небольшую проверку, которая не будет позволять срабатывать коду в методе больше одного раза
-                    var index = 0
+                .getBibleVerseForDailyVerse(BibleDataViewModel.TABLE_VERSES, dailyVerse.book_number, dailyVerse.chapter_number, verses!!)
+                .observe(viewLifecycleOwner, Observer { verseText ->
                     bibleDataViewModel
-                            .getBookShortName(BibleDataViewModel.TABLE_BOOKS, dailyVerse.bookNumber)
-                            .observe(viewLifecycleOwner, Observer { verseShortName ->
-                                if (index == 0) {
-                                    //Очищаем текст от ненужных тегов. Эти действия называются регулярными выражениями
-                                    val str = Utility.getClearedText(StringBuilder(verseModel!!.text))
-
-                                    tvVerse.text = "«" + str + "»" + " (" + verseShortName + ". " + verseModel.chapter_number + ":" + verseModel.verse_number + ")"
-
-                                    index++
+                            .getBookShortName(BibleDataViewModel.TABLE_BOOKS, verseText!!.book_number)
+                            .observe(viewLifecycleOwner, Observer { shortName ->
+                                //Формируем ссылку текста нужным образом в случае, если Стих дня состоит из двух и более стихов
+                                var textAddress = verseText.chapter_number.toString() + ":" + verseText.verses_numbers[0]
+                                for ((index, element) in verseText.verses_numbers.withIndex()) {
+                                    if (verseText.verses_numbers.size > 1 && index != 0) {
+                                        textAddress += if ((element - verseText.verses_numbers[index - 1]) == 1) {
+                                            if (index + 1 != verseText.verses_numbers.size && (verseText.verses_numbers[index + 1] - element) == 1) {
+                                                continue
+                                            }
+                                            "-$element"
+                                        } else {
+                                            ",$element"
+                                        }
+                                    }
                                 }
+
+                                val clearedStr = Utility.getClearedText(StringBuilder(verseText.verse_text))
+                                tvVerse.text = "«$clearedStr» ($shortName. $textAddress)"
                             })
                 })
+    }
+
+    private fun readJSONFromAsset(name: String?): String? {
+        val json: String?
+        try {
+            val inputStream: InputStream = activity!!.assets.open(name!!)
+            json = inputStream.bufferedReader().use { it.readText() }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            return null
+        }
+        return json
+    }
+
+    private fun fromJSON(json: String?): ArrayList<DailyVerseModel> {
+        val gson = Gson()
+        Utility.log(json!!)
+        return gson.fromJson(StringReader(json), Array<DailyVerseModel>::class.java).toList() as ArrayList<DailyVerseModel>
+    }
+
+    private fun getRandomObject(from: ArrayList<DailyVerseModel>): DailyVerseModel {
+        val rnd = Random()
+        val i = rnd.nextInt(from.size)
+        return from.toTypedArray()[i]
     }
 
     override fun onAttach(context: Context) {
@@ -181,24 +232,9 @@ class DailyVerseFragment : Fragment() {
         super.onResume()
         //Обновляем тему вьюшек в onResume, чтобы при смене темы и возврата к этому фрагменту, внешний вид вьюшек поменялся в соответствии с темой
         when (ThemeManager.theme) {
-            ThemeManager.Theme.LIGHT -> {
-                ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconLightTheme), PorterDuff.Mode.SRC_IN)
-
-                btnShare.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconLightTheme)
-                btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextLightTheme))
-            }
-            ThemeManager.Theme.DARK -> {
-                ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconDarkTheme), PorterDuff.Mode.SRC_IN)
-
-                btnShare.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconLightTheme)
-                btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextDarkTheme))
-            }
-            ThemeManager.Theme.BOOK -> {
-                ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconBookTheme), PorterDuff.Mode.SRC_IN)
-
-                btnShare.strokeColor = ContextCompat.getColorStateList(context!!, R.color.colorButtonIconBookTheme)
-                btnShare.setTextColor(ContextCompat.getColorStateList(context!!, R.color.colorTextBookTheme))
-            }
+            ThemeManager.Theme.LIGHT -> ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconLightTheme), PorterDuff.Mode.SRC_IN)
+            ThemeManager.Theme.DARK -> ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconDarkTheme), PorterDuff.Mode.SRC_IN)
+            ThemeManager.Theme.BOOK -> ivBook.setColorFilter(ContextCompat.getColor(context!!, R.color.colorButtonIconBookTheme), PorterDuff.Mode.SRC_IN)
         }
 
         listener.setTabNumber(1)
@@ -208,6 +244,10 @@ class DailyVerseFragment : Fragment() {
         listener.setBtnSelectTranslationVisibility(View.GONE)
 
         listener.setShowHideToolbarBackButton(View.VISIBLE)
+    }
+
+    override fun dismissDialog() {
+        addNoteDialog.dismiss()
     }
 
 //    override fun onAttach(context: Context) {
