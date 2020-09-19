@@ -14,8 +14,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -118,12 +120,19 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
     private lateinit var bibleTextFragment: BibleTextFragment //Объект необходим для управления BottomAppBar в BibleTextFragment
     private var isBibleTextFragmentOpened: Boolean = false
 
+    private var isFullScreenEnabled: Boolean = false
+    private var isChangeFontSizeEnabled: Boolean = false
+
     private lateinit var multiSelectedTextsList: ArrayList<BibleTextModel> //Список данных необходим для обработки двух и более выбранных текстов Библии в режиме мульти выбора
     private var isMultiSelectedTextsListContainsHighlightedVerse: Boolean = false //Поле нужно для определения того, содержится ли хотя бы один выделенный текст в списке выделенных текстов
 
     private var articlesInfoDialog: ArticlesInfoDialog? = null
     private var addNoteDialog: AddNoteDialog? = null
     private var colorPickerDialog: ColorPickerDialog? = null
+
+    private var translationY = 100f
+    private var interpolator = OvershootInterpolator()
+    private var isMenuOpen = false
 
     private lateinit var saveLoadData: SaveLoadData
 
@@ -198,6 +207,59 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         setupTabIconsContent()
 
         //BottomAppBar кнопки
+        btnFABFullScreen.alpha = 0f
+        btnFABChangeFontSize.alpha = 0f
+
+        btnFABFullScreen.translationY = translationY
+        btnFABChangeFontSize.translationY = translationY
+
+        btnFAB.setOnClickListener {
+            if (isMenuOpen) closeMenu()
+            else openMenu()
+        }
+
+        btnFABFullScreen.setOnClickListener {
+            isFullScreenEnabled = if (isFullScreenEnabled) {
+                btnFABFullScreen.setImageResource(R.drawable.ic_full_screen)
+
+                //Открываем statusBar и tabLayout
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                tabLayout.visibility = View.VISIBLE
+                false
+            } else {
+                btnFABFullScreen.setImageResource(R.drawable.ic_exit_full_screen)
+
+                //Закрываем statusBar и tabLayout
+                tabLayout.visibility = View.GONE
+                window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                true
+            }
+        }
+
+        btnFABChangeFontSize.setOnClickListener {
+            isChangeFontSizeEnabled = if (isChangeFontSizeEnabled) {
+                val animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out)
+                btnFABFontSizePlus.visibility = View.GONE
+                btnFABFontSizePlus.startAnimation(animation)
+                clearAnimation(animation, btnFABFontSizePlus)
+
+                btnFABFontSizeMinus.visibility = View.GONE
+                btnFABFontSizeMinus.startAnimation(animation)
+                clearAnimation(animation, btnFABFontSizeMinus)
+                false
+            } else {
+                val animation = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
+                btnFABFontSizePlus.visibility = View.VISIBLE
+                btnFABFontSizePlus.startAnimation(animation)
+                clearAnimation(animation, btnFABFontSizePlus)
+
+                btnFABFontSizeMinus.visibility = View.VISIBLE
+                btnFABFontSizeMinus.startAnimation(animation)
+                clearAnimation(animation, btnFABFontSizeMinus)
+                true
+            }
+        }
+
         btnHome.setOnClickListener { bibleTextFragment.btnHomeClicked() }
         btnInterpretation.setOnClickListener { bibleTextFragment.btnInterpretationClicked() }
         btnNotes.setOnClickListener { bibleTextFragment.btnNotesClicked() }
@@ -335,6 +397,34 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
 //            requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE), 1000)
 //        }
 
+    }
+
+    private fun openMenu() {
+        isMenuOpen = !isMenuOpen
+        btnFAB.animate().setInterpolator(interpolator).rotation(45f).setDuration(300).start()
+
+        btnFABFullScreen.animate().translationY(0f).alpha(1f).setInterpolator(interpolator).setDuration(300).start()
+        btnFABChangeFontSize.animate().translationY(0f).alpha(1f).setInterpolator(interpolator).setDuration(300).start()
+    }
+
+    private fun closeMenu() {
+        isMenuOpen = !isMenuOpen
+        btnFAB.animate().setInterpolator(interpolator).rotation(0f).setDuration(300).start()
+
+        btnFABFullScreen.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start()
+        btnFABChangeFontSize.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start()
+
+        if (btnFABFontSizePlus.visibility != View.GONE && btnFABFontSizeMinus.visibility != View.GONE) {
+            val animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out)
+            btnFABFontSizePlus.visibility = View.GONE
+            btnFABFontSizePlus.startAnimation(animation)
+            clearAnimation(animation, btnFABFontSizePlus)
+
+            btnFABFontSizeMinus.visibility = View.GONE
+            btnFABFontSizeMinus.startAnimation(animation)
+            clearAnimation(animation, btnFABFontSizeMinus)
+            isChangeFontSizeEnabled = false
+        }
     }
 
     override fun disableMultiSelection() {
@@ -655,6 +745,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             btnArticlesInfo.isEnabled = false //Нужно отключать кнопку, потому что в противном случае по какой-то причине кнопка продолжает нажиматься даже с видимостью GONE
             animation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
         }
+        clearAnimation(animation, btnArticlesInfo)
         btnArticlesInfo.startAnimation(animation)
     }
 
@@ -677,13 +768,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             btnAddNoteFAB.isEnabled = false //Нужно отключать кнопку, потому что в противном случае по какой-то причине кнопка продолжает нажиматься даже с видимостью GONE
             animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
         }
-        animation.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {}
-            override fun onAnimationEnd(animation: Animation?) {
-                btnAddNoteFAB.clearAnimation()
-            }
-            override fun onAnimationRepeat(animation: Animation?) {}
-        })
+        clearAnimation(animation, btnAddNoteFAB)
         btnAddNoteFAB.startAnimation(animation)
     }
 
@@ -706,6 +791,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             btnDeleteNote.isEnabled = false //Нужно отключать кнопку, потому что в противном случае по какой-то причине кнопка продолжает нажиматься даже с видимостью GONE
             animation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
         }
+        clearAnimation(animation, btnDeleteNote)
         btnDeleteNote.startAnimation(animation)
     }
 
@@ -728,7 +814,19 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             btnSelectTranslation.isEnabled = false //Нужно отключать кнопку, потому что в противном случае по какой-то причине кнопка продолжает нажиматься даже с видимостью GONE
             animation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
         }
+        clearAnimation(animation, btnSelectTranslation)
         btnSelectTranslation.startAnimation(animation)
+    }
+
+    private fun clearAnimation(animation: Animation, view: View) {
+        animation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationEnd(animation: Animation?) {
+                view.clearAnimation()
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {}
+        })
     }
 
     //Устанавливаем в текст кнопки выбора переводов аббревиатуру выбранного перевода
@@ -756,7 +854,10 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             animation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
             animation.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationRepeat(animation: Animation?) {}
-                override fun onAnimationEnd(animation: Animation?) {}
+                override fun onAnimationEnd(animation: Animation?) {
+                    toolbarTitle.clearAnimation()
+                }
+
                 override fun onAnimationStart(animation: Animation?) {
                     toolbarTitle.startAnimation(AnimationUtils.loadAnimation(this@MainActivity, R.anim.fade_out))
                     toolbarTitle.visibility = View.GONE
@@ -768,7 +869,10 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             animation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
             animation.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationRepeat(animation: Animation?) {}
-                override fun onAnimationEnd(animation: Animation?) {}
+                override fun onAnimationEnd(animation: Animation?) {
+                    toolbarTitle.clearAnimation()
+                }
+
                 override fun onAnimationStart(animation: Animation?) {
                     layTvSelectedBibleText.startAnimation(AnimationUtils.loadAnimation(this@MainActivity, R.anim.fade_out))
                     layTvSelectedBibleText.visibility = View.GONE
@@ -906,7 +1010,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         }
 
         appBar.visibility = visibility
-        btnFAB.visibility = visibility
+        fabMenuLayout.visibility = visibility
         val animationBottomAppBar: Animation
         val animationFAB: Animation
         if (visibility == View.VISIBLE) {
@@ -916,8 +1020,11 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             animationBottomAppBar = AnimationUtils.loadAnimation(this, R.anim.slide_down)
             animationFAB = AnimationUtils.loadAnimation(this, R.anim.zoom_out_slow)
         }
+        clearAnimation(animationBottomAppBar, appBar)
         appBar.startAnimation(animationBottomAppBar)
-        btnFAB.startAnimation(animationFAB)
+
+        clearAnimation(animationFAB, fabMenuLayout)
+        fabMenuLayout.startAnimation(animationFAB)
     }
 
     override fun setIsBibleTextFragmentOpened(isBibleTextFragmentOpened: Boolean) {

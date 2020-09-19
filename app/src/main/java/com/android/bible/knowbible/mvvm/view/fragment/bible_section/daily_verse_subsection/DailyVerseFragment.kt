@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
@@ -22,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.bible.knowbible.R
@@ -77,24 +79,22 @@ class DailyVerseFragment : Fragment(), DialogListener {
         progressBar = myView.findViewById(R.id.progressBar)
 
         //При открытии фрагмента сразу получаем, форматируем и добавляем готовые тексты для "Стих дня" в коллекцию.
-        tvVerse.visibility = View.GONE
-
         val jsonFileContent: String = readJSONFromAsset("verses.txt")!!
         versesInfoList = fromJSON(jsonFileContent)
 
-        val mainHandler = Handler(context!!.mainLooper)
-        val myRunnable = Runnable {
-            GlobalScope.launch(Dispatchers.Main) {
-                delay(300)
+//        val mainHandler = Handler(context!!.mainLooper)
+//        val myRunnable = Runnable {
+//            GlobalScope.launch(Dispatchers.Main) {
+//                delay(300)
                 //ViewModel для получения конкретного текста для Стих дня
                 bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
 
-                tvVerse.visibility = View.VISIBLE
-                val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
-                tvVerse.startAnimation(animation)
-            }
-        }
-        mainHandler.post(myRunnable)
+//                tvVerse.visibility = View.VISIBLE
+//                val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
+//                tvVerse.startAnimation(animation)
+//            }
+//        }
+//        mainHandler.post(myRunnable)
 
         btnFind = myView.findViewById(R.id.btnFind)
         btnFind.setOnClickListener {
@@ -248,6 +248,19 @@ class DailyVerseFragment : Fragment(), DialogListener {
 
     override fun dismissDialog() {
         addNoteDialog.dismiss()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        //Устанавливаем нужный layout на отображаемую ориентацию экрана. Делать это по той причине, что обновление активити отключено при повороте экрана,
+        //поэтому в случае необходимсти обновления xml, это нужно делать самому
+        myFragmentManager.let {
+            val dailyVerseFragment = DailyVerseFragment()
+            dailyVerseFragment.setRootFragmentManager(it)
+            val transaction: FragmentTransaction = it.beginTransaction()
+            transaction.replace(R.id.fragment_container_bible, dailyVerseFragment)
+            transaction.commit()
+        }
     }
 
 //    override fun onAttach(context: Context) {

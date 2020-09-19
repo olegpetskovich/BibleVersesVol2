@@ -11,28 +11,59 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyCardView
             android:id="@+id/btnOldTestament"
-            style="@style/Widget.MaterialComponents.Button"
+            style="@style/Widget.MaterialComponents.CardView"
             android:layout_width="wrap_content"
             android:layout_height="300dp"
             android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="2dp"
             android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_weight="2"
-            android:lineSpacingExtra="-6dp"
-            android:text="@string/btn_old_testament"
-            android:textSize="22sp"
-            app:strokeWidth="0.6dp"
-            tools:ignore="RtlHardcoded" />
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            app:strokeWidth="0.6dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent">
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:textAllCaps="true"
+                    android:text="@string/btn_old_testament"
+                    android:textSize="24sp" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
+                    android:id="@+id/btnOldTestamentInfo"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="38dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="20dp"
+                    android:padding="4dp"
+                    app:icon="@drawable/ic_testament_info"
+                    app:iconSize="28dp"
+                    app:cornerRadius="40dp"
+                    app:strokeWidth="0.8dp"
+                    tools:ignore="RtlSymmetry" />
+
+            </RelativeLayout>
+
+        </com.android.bible.knowbible.mvvm.view.theme_editor.MyCardView>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:layout_weight="2"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -127,22 +158,52 @@
 
         </LinearLayout>
 
-        <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyCardView
             android:id="@+id/btnNewTestament"
-            style="@style/Widget.MaterialComponents.Button"
+            style="@style/Widget.MaterialComponents.CardView"
             android:layout_width="wrap_content"
             android:layout_height="300dp"
             android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="2dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_weight="2"
-            android:lineSpacingExtra="-6dp"
-            android:text="@string/btn_new_testament"
-            android:textSize="22sp"
-            app:strokeWidth="0.6dp"
-            tools:ignore="RtlHardcoded" />
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            app:strokeWidth="0.6dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent">
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:textAllCaps="true"
+                    android:text="@string/btn_new_testament"
+                    android:textSize="24sp" />
+
+                <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
+                    android:id="@+id/btnNewTestamentInfo"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="38dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="20dp"
+                    android:padding="4dp"
+                    app:icon="@drawable/ic_testament_info"
+                    app:iconSize="28dp"
+                    app:cornerRadius="40dp"
+                    app:strokeWidth="0.8dp"
+                    tools:ignore="RtlSymmetry" />
+            </RelativeLayout>
+        </com.android.bible.knowbible.mvvm.view.theme_editor.MyCardView>
     </LinearLayout>
 
 </com.android.bible.knowbible.mvvm.view.theme_editor.MyNestedScrollViewLayout>

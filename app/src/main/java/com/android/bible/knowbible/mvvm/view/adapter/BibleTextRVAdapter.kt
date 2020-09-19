@@ -26,6 +26,7 @@ import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
 import com.android.bible.knowbible.mvvm.view.dialog.VerseDialog
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
+import com.android.bible.knowbible.utility.FontCache
 import com.android.bible.knowbible.utility.Utility
 import com.android.bible.knowbible.utility.Utility.Companion.convertDbInPx
 import java.util.*
@@ -151,7 +152,7 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
             }
         }
 
-//        holder.tvVerse.typeface = FontCache["alexandra_script_regular_cyr.ttf", context]
+        holder.tvVerse.typeface = FontCache["verdana_regular_cyr.ttf", context]
     }
 
     private fun createIndentedText(text: String, marginFirstLine: Int, marginNextLines: Int): SpannableString? {

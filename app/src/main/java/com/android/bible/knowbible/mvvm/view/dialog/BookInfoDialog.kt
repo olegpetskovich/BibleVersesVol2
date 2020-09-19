@@ -6,15 +6,21 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.Window
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment
 import com.google.android.material.button.MaterialButton
+import kotlinx.android.synthetic.main.dialog_book_info.*
 
 class BookInfoDialog(private val listener: DialogListener) : AppCompatDialogFragment() {
 
@@ -38,6 +44,9 @@ class BookInfoDialog(private val listener: DialogListener) : AppCompatDialogFrag
 
         val btnDismissDialog: MaterialButton = view.findViewById(R.id.btnDismissDialog)
         btnDismissDialog.setOnClickListener { listener.dismissDialog() }
+
+        val tvBookInfo: TextView = view.findViewById(R.id.tvBookInfo)
+
         builder.setView(view)
         return builder.create()
     }

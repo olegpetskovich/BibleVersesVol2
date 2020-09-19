@@ -62,8 +62,8 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 
 
     private lateinit var btnCloseInterpretation: ImageView
-    private lateinit var btnFullScreen: ImageView
-    private lateinit var btnExitFullScreen: ImageView
+    private lateinit var btnInterpretationFullScreen: ImageView
+    private lateinit var btnExitInterpretationFullScreen: ImageView
     private lateinit var myDividerView: RelativeLayout
 
     var isBibleTextFragmentOpenedFromSearchFragment: Boolean = false
@@ -115,8 +115,8 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
             isInterpretationOpened = false
         }
 
-        btnFullScreen = myView.findViewById(R.id.btnFullScreen)
-        btnFullScreen.setOnClickListener {
+        btnInterpretationFullScreen = myView.findViewById(R.id.btnInterpretationFullScreen)
+        btnInterpretationFullScreen.setOnClickListener {
             val allHeightOfLayout = coordinatorLayout.height - (interpretationLayout.height - 10) //Выставляем оптимальный отступ, учитывая высоту interpretationLayout
             Utility.log("allHeightOfLayout: $allHeightOfLayout")
 
@@ -134,21 +134,21 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
             animationZoomOut.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {}
                 override fun onAnimationEnd(animation: Animation?) {
-                    btnExitFullScreen.startAnimation(animationZoomIn)
-                    btnExitFullScreen.visibility = View.VISIBLE
+                    btnExitInterpretationFullScreen.startAnimation(animationZoomIn)
+                    btnExitInterpretationFullScreen.visibility = View.VISIBLE
 
-                    btnFullScreen.clearAnimation()
-                    btnFullScreen.visibility = View.GONE
+                    btnInterpretationFullScreen.clearAnimation()
+                    btnInterpretationFullScreen.visibility = View.GONE
                 }
 
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
-            btnFullScreen.startAnimation(animationZoomOut)
+            btnInterpretationFullScreen.startAnimation(animationZoomOut)
             Utility.slideView(fragmentContainerInterpretationLay, 500, halfHeightOfLayout, allHeightOfLayout, true).start()
         }
 
-        btnExitFullScreen = myView.findViewById(R.id.btnExitFullScreen)
-        btnExitFullScreen.setOnClickListener {
+        btnExitInterpretationFullScreen = myView.findViewById(R.id.btnExitInterpretationFullScreen)
+        btnExitInterpretationFullScreen.setOnClickListener {
             val allHeightOfLayout = coordinatorLayout.height - (interpretationLayout.height - 10) //Выставляем оптимальный отступ, учитывая высоту interpretationLayout
             val halfHeightOfLayout = coordinatorLayout.height / 2
 
@@ -163,16 +163,16 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
             animationZoomOut.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {}
                 override fun onAnimationEnd(animation: Animation?) {
-                    btnFullScreen.startAnimation(animationZoomIn)
-                    btnFullScreen.visibility = View.VISIBLE
+                    btnInterpretationFullScreen.startAnimation(animationZoomIn)
+                    btnInterpretationFullScreen.visibility = View.VISIBLE
 
-                    btnExitFullScreen.clearAnimation()
-                    btnExitFullScreen.visibility = View.GONE
+                    btnExitInterpretationFullScreen.clearAnimation()
+                    btnExitInterpretationFullScreen.visibility = View.GONE
                 }
 
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
-            btnExitFullScreen.startAnimation(animationZoomOut)
+            btnExitInterpretationFullScreen.startAnimation(animationZoomOut)
 
             Utility.slideView(fragmentContainerInterpretationLay, 500, allHeightOfLayout, halfHeightOfLayout, true).start()
         }
@@ -567,10 +567,10 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
             override fun onAnimationStart(animation: Animator?) {}
             override fun onAnimationEnd(animation: Animator?) {
                 //Задаём исходные данные, чтобы не происходило багов из-за оставленных ранее по разному использованных кнопок
-                btnExitFullScreen.visibility = View.GONE
-                btnExitFullScreen.clearAnimation()
-                btnFullScreen.visibility = View.VISIBLE
-                btnFullScreen.clearAnimation()
+                btnExitInterpretationFullScreen.visibility = View.GONE
+                btnExitInterpretationFullScreen.clearAnimation()
+                btnInterpretationFullScreen.visibility = View.VISIBLE
+                btnInterpretationFullScreen.clearAnimation()
                 isFullScreenInterpretationEnabled = false
 
                 interpretationLayout.visibility = View.GONE //После закрытия панели толкования, задаём видимость GONE лейауту с кнопками

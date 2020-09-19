@@ -31,7 +31,7 @@
     <color name="colorButtonDarkTheme">#1d2731</color>
     <color name="colorButtonLightTheme">#FFFFFF</color>
     <color name="colorButtonBookTheme">#D8A758</color>
-<!--    <color name="colorButtonBookTheme">#C59342</color>-->
+    <!--    <color name="colorButtonBookTheme">#C59342</color>-->
 
     <!-- Button ripple color -->
     <color name="colorButtonRippleDarkTheme">#1a232c</color>
@@ -100,6 +100,11 @@
     <color name="colorBackgroundFABDarkTheme">#006EFF</color>
     <color name="colorBackgroundFABLightTheme">#006EFF</color>
     <color name="colorBackgroundFABBookTheme">#181818</color>
+
+    <!-- FAB ripple color -->
+    <color name="colorRippleFABDarkTheme">#194B8E</color>
+    <color name="colorRippleFABLightTheme">#194B8E</color>
+    <color name="colorRippleFABBookTheme">#3E3E3E</color>
 
     <!-- FAB icon color -->
     <color name="colorIconFABDarkTheme">#FFFFFF</color>

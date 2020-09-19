@@ -33,6 +33,15 @@ object ThemeManager {
             val textColor: Int
     )
 
+    data class CardViewTheme(
+            @ColorRes
+            val backgroundTint: Int,
+            @ColorRes
+            val rippleColor: Int,
+            @ColorRes
+            val strokeColor: Int
+    )
+
     data class TextViewTheme(
             @ColorRes
             val textColor: Int
@@ -92,12 +101,15 @@ object ThemeManager {
             @ColorRes
             val backgroundColor: Int,
             @ColorRes
+            val rippleColor: Int,
+            @ColorRes
             val iconColor: Int
     )
 
     enum class Theme(
             val iconTheme: IconTheme,
             val buttonTheme: ButtonTheme,
+            val cardViewTheme: CardViewTheme,
             val textViewTheme: TextViewTheme,
             val viewGroupTheme: ViewGroupTheme,
             val tabLayoutTheme: TabLayoutTheme,
@@ -118,6 +130,11 @@ object ThemeManager {
                         strokeColor = R.color.colorButtonStrokeDarkTheme,
                         iconColor = R.color.colorButtonIconDarkTheme,
                         textColor = R.color.colorTextDarkTheme
+                ),
+                cardViewTheme = CardViewTheme(
+                        backgroundTint = R.color.colorButtonDarkTheme,
+                        rippleColor = R.color.colorButtonRippleDarkTheme,
+                        strokeColor = R.color.colorButtonStrokeDarkTheme
                 ),
                 textViewTheme = TextViewTheme(
                         textColor = R.color.colorTextDarkTheme
@@ -152,6 +169,7 @@ object ThemeManager {
                 ),
                 floatingActionButtonTheme = FloatingActionButtonTheme(
                         backgroundColor = R.color.colorBackgroundFABDarkTheme,
+                        rippleColor = R.color.colorRippleFABDarkTheme,
                         iconColor = R.color.colorIconFABDarkTheme
                 )
         ),
@@ -165,6 +183,11 @@ object ThemeManager {
                         strokeColor = R.color.colorButtonStrokeLightTheme,
                         iconColor = R.color.colorButtonIconLightTheme,
                         textColor = R.color.colorTextLightTheme
+                ),
+                cardViewTheme = CardViewTheme(
+                        backgroundTint = R.color.colorButtonLightTheme,
+                        rippleColor = R.color.colorButtonRippleLightTheme,
+                        strokeColor = R.color.colorButtonStrokeLightTheme
                 ),
                 textViewTheme = TextViewTheme(
                         textColor = R.color.colorTextLightTheme
@@ -199,6 +222,7 @@ object ThemeManager {
                 ),
                 floatingActionButtonTheme = FloatingActionButtonTheme(
                         backgroundColor = R.color.colorBackgroundFABLightTheme,
+                        rippleColor = R.color.colorRippleFABLightTheme,
                         iconColor = R.color.colorIconFABLightTheme
                 )
         ),
@@ -212,6 +236,11 @@ object ThemeManager {
                         strokeColor = R.color.colorButtonStrokeBookTheme,
                         iconColor = R.color.colorButtonIconBookTheme,
                         textColor = R.color.colorTextLightTheme
+                ),
+                cardViewTheme = CardViewTheme(
+                        backgroundTint = R.color.colorButtonBookTheme,
+                        rippleColor = R.color.colorButtonRippleBookTheme,
+                        strokeColor = R.color.colorButtonStrokeBookTheme
                 ),
                 textViewTheme = TextViewTheme(
                         textColor = R.color.colorTextBookTheme
@@ -246,6 +275,7 @@ object ThemeManager {
                 ),
                 floatingActionButtonTheme = FloatingActionButtonTheme(
                         backgroundColor = R.color.colorBackgroundFABBookTheme,
+                        rippleColor = R.color.colorRippleFABDarkTheme,
                         iconColor = R.color.colorIconFABBookTheme
                 )
         )

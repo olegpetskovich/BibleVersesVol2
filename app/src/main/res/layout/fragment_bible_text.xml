@@ -1,122 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.android.bible.knowbible.mvvm.view.theme_editor.MyLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/coordinatorLayout"
+    android:id="@+id/mainLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    app:layout_behavior=".utility.BottomAppBarBehavior">
+    android:layout_height="match_parent">
 
-    <com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout
-        android:id="@+id/viewPager2Layout"
+    <com.android.bible.knowbible.mvvm.view.theme_editor.MyLinearLayout
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
+        android:layout_centerInParent="true"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:orientation="vertical"
+        app:layout_behavior=".utility.BottomAppBarBehavior">
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager2"
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout
+            android:id="@+id/viewPager2Layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:visibility="visible"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:layout_weight="1">
 
-        <LinearLayout
-            android:id="@+id/interpretationLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="-5dp"
-            android:background="@null"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:visibility="visible"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="30dp"
-                android:layout_height="32dp"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="10dp">
+            <LinearLayout
+                android:id="@+id/interpretationLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="-5dp"
+                android:background="@null"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    app:cardCornerRadius="5dp"
+                    app:cardElevation="10dp">
+
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                            android:id="@+id/btnCloseInterpretation"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="2dp"
+                            app:srcCompat="@drawable/ic_close" />
+                    </com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout>
+
+
+                </com.google.android.material.card.MaterialCardView>
 
                 <com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:id="@+id/myDividerView"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"/>
 
-                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
-                        android:id="@+id/btnCloseInterpretation"
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    app:cardCornerRadius="5dp"
+                    app:cardElevation="10dp">
+
+                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="2dp"
-                        app:srcCompat="@drawable/ic_close" />
-                </com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout>
+                        android:layout_height="match_parent">
 
+                        <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                            android:id="@+id/btnInterpretationFullScreen"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:paddingBottom="4dp"
+                            android:visibility="visible"
+                            app:srcCompat="@drawable/ic_full_screen" />
 
-            </com.google.android.material.card.MaterialCardView>
+                        <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
+                            android:id="@+id/btnExitInterpretationFullScreen"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:paddingBottom="4dp"
+                            android:visibility="gone"
+                            app:srcCompat="@drawable/ic_exit_full_screen" />
 
-            <com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout
-                android:id="@+id/myDividerView"
-                android:layout_width="0dp"
-                android:layout_height="32dp"
-                android:layout_weight="1"
-                android:visibility="invisible"/>
+                    </com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="30dp"
-                android:layout_height="32dp"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="10dp">
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
-                <com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+        </com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout>
 
-                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
-                        android:id="@+id/btnFullScreen"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:paddingBottom="4dp"
-                        android:visibility="visible"
-                        app:srcCompat="@drawable/ic_full_screen" />
-
-                    <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView
-                        android:id="@+id/btnExitFullScreen"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:paddingBottom="4dp"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_exit_full_screen" />
-
-                </com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
-
-    </com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout>
-
-    <com.android.bible.knowbible.mvvm.view.theme_editor.MyAppBarLayout
-        android:id="@+id/fragmentContainerInterpretationLay"
-        android:layout_width="match_parent"
-        android:layout_height="0dp">
-
-        <FrameLayout
-            android:id="@+id/fragmentContainerInterpretation"
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyAppBarLayout
+            android:id="@+id/fragmentContainerInterpretationLay"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </com.android.bible.knowbible.mvvm.view.theme_editor.MyAppBarLayout>
-</com.android.bible.knowbible.mvvm.view.theme_editor.MyLinearLayout>
+            android:layout_height="0dp">
+
+            <FrameLayout
+                android:id="@+id/fragmentContainerInterpretation"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.android.bible.knowbible.mvvm.view.theme_editor.MyAppBarLayout>
+    </com.android.bible.knowbible.mvvm.view.theme_editor.MyLinearLayout>
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:background="@android:color/black"-->
+<!--        android:alpha="0.3"/>-->
+
+</com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout>

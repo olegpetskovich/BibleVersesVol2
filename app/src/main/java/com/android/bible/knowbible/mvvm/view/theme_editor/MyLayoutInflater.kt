@@ -18,6 +18,7 @@ class MyLayoutInflater(private val delegate: AppCompatDelegate) : LayoutInflater
         return when (name) {
             "TextView" -> MyTextView(context, attrs)
             "MaterialButton" -> MyButton(context, attrs, R.attr.materialButtonStyle)
+            "MaterialCardView" -> MyCardView(context, attrs, R.attr.materialButtonStyle)
             "LinearLayout" -> MyLinearLayout(context, attrs)
             "ConstraintLayout" -> MyConstraintLayout(context, attrs)
             "CoordinatorLayout" -> MyCoordinatorLayout(context, attrs)

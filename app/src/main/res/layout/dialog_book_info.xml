@@ -6,6 +6,7 @@
     android:layout_height="wrap_content">
 
     <com.android.bible.knowbible.mvvm.view.theme_editor.MyConstraintLayout
+        android:id="@+id/mainLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
@@ -26,13 +27,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyButton
             android:id="@+id/btnDismissDialog"
-            style="?android:attr/borderlessButtonStyle"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:text="OK"
             android:textColor="@color/colorPrimary"
             android:textSize="18sp"

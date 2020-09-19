@@ -88,8 +88,8 @@
                     android:layout_width="34dp"
                     android:layout_height="34dp"
                     android:layout_centerVertical="true"
-                    android:layout_toStartOf="@id/btnHighlight"
                     android:layout_marginEnd="-5dp"
+                    android:layout_toStartOf="@id/btnHighlight"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     android:focusable="true"
@@ -392,16 +392,72 @@
         app:layout_anchor="@id/appBar"
         app:pressedTranslationZ="0dp" />
 
-    <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
-        android:id="@+id/btnFAB"
+    <RelativeLayout
+        android:id="@+id/fabMenuLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|bottom"
         android:layout_marginBottom="36dp"
-        android:src="@drawable/ic_add_note"
-        android:visibility="gone"
-        app:backgroundTint="@color/colorPrimary"
-        app:fabSize="mini"
-        app:tint="@android:color/white" />
+        android:orientation="vertical"
+        android:visibility="invisible">
 
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
+            android:id="@+id/btnFABFontSizeMinus"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/ic_font_size_minus"
+            android:visibility="gone"
+            app:fabSize="mini"
+            app:tint="@android:color/white" />
+
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
+            android:id="@+id/btnFABChangeFontSize"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_toEndOf="@id/btnFABFontSizeMinus"
+            android:src="@drawable/ic_font_size"
+            app:fabSize="mini"
+            app:tint="@android:color/white" />
+
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
+            android:id="@+id/btnFABFontSizePlus"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_toEndOf="@id/btnFABChangeFontSize"
+            android:src="@drawable/ic_add_note"
+            android:visibility="gone"
+            app:fabSize="mini"
+            app:tint="@android:color/white" />
+
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
+            android:id="@+id/btnFABFullScreen"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnFABChangeFontSize"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_full_screen"
+            app:fabSize="mini"
+            app:tint="@android:color/white" />
+
+        <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
+            android:id="@+id/btnFAB"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnFABFullScreen"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_add_note"
+            android:visibility="visible"
+            app:fabSize="mini"
+            app:tint="@android:color/white" />
+    </RelativeLayout>
 </com.android.bible.knowbible.mvvm.view.theme_editor.MyCoordinatorLayout>

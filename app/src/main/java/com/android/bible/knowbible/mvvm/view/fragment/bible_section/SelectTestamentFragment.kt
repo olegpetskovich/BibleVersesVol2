@@ -26,6 +26,7 @@ import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.gson.Gson
 
 open class SelectTestamentFragment : Fragment() {
@@ -115,7 +116,7 @@ open class SelectTestamentFragment : Fragment() {
                                     selectBibleBookFragment.setRootFragmentManager(myFragmentManager)
 
                                     //В случае если перевод скачан, но не выбран, при нажатии на кнопки завета отрывается фрагмент списка переводов, чтобы пользователь всё-таки выбрал перевод.
-                                    val btnOldTestament: MaterialButton = myView.findViewById(R.id.btnOldTestament)
+                                    val btnOldTestament: MaterialCardView = myView.findViewById(R.id.btnOldTestament)
                                     btnOldTestament.setOnClickListener {
                                         selectBibleBookFragment.isOldTestament = true
                                         selectBibleBookFragment.abbreviationTranslationName = bibleTranslationInfo.abbreviationTranslationName
@@ -125,7 +126,7 @@ open class SelectTestamentFragment : Fragment() {
                                         transaction.commit()
                                     }
 
-                                    val btnNewTestament: MaterialButton = myView.findViewById(R.id.btnNewTestament)
+                                    val btnNewTestament: MaterialCardView = myView.findViewById(R.id.btnNewTestament)
                                     btnNewTestament.setOnClickListener {
                                         selectBibleBookFragment.isOldTestament = false
                                         selectBibleBookFragment.abbreviationTranslationName = bibleTranslationInfo.abbreviationTranslationName
