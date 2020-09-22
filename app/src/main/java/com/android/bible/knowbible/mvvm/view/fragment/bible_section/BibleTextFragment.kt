@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -37,6 +38,7 @@ import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
+import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_bible_text.*
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +69,9 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     private lateinit var myDividerView: RelativeLayout
 
     var isBibleTextFragmentOpenedFromSearchFragment: Boolean = false
+    private lateinit var interpretationLayout: LinearLayout
+    private lateinit var coordinatorLayout: LinearLayout
+    private lateinit var fragmentContainerInterpretationLay: AppBarLayout
 
     private lateinit var swipeListener: OnViewPagerSwipeStateListener
     private lateinit var listener: IActivityCommunicationListener
@@ -102,6 +107,10 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 //        viewPager2.offscreenPageLimit = 10 //Потестировать этот метод, чтобы не было мелкого пролага при перелистывании
 
         myDividerView = myView.findViewById(R.id.myDividerView)
+
+        interpretationLayout = myView.findViewById(R.id.interpretationLayout)
+        coordinatorLayout = myView.findViewById(R.id.coordinatorLayout)
+        fragmentContainerInterpretationLay = myView.findViewById(R.id.fragmentContainerInterpretationLay)
 
         btnCloseInterpretation = myView.findViewById(R.id.btnCloseInterpretation)
         btnCloseInterpretation.setOnClickListener {
@@ -184,7 +193,6 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                 })
 
         reduceDragSensitivity(viewPager2)
-
         return myView
     }
 
@@ -235,6 +243,10 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 //        a.duration = ((initialHeight / v.context.resources.displayMetrics.density).toLong())
 //        v.startAnimation(a)
 //    }
+
+    override fun onStart() {
+        super.onStart()
+    }
 
 
     override fun onAttach(context: Context) {
@@ -312,6 +324,35 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                     .getBibleTextOfBook(BibleDataViewModel.TABLE_VERSES, chapterInfo?.bookNumber!!)
                     .observe(viewLifecycleOwner, Observer { bookTexts ->
 
+                        //Если панель толкования была открыта до перехода в другой фрагмент, то при возвращении на данный фрагмент из другого фрагмента мы её снова открываем
+                        if (isInterpretationOpened) {
+                            interpretationLayout.clearAnimation()
+                            interpretationLayout.visibility = View.VISIBLE //При открытии панели толкования, задаём видимость VISIBLE лейауту с кнопками
+
+                            myFragmentManager.let {
+                                val myFragment = BibleInterpretationFragment()
+                                myFragment.setRootFragmentManager(myFragmentManager)
+
+                                val transaction: FragmentTransaction = it.beginTransaction()
+                                transaction.replace(R.id.fragmentContainerInterpretation, myFragment)
+                                transaction.commit()
+                            }
+
+                            if (isFullScreenInterpretationEnabled) {
+                                viewPager2.visibility = View.INVISIBLE
+
+                                btnExitInterpretationFullScreen.visibility = View.VISIBLE
+                                btnInterpretationFullScreen.visibility = View.GONE
+
+                                val allHeightOfLayout = coordinatorLayout.height - (interpretationLayout.height - 10) //Выставляем оптимальный отступ, учитывая высоту interpretationLayout
+                                fragmentContainerInterpretationLay.layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, allHeightOfLayout)
+                            } else {
+                                val halfHeightOfLayout = coordinatorLayout.height / 2
+                                fragmentContainerInterpretationLay.layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, halfHeightOfLayout)
+                            }
+                            fragmentContainerInterpretationLay.requestLayout()
+                        }
+
                         vpAdapter = ViewPager2Adapter(context!!, bookTexts, myFragmentManager)
                         vpAdapter!!.setRecyclerViewThemeChangerListener(this)
                         vpAdapter!!.setIFragmentCommunicationListener(this)
@@ -360,7 +401,8 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         //Задаём видимость кнопке только в случае включённого режима множественного выбора, потому что при включенном режиме,
         //при открытии этого фрагмента в 170 строке срабатывает метод openMultiSelectionPanel(),
         //в котором кнопке выбора переводов задаётся видимость
-        if (!isMultiSelectionEnabled) listener.setBtnSelectTranslationVisibility(View.VISIBLE)
+        if (!isMultiSelectionEnabled)
+            listener.setBtnSelectTranslationVisibility(View.VISIBLE)
 
         listener.setShowHideToolbarBackButton(View.VISIBLE)
 
@@ -519,6 +561,23 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         dataToRestore.bookNumber = bookNumber
         dataToRestore.chapterNumber = chapterNumber
         dataToRestore.scrollPosition = scrollPosition
+    }
+
+    fun btnFABFullScreenClicked(isFullScreenEnabled: Boolean, heightForChanging: Int) {
+        //Реализация высоты панели толкования при смене режима экрана на Full Screen и обратно
+        //Ничего не менять, всё реализовано должным образом как нужно
+        //Число 45 это примерный отступ, обеспечивающий возвращение панели при отключении режима Full Screen на место, в котором она была до включённого режима
+        if (isInterpretationOpened) {
+            if (isFullScreenEnabled) {
+                if (isFullScreenInterpretationEnabled)
+                    Utility.slideView(fragmentContainerInterpretationLay, 300, fragmentContainerInterpretationLay.height, (coordinatorLayout.height + heightForChanging) - (interpretationLayout.height - 10), true).start()
+                else Utility.slideView(fragmentContainerInterpretationLay, 300, fragmentContainerInterpretationLay.height, coordinatorLayout.height / 2 + (interpretationLayout.height + 45), true).start()
+            } else {
+                if (isFullScreenInterpretationEnabled)
+                    Utility.slideView(fragmentContainerInterpretationLay, 300, fragmentContainerInterpretationLay.height, (fragmentContainerInterpretationLay.height - heightForChanging) - (interpretationLayout.height - 25), true).start()
+                else Utility.slideView(fragmentContainerInterpretationLay, 300, fragmentContainerInterpretationLay.height, coordinatorLayout.height / 2 - (interpretationLayout.height + 45), true).start()
+            }
+        }
     }
 
     fun btnHomeClicked() {

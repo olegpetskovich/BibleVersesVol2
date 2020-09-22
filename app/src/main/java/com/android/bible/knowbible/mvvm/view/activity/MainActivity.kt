@@ -10,10 +10,12 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import android.view.Window
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -234,16 +236,23 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
                 window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 true
             }
+
+            val rectangle = Rect()
+            val window: Window = window
+            window.decorView.getWindowVisibleDisplayFrame(rectangle)
+            val statusBarHeight: Int = rectangle.top
+
+            bibleTextFragment.btnFABFullScreenClicked(isFullScreenEnabled, statusBarHeight + tabLayout.height)
         }
 
         btnFABChangeFontSize.setOnClickListener {
             isChangeFontSizeEnabled = if (isChangeFontSizeEnabled) {
-                val animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out)
-                btnFABFontSizePlus.visibility = View.GONE
+                val animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+                btnFABFontSizePlus.visibility = View.INVISIBLE
                 btnFABFontSizePlus.startAnimation(animation)
                 clearAnimation(animation, btnFABFontSizePlus)
 
-                btnFABFontSizeMinus.visibility = View.GONE
+                btnFABFontSizeMinus.visibility = View.INVISIBLE
                 btnFABFontSizeMinus.startAnimation(animation)
                 clearAnimation(animation, btnFABFontSizeMinus)
                 false
@@ -414,13 +423,13 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         btnFABFullScreen.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start()
         btnFABChangeFontSize.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start()
 
-        if (btnFABFontSizePlus.visibility != View.GONE && btnFABFontSizeMinus.visibility != View.GONE) {
-            val animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out)
-            btnFABFontSizePlus.visibility = View.GONE
+        if (btnFABFontSizePlus.visibility != View.INVISIBLE && btnFABFontSizeMinus.visibility != View.INVISIBLE) {
+            val animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+            btnFABFontSizePlus.visibility = View.INVISIBLE
             btnFABFontSizePlus.startAnimation(animation)
             clearAnimation(animation, btnFABFontSizePlus)
 
-            btnFABFontSizeMinus.visibility = View.GONE
+            btnFABFontSizeMinus.visibility = View.INVISIBLE
             btnFABFontSizeMinus.startAnimation(animation)
             clearAnimation(animation, btnFABFontSizeMinus)
             isChangeFontSizeEnabled = false
@@ -1020,10 +1029,10 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
             animationBottomAppBar = AnimationUtils.loadAnimation(this, R.anim.slide_down)
             animationFAB = AnimationUtils.loadAnimation(this, R.anim.zoom_out_slow)
         }
-        clearAnimation(animationBottomAppBar, appBar)
+//        clearAnimation(animationBottomAppBar, appBar)
         appBar.startAnimation(animationBottomAppBar)
 
-        clearAnimation(animationFAB, fabMenuLayout)
+//        clearAnimation(animationFAB, fabMenuLayout)
         fabMenuLayout.startAnimation(animationFAB)
     }
 
