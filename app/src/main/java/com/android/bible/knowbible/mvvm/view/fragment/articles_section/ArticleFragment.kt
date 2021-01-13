@@ -102,17 +102,10 @@ class ArticleFragment : Fragment() {
         listener.setMyFragmentManager(myFragmentManager)
         listener.setIsBackStackNotEmpty(true)
 
-        listener.setShowHideArticlesInfoButton(View.VISIBLE) //Устанавливаем видимость кнопки btnArticlesInfo
-
         listener.setBtnSelectTranslationVisibility(View.GONE)
 
         listener.setShowHideToolbarBackButton(View.VISIBLE)
 
         listener.setTvSelectedBibleTextVisibility(View.GONE)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        listener.setShowHideArticlesInfoButton(View.GONE) //Устанавливаем видимость кнопки btnArticlesInfo
     }
 }

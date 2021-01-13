@@ -127,11 +127,4 @@
                 android:layout_height="match_parent" />
         </com.android.bible.knowbible.mvvm.view.theme_editor.MyAppBarLayout>
     </com.android.bible.knowbible.mvvm.view.theme_editor.MyLinearLayout>
-
-<!--    <View-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:background="@android:color/black"-->
-<!--        android:alpha="0.3"/>-->
-
 </com.android.bible.knowbible.mvvm.view.theme_editor.MyRelativeLayout>

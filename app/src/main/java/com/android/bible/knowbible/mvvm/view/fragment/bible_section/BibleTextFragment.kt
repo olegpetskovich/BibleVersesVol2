@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -26,12 +25,15 @@ import com.android.bible.knowbible.R
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.ChapterModel
 import com.android.bible.knowbible.mvvm.model.DataToRestoreModel
+import com.android.bible.knowbible.mvvm.model.DataToSetModel
+import com.android.bible.knowbible.mvvm.view.activity.MainActivity
 import com.android.bible.knowbible.mvvm.view.activity.MainActivity.Companion.isBackButtonClicked
 import com.android.bible.knowbible.mvvm.view.adapter.BibleTextRVAdapter
 import com.android.bible.knowbible.mvvm.view.adapter.BibleTextRVAdapter.Companion.isMultiSelectionEnabled
 import com.android.bible.knowbible.mvvm.view.adapter.ViewPager2Adapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
+import com.android.bible.knowbible.mvvm.view.fragment.bible_section.interpretations.BibleInterpretationFragment
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.notes_subsection.NotesFragment
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.search_subsection.SearchFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
@@ -40,7 +42,6 @@ import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
 import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.fragment_bible_text.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -50,6 +51,7 @@ import java.lang.reflect.Field
 class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragmentCommunication, BibleTextRVAdapter.MultiSelectionPanelListener {
     companion object {
         const val DATA_TO_RESTORE = "DATA_TO_RESTORE"
+        const val DATA_TO_SET = "DATA_TO_SET"
     }
 
     //Поле нужно в случае, когда была нажата кнопки btnHome в BottomAppBar и нам нужно очистить данные сохранённого скролла,
@@ -68,7 +70,6 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     private lateinit var btnExitInterpretationFullScreen: ImageView
     private lateinit var myDividerView: RelativeLayout
 
-    var isBibleTextFragmentOpenedFromSearchFragment: Boolean = false
     private lateinit var interpretationLayout: LinearLayout
     private lateinit var coordinatorLayout: LinearLayout
     private lateinit var fragmentContainerInterpretationLay: AppBarLayout
@@ -80,6 +81,9 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     private lateinit var bibleDataViewModel: BibleDataViewModel
 
     private lateinit var myFragmentManager: FragmentManager
+
+    var isBibleTextFragmentOpenedFromSearchFragment: Boolean = false
+    var isBibleTextFragmentOpenedFromAddEditNoteFragment: Boolean = false
 
     private var vpAdapter: ViewPager2Adapter? = null
     private lateinit var viewPager2: ViewPager2
@@ -192,7 +196,7 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                     listener.setTvSelectedBibleText("$shortName.", true)
                 })
 
-        reduceDragSensitivity(viewPager2)
+//        reduceDragSensitivity(viewPager2)
         return myView
     }
 
@@ -247,7 +251,6 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
     override fun onStart() {
         super.onStart()
     }
-
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -366,7 +369,7 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
                         //потому что с анимацией в таком случае глава открывается будто бы с пролагом.
                         //Анимируется только когда пользователь делает слайд влево или вправо, чтобы листать главы
 
-                        if (!isBibleTextFragmentOpenedFromSearchFragment)
+                        if (!isBibleTextFragmentOpenedFromSearchFragment && !isBibleTextFragmentOpenedFromAddEditNoteFragment)
                             setScroll(vpPage, false)
                         else {
                             val verseNumberForScroll = chapterInfo?.verseNumber
@@ -416,6 +419,7 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
         //Включаем свайп для навигации между табами, отключая при этом свайп для листания глав Библии
         swipeListener.setViewPagerSwipeState(true)
 
+        (activity as MainActivity).closeMenuFromBibleTextFragment()
         //Сообщаем, что BibleTextFragment закрыт, а это значит, что BottomAppBar нельзя показывать
         listener.setIsBibleTextFragmentOpened(false)
 
@@ -430,7 +434,7 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 
         //Если BibleTextFragment открыт из SearchFragment с целью просто открыть текст с выбранным найденным в SearchFragment текстом,
         //то при возврате назад нет нужды очищать данные скролла и вообще производить какую-либо работу по сохранению данных скролла
-        if (!isBibleTextFragmentOpenedFromSearchFragment) {
+        if (!isBibleTextFragmentOpenedFromAddEditNoteFragment && !isBibleTextFragmentOpenedFromSearchFragment) {
             val jsonScrollData = saveLoadData.loadString(DATA_TO_RESTORE)
 
             val dataToRestoreJson =
@@ -477,6 +481,10 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 
     fun getCurrentRecyclerViewAdapter(): BibleTextRVAdapter {
         return vpAdapter?.getRecyclerView(chapterInfo!!.chapterNumber - 1)?.adapter as BibleTextRVAdapter
+    }
+
+    fun notifyDataSetChangedVP() {
+        vpAdapter?.notifyDataSetChanged()
     }
 
 
@@ -537,12 +545,23 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
             val touchSlopField: Field = RecyclerView::class.java.getDeclaredField("mTouchSlop")
             touchSlopField.isAccessible = true
             val touchSlop = touchSlopField.get(recyclerView) as Int
-            touchSlopField.set(recyclerView, touchSlop * 2)
+            touchSlopField.set(recyclerView, touchSlop * 4)
         } catch (e: NoSuchFieldException) {
             e.printStackTrace()
         } catch (e: IllegalAccessException) {
             e.printStackTrace()
         }
+    }
+
+    fun reduceDragSensitivity() {
+        val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
+        recyclerViewField.isAccessible = true
+        val recyclerView = recyclerViewField.get(this) as RecyclerView
+
+        val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
+        touchSlopField.isAccessible = true
+        val touchSlop = touchSlopField.get(recyclerView) as Int
+        touchSlopField.set(recyclerView, touchSlop * 8) // "8" was obtained experimentally
     }
 
     interface OnViewPagerSwipeStateListener {
@@ -677,6 +696,13 @@ class BibleTextFragment : Fragment(), IThemeChanger, ViewPager2Adapter.IFragment
 
     fun btnNotesClicked() {
         isBtnNotesClicked = true
+
+        //Если BibleTextFragment открыт из AddEditNoteFragment, то при повторном нажатии на btnNotes произойдёт возврат назад на экран заметки,
+        //вместо того, чтобы открывать AddEditNoteFragment по новой
+        if (isBibleTextFragmentOpenedFromAddEditNoteFragment) {
+            activity?.onBackPressed()
+            return
+        }
 
         val transaction: FragmentTransaction = myFragmentManager.beginTransaction()
         transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)

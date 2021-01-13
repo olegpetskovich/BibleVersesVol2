@@ -126,6 +126,9 @@ class SelectBookChapterFragment : Fragment(), IChangeFragment, IThemeChanger, IS
     override fun changeFragment(fragment: Fragment) {
         myFragmentManager.let {
             val myFragment = fragment as BibleTextFragment
+            //Указываем, что фрагмент не был открыт ни с фрагмента AddEditNoteFragment, ни с фрагмента SearchFragment
+//            myFragment.isBibleTextFragmentOpenedFromAddEditNoteFragment = false
+//            myFragment.isBibleTextFragmentOpenedFromSearchFragment = false
             myFragment.chapterInfo!!.bookNumber = bookNumber
             myFragment.setRootFragmentManager(myFragmentManager)
 

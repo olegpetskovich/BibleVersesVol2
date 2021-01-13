@@ -9,7 +9,6 @@ import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
@@ -27,19 +26,17 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.bible.knowbible.R
+import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.DailyVerseModel
+import com.android.bible.knowbible.mvvm.model.NoteModel
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
-import com.android.bible.knowbible.mvvm.view.dialog.AddNoteDialog
+import com.android.bible.knowbible.mvvm.view.dialog.AddVerseNoteDialog
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.mvvm.viewmodel.BibleDataViewModel
 import com.android.bible.knowbible.utility.Utility
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.InputStream
 import java.io.StringReader
 import java.util.*
@@ -62,7 +59,8 @@ class DailyVerseFragment : Fragment(), DialogListener {
     private lateinit var btnCopy: ImageView
 
     private lateinit var versesInfoList: ArrayList<DailyVerseModel>
-    private lateinit var addNoteDialog: AddNoteDialog
+    private lateinit var verseObject: BibleTextModel
+    private lateinit var addVerseNoteDialog: AddVerseNoteDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,8 +84,8 @@ class DailyVerseFragment : Fragment(), DialogListener {
 //        val myRunnable = Runnable {
 //            GlobalScope.launch(Dispatchers.Main) {
 //                delay(300)
-                //ViewModel для получения конкретного текста для Стих дня
-                bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
+        //ViewModel для получения конкретного текста для Стих дня
+        bibleDataViewModel = activity?.let { ViewModelProvider(requireActivity()).get(BibleDataViewModel::class.java) }!!
 
 //                tvVerse.visibility = View.VISIBLE
 //                val animation = AnimationUtils.loadAnimation(context, R.anim.my_anim)
@@ -112,11 +110,11 @@ class DailyVerseFragment : Fragment(), DialogListener {
                 return@setOnClickListener
             }
 
-            addNoteDialog = AddNoteDialog(this)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) addNoteDialog.setVerse(Html.fromHtml(tvVerse.text.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY).toString())
-            else addNoteDialog.setVerse(Html.fromHtml(tvVerse.text.toString()).toString())
+            addVerseNoteDialog = AddVerseNoteDialog(this)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) addVerseNoteDialog.setVerse(verseObject, Html.fromHtml(tvVerse.text.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY).toString())
+            else addVerseNoteDialog.setVerse(verseObject, Html.fromHtml(tvVerse.text.toString()).toString())
 
-            addNoteDialog.show(myFragmentManager, "Add Note Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
+            addVerseNoteDialog.show(myFragmentManager, "Add Note Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
         }
 
         btnShare = myView.findViewById(R.id.btnShare)
@@ -169,10 +167,12 @@ class DailyVerseFragment : Fragment(), DialogListener {
             verses.add(dailyVerse.verse_number)
         } else if (dailyVerse.verses_numbers.isNotEmpty())
             verses = dailyVerse.verses_numbers
+        verseObject = BibleTextModel(-1, dailyVerse.book_number, dailyVerse.chapter_number, verses!![0], "", "", isTextBold = false, isTextUnderline = false, isTextSelected = false, selectedItem = -1)
+
 
         //Именно в таком порядке вызовов всё работает должным образом
         bibleDataViewModel
-                .getBibleVerseForDailyVerse(BibleDataViewModel.TABLE_VERSES, dailyVerse.book_number, dailyVerse.chapter_number, verses!!)
+                .getBibleVerseForDailyVerse(BibleDataViewModel.TABLE_VERSES, dailyVerse.book_number, dailyVerse.chapter_number, verses)
                 .observe(viewLifecycleOwner, Observer { verseText ->
                     bibleDataViewModel
                             .getBookShortName(BibleDataViewModel.TABLE_BOOKS, verseText!!.book_number)
@@ -247,7 +247,7 @@ class DailyVerseFragment : Fragment(), DialogListener {
     }
 
     override fun dismissDialog() {
-        addNoteDialog.dismiss()
+        addVerseNoteDialog.dismiss()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

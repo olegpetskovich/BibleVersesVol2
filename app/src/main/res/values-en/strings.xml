@@ -86,6 +86,7 @@
     <string name="night_theme">Dark theme</string>
     <string name="book_theme">Book theme</string>
     <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
+    <string name="instagram_channel_link">https://www.instagram.com/invites/contact/?i=1s35vkib0rz8g&amp;utm_content=fiolcem</string>
     <string name="verse_copied">Verse copied</string>
     <string name="toast_no_verses_in_daily_verse">You have not added a single verse in «DailyVerse»</string>
     <string name="tv_empty_daily_verses_list">List of verses is empty</string>
@@ -95,4 +96,7 @@
     <string name="toast_at_least_three_letters">The search field must contain at least three letters</string>
     <string name="btn_home">Home</string>
     <string name="btn_interpretation">Interpretation</string>
+    <string name="tab_first_interpretation">Interpretation by Dallas Seminary</string>
+    <string name="tab_second_interpretation">Interpretation by William MacDonald</string>
+    <string name="tab_third_interpretation">Interpretation by Matthew Henry</string>
 </resources>

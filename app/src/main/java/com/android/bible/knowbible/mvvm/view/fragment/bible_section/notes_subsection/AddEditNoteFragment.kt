@@ -10,11 +10,15 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.data.local.NotesDBHelper
+import com.android.bible.knowbible.mvvm.model.ChapterModel
 import com.android.bible.knowbible.mvvm.model.NoteModel
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
+import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTextFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
+import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
 import com.google.android.material.button.MaterialButton
 
@@ -32,6 +36,8 @@ class AddEditNoteFragment : Fragment() {
     private lateinit var editTextNote: AppCompatEditText
     private lateinit var btnSave: MaterialButton
 
+    private lateinit var saveLoadData: SaveLoadData
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true //Без этого кода не будет срабатывать поворот экрана
@@ -41,10 +47,25 @@ class AddEditNoteFragment : Fragment() {
         val myView: View = inflater.inflate(R.layout.fragment_add_note, container, false)
         listener.setTheme(ThemeManager.theme, false) //Если не устанавливать тему каждый раз при открытии фрагмента, то по какой-то причине внешний вид View не обновляется, поэтому на данный момент только такой решение
 
+        saveLoadData = SaveLoadData(context!!)
         notesDBHelper = NotesDBHelper(context!!)
 
         if (noteData != null && noteData!!.verseText.isNotEmpty()) {
             tvVerseForNote = myView.findViewById(R.id.tvVerseForNote)
+            tvVerseForNote.setOnClickListener {
+                myFragmentManager.let {
+                    val myFragment = BibleTextFragment()
+                    myFragment.isBibleTextFragmentOpenedFromAddEditNoteFragment = true
+                    myFragment.chapterInfo = ChapterModel(noteData!!.bookNumber, noteData!!.chapterNumber, noteData!!.verseNumber - 1) //Пишем - 1, чтобы проскроллить к нужному айтему
+                    myFragment.setRootFragmentManager(myFragmentManager)
+
+                    val transaction: FragmentTransaction = it.beginTransaction()
+                    transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                    transaction.addToBackStack(null)
+                    transaction.replace(R.id.fragment_container_bible, myFragment)
+                    transaction.commit()
+                }
+            }
             tvVerseForNote.visibility = View.VISIBLE
             tvVerseForNote.text = noteData!!.verseText
         }
@@ -57,7 +78,7 @@ class AddEditNoteFragment : Fragment() {
             if (editTextNote.text.toString().isNotEmpty()) {
                 isBtnSaveClicked = true
                 saveOrUpdateNote()
-                activity?.onBackPressed() //Закрываем фрагмент
+                myFragmentManager.popBackStack() //Закрываем фрагмент
             } else Toast.makeText(context, getString(R.string.toast_field_cant_be_empty), Toast.LENGTH_SHORT).show()
         }
 
@@ -69,6 +90,9 @@ class AddEditNoteFragment : Fragment() {
             notesDBHelper.addNote(NoteModel(
                     -1/*-1 здесь как заглушка, этот параметр нужен не при добавлении, а при получении данных, потому что там id создаётся автоматически*/,
                     false,
+                    -1,
+                    -1,
+                    -1,
                     "",
                     editTextNote.text.toString()))
             Toast.makeText(context, getString(R.string.toast_note_added), Toast.LENGTH_SHORT).show()
@@ -78,6 +102,9 @@ class AddEditNoteFragment : Fragment() {
                 notesDBHelper.updateNote(NoteModel(
                         noteData!!.id,
                         noteData!!.isNoteForVerse,
+                        noteData!!.bookNumber,
+                        noteData!!.chapterNumber,
+                        noteData!!.verseNumber,
                         noteData!!.verseText,
                         editTextNote.text.toString()))
                 Toast.makeText(context, getString(R.string.toast_note_edited), Toast.LENGTH_SHORT).show()

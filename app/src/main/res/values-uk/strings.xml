@@ -85,6 +85,7 @@
     <string name="night_theme">Темна тема</string>
     <string name="book_theme">Книжна тема</string>
     <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
+    <string name="instagram_channel_link">https://www.instagram.com/invites/contact/?i=1s35vkib0rz8g&amp;utm_content=fiolcem</string>
     <string name="verse_copied">Вірш скопійовано</string>
     <string name="toast_no_verses_in_daily_verse">Ви не додали жодного вірша в «Вірш дня»</string>
     <string name="tv_empty_daily_verses_list">Список віршів порожній</string>
@@ -94,4 +95,7 @@
     <string name="toast_at_least_three_letters">В поле пошуку повинно бути щонайменше три букви</string>
     <string name="btn_home">Додому</string>
     <string name="btn_interpretation">Тлумачення</string>
+    <string name="tab_first_interpretation">Тлумачення Далласської Семінарії</string>
+    <string name="tab_second_interpretation">Тлумачення Вільяма МакДональда</string>
+    <string name="tab_third_interpretation">Тлумачення Метью Генрі</string>
 </resources>

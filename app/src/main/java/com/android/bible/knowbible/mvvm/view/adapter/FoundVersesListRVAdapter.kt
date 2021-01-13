@@ -24,7 +24,7 @@ import com.android.bible.knowbible.mvvm.model.ChapterModel
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.ISelectBibleText
-import com.android.bible.knowbible.mvvm.view.dialog.AddNoteDialog
+import com.android.bible.knowbible.mvvm.view.dialog.AddVerseNoteDialog
 import com.android.bible.knowbible.mvvm.view.fragment.bible_section.BibleTextFragment
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import java.util.*
@@ -79,7 +79,7 @@ class FoundVersesListRVAdapter(internal val context: Context, private val search
     }
 
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), DialogListener {
-        private lateinit var addNoteDialog: AddNoteDialog
+        private lateinit var addVerseNoteDialog: AddVerseNoteDialog
 
         var tvVerse: TextView = itemView.findViewById(R.id.tvVerse)
         var progressBar: ProgressBar = itemView.findViewById(R.id.progressBar)
@@ -90,11 +90,11 @@ class FoundVersesListRVAdapter(internal val context: Context, private val search
 
         init {
             btnAddNote.setOnClickListener {
-                addNoteDialog = AddNoteDialog(this)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) addNoteDialog.setVerse(Html.fromHtml(searchedVersesList[adapterPosition].text, HtmlCompat.FROM_HTML_MODE_LEGACY).toString())
-                else addNoteDialog.setVerse(Html.fromHtml(searchedVersesList[adapterPosition].text).toString())
+                addVerseNoteDialog = AddVerseNoteDialog(this)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) addVerseNoteDialog.setVerse(searchedVersesList[0], Html.fromHtml(searchedVersesList[adapterPosition].text, HtmlCompat.FROM_HTML_MODE_LEGACY).toString())
+                else addVerseNoteDialog.setVerse(searchedVersesList[0], Html.fromHtml(searchedVersesList[adapterPosition].text).toString())
 
-                addNoteDialog.show(myFragmentManager, "Add Note Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
+                addVerseNoteDialog.show(myFragmentManager, "Add Note Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
             }
 
             btnCopyVerse.setOnClickListener {
@@ -115,24 +115,24 @@ class FoundVersesListRVAdapter(internal val context: Context, private val search
                 val shareBody =
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) Html.fromHtml(searchedVersesList[adapterPosition].text, HtmlCompat.FROM_HTML_MODE_LEGACY)
                         else Html.fromHtml(searchedVersesList[adapterPosition].text)
-
+                
                 myIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
                 context.startActivity(Intent.createChooser(myIntent, context.getString(R.string.toast_share_verse)))
             }
 
             itemView.setOnClickListener {
-                selectBibleTextListener.setSelectedBibleText(searchedVersesList[adapterPosition].chapter_number.toString(), false)
+//                selectBibleTextListener.setSelectedBibleText(searchedVersesList[adapterPosition].chapter_number.toString(), false)
 
                 val bibleTextFragment = BibleTextFragment()
                 bibleTextFragment.isBibleTextFragmentOpenedFromSearchFragment = true
-                val chapterModel = ChapterModel(searchedVersesList[adapterPosition].book_number, searchedVersesList[adapterPosition].chapter_number, searchedVersesList[adapterPosition].verse_number - 1)
+                val chapterModel = ChapterModel(searchedVersesList[adapterPosition].book_number, searchedVersesList[adapterPosition].chapter_number, searchedVersesList[adapterPosition].verse_number - 1) //Пишем - 1, чтобы проскроллить к нужному айтему
                 bibleTextFragment.chapterInfo = chapterModel
                 fragmentChanger.changeFragment(bibleTextFragment)
             }
         }
 
         override fun dismissDialog() {
-            addNoteDialog.dismiss()
+            addVerseNoteDialog.dismiss()
         }
     }
 }

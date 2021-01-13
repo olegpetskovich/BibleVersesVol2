@@ -28,4 +28,12 @@
         android:lineSpacingExtra="6dp"
         android:textSize="18sp"
         tools:text="В начале Бог сотворил небо и землю. Земля же была безвидна и пуста, и тьма над бездною." />
+
+<!--    <com.android.bible.knowbible.mvvm.view.theme_editor.MyIconImageView-->
+<!--        android:id="@+id/noteIcon"-->
+<!--        android:layout_width="25dp"-->
+<!--        android:layout_height="25dp"-->
+<!--        app:srcCompat="@drawable/ic_write_note"-->
+<!--        android:layout_alignBottom="@id/tvVerse"-->
+<!--        android:layout_toEndOf="@id/tvVerse"/>-->
 </RelativeLayout>

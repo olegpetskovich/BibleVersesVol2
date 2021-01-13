@@ -22,11 +22,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.mvvm.model.BibleTextInfoModel
 import com.android.bible.knowbible.mvvm.model.BibleTextModel
+import com.android.bible.knowbible.mvvm.view.activity.MainActivity.Companion.TEXT_SIZE_KEY
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IChangeFragment
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IThemeChanger
 import com.android.bible.knowbible.mvvm.view.dialog.VerseDialog
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.utility.FontCache
+import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.utility.Utility
 import com.android.bible.knowbible.utility.Utility.Companion.convertDbInPx
 import java.util.*
@@ -42,6 +44,12 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
     //для обеспечения отключения режима множественного выбора текстов
     companion object {
         var isMultiSelectionEnabled: Boolean = false
+    }
+
+    private val saveLoadData = SaveLoadData(context)
+
+    init {
+        if (saveLoadData.loadInt(TEXT_SIZE_KEY) == -1) saveLoadData.saveInt(TEXT_SIZE_KEY, 18)
     }
 
     private lateinit var multiSelectedTextsList: ArrayList<BibleTextModel>
@@ -152,6 +160,7 @@ class BibleTextRVAdapter(private val context: Context, private val models: Array
             }
         }
 
+        holder.tvVerse.textSize = saveLoadData.loadInt(TEXT_SIZE_KEY).toFloat()
         holder.tvVerse.typeface = FontCache["verdana_regular_cyr.ttf", context]
     }
 

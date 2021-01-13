@@ -402,14 +402,13 @@
         android:visibility="invisible">
 
         <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
-            android:id="@+id/btnFABFontSizeMinus"
+            android:id="@+id/btnFABTextSizeMinus"
             style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:layout_marginBottom="2dp"
             android:src="@drawable/ic_font_size_minus"
-            android:visibility="gone"
+            android:visibility="invisible"
             app:fabSize="mini"
             app:tint="@android:color/white" />
 
@@ -419,20 +418,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
-            android:layout_toEndOf="@id/btnFABFontSizeMinus"
+            android:layout_toEndOf="@id/btnFABTextSizeMinus"
             android:src="@drawable/ic_font_size"
+            android:visibility="invisible"
             app:fabSize="mini"
             app:tint="@android:color/white" />
 
         <com.android.bible.knowbible.mvvm.view.theme_editor.MyFloatingActionButton
-            android:id="@+id/btnFABFontSizePlus"
+            android:id="@+id/btnFABTextSizePlus"
             style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_toEndOf="@id/btnFABChangeFontSize"
             android:src="@drawable/ic_add_note"
-            android:visibility="gone"
+            android:visibility="invisible"
             app:fabSize="mini"
             app:tint="@android:color/white" />
 
@@ -445,6 +445,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="8dp"
             android:src="@drawable/ic_full_screen"
+            android:visibility="invisible"
             app:fabSize="mini"
             app:tint="@android:color/white" />
 

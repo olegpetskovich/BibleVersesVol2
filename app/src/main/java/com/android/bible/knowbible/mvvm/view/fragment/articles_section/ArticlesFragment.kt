@@ -61,7 +61,6 @@ class ArticlesFragment : Fragment(), IThemeChanger, IChangeFragment {
 
 //        loadData(context!!) //Загружать данные в onResume, потому что загружая в onCreate выдаёт ошибку
 
-
         myFragmentManager.let {
 //            val transaction: FragmentTransaction = it.beginTransaction()
 //            transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)

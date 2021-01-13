@@ -4,15 +4,9 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.Window
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -21,19 +15,18 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.appcompat.widget.AppCompatEditText
 import com.android.bible.knowbible.R
 import com.android.bible.knowbible.data.local.NotesDBHelper
+import com.android.bible.knowbible.mvvm.model.BibleTextModel
 import com.android.bible.knowbible.mvvm.model.NoteModel
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.theme_editor.ThemeManager
 import com.android.bible.knowbible.utility.SaveLoadData
 import com.android.bible.knowbible.mvvm.view.fragment.more_section.ThemeModeFragment
-import com.android.bible.knowbible.utility.Utility
 import com.google.android.material.button.MaterialButton
-import kotlinx.android.synthetic.main.fragment_bible_text.*
-import java.lang.StringBuilder
 
-class AddNoteDialog(private val listener: DialogListener) : AppCompatDialogFragment() {
+class AddVerseNoteDialog(private val listener: DialogListener) : AppCompatDialogFragment() {
     private lateinit var notesDBHelper: NotesDBHelper
 
+    private lateinit var verseModel: BibleTextModel
     private lateinit var verseText: String
 
     private lateinit var tvVerseForNote: TextView
@@ -50,7 +43,7 @@ class AddNoteDialog(private val listener: DialogListener) : AppCompatDialogFragm
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder: AlertDialog.Builder = context?.let { AlertDialog.Builder(it) }!!
         val inflater = LayoutInflater.from(context)
-        val view: View = inflater.inflate(R.layout.dialog_add_note, null)
+        val view: View = inflater.inflate(R.layout.dialog_add_verse_note, null)
 
         //По непонятной причине в диалогах тема не меняется, поэтому приходится менять их в каждом диалоге
         when (SaveLoadData(context!!).loadString(ThemeModeFragment.THEME_NAME_KEY)) {
@@ -81,6 +74,9 @@ class AddNoteDialog(private val listener: DialogListener) : AppCompatDialogFragm
                 notesDBHelper.addNote(NoteModel(
                         -1/*-1 здесь как заглушка, этот параметр нужен не при добавлении, а при получении данных, потому что там id создаётся автоматически*/,
                         true,
+                        verseModel.book_number,
+                        verseModel.chapter_number,
+                        verseModel.verse_number,
                         verseText,
                         editTextNote.text.toString()))
                 Toast.makeText(context, getString(R.string.toast_note_added), Toast.LENGTH_SHORT).show()
@@ -95,7 +91,8 @@ class AddNoteDialog(private val listener: DialogListener) : AppCompatDialogFragm
         return builder.create()
     }
 
-    fun setVerse(verseText: String) {
+    fun setVerse(verseModel: BibleTextModel, verseText: String) {
+        this.verseModel = verseModel
         this.verseText = verseText
     }
 

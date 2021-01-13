@@ -39,7 +39,7 @@ import com.android.bible.knowbible.mvvm.view.adapter.BibleTranslationsRVAdapter
 import com.android.bible.knowbible.mvvm.view.adapter.ViewPagerAdapter
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.DialogListener
 import com.android.bible.knowbible.mvvm.view.callback_interfaces.IActivityCommunicationListener
-import com.android.bible.knowbible.mvvm.view.dialog.AddNoteDialog
+import com.android.bible.knowbible.mvvm.view.dialog.AddVerseNoteDialog
 import com.android.bible.knowbible.mvvm.view.dialog.ArticlesInfoDialog
 import com.android.bible.knowbible.mvvm.view.dialog.ColorPickerDialog
 import com.android.bible.knowbible.mvvm.view.fragment.articles_section.ArticlesRootFragment
@@ -105,6 +105,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
 
     companion object {
         var isBackButtonClicked: Boolean = false //Поле сугубо для BibleTextFragment. Оно нужно, чтобы с помощью его значения при закрытии этого фрагмента кнопкой "Назад" очищать данные скролла.
+        const val TEXT_SIZE_KEY = "TEXT_SIZE_KEY"
     }
 
     private var tabNumber: Int = 1 //Номер таба нужен, чтобы при повороте экрана в вертикальное положение, устанавливать выделенную иконку в том табе, который выбран
@@ -129,7 +130,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
     private var isMultiSelectedTextsListContainsHighlightedVerse: Boolean = false //Поле нужно для определения того, содержится ли хотя бы один выделенный текст в списке выделенных текстов
 
     private var articlesInfoDialog: ArticlesInfoDialog? = null
-    private var addNoteDialog: AddNoteDialog? = null
+    private var addVerseNoteDialog: AddVerseNoteDialog? = null
     private var colorPickerDialog: ColorPickerDialog? = null
 
     private var translationY = 100f
@@ -247,29 +248,53 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
 
         btnFABChangeFontSize.setOnClickListener {
             isChangeFontSizeEnabled = if (isChangeFontSizeEnabled) {
-                val animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
-                btnFABFontSizePlus.visibility = View.INVISIBLE
-                btnFABFontSizePlus.startAnimation(animation)
-                clearAnimation(animation, btnFABFontSizePlus)
+                val animation1 = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+                val animation2 = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+                btnFABTextSizePlus.visibility = View.INVISIBLE
+                btnFABTextSizePlus.startAnimation(animation1)
+                clearAnimation(animation1, btnFABTextSizePlus)
 
-                btnFABFontSizeMinus.visibility = View.INVISIBLE
-                btnFABFontSizeMinus.startAnimation(animation)
-                clearAnimation(animation, btnFABFontSizeMinus)
+                btnFABTextSizeMinus.visibility = View.INVISIBLE
+                btnFABTextSizeMinus.startAnimation(animation2)
+                clearAnimation(animation2, btnFABTextSizeMinus)
                 false
             } else {
-                val animation = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
-                btnFABFontSizePlus.visibility = View.VISIBLE
-                btnFABFontSizePlus.startAnimation(animation)
-                clearAnimation(animation, btnFABFontSizePlus)
+                val animation1 = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
+                val animation2 = AnimationUtils.loadAnimation(this, R.anim.zoom_in)
+                btnFABTextSizePlus.visibility = View.VISIBLE
+                btnFABTextSizePlus.startAnimation(animation1)
+                clearAnimation(animation1, btnFABTextSizePlus)
 
-                btnFABFontSizeMinus.visibility = View.VISIBLE
-                btnFABFontSizeMinus.startAnimation(animation)
-                clearAnimation(animation, btnFABFontSizeMinus)
+                btnFABTextSizeMinus.visibility = View.VISIBLE
+                btnFABTextSizeMinus.startAnimation(animation2)
+                clearAnimation(animation2, btnFABTextSizeMinus)
                 true
             }
         }
 
-        btnHome.setOnClickListener { bibleTextFragment.btnHomeClicked() }
+        val minTextSize = 12
+        val maxTextSize = 32
+        btnFABTextSizeMinus.setOnClickListener {
+            val currentTextSize = saveLoadData.loadInt(TEXT_SIZE_KEY)
+            if (currentTextSize == minTextSize) return@setOnClickListener
+            saveLoadData.saveInt(TEXT_SIZE_KEY, currentTextSize - 2)
+//            bibleTextFragment.getCurrentRecyclerViewAdapter().notifyDataSetChanged()
+            bibleTextFragment.notifyDataSetChangedVP()
+        }
+
+        btnFABTextSizePlus.setOnClickListener {
+            val currentTextSize = saveLoadData.loadInt(TEXT_SIZE_KEY)
+            if (currentTextSize == maxTextSize) return@setOnClickListener
+            saveLoadData.saveInt(TEXT_SIZE_KEY, currentTextSize + 2)
+//            bibleTextFragment.getCurrentRecyclerViewAdapter().notifyDataSetChanged()
+            bibleTextFragment.notifyDataSetChangedVP()
+        }
+
+        btnHome.setOnClickListener {
+            bibleTextFragment.btnHomeClicked()
+
+            if (isFullScreenEnabled) disableFullScreenMode() //Выключаем режим полного экрана, если он включён при нажатии кнопки "Домой"
+        }
         btnInterpretation.setOnClickListener { bibleTextFragment.btnInterpretationClicked() }
         btnNotes.setOnClickListener { bibleTextFragment.btnNotesClicked() }
         btnSearch.setOnClickListener { bibleTextFragment.btnSearchClicked() }
@@ -349,9 +374,9 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         }
 
         btnAddNote.setOnClickListener {
-            addNoteDialog = AddNoteDialog(this)
-            addNoteDialog!!.setVerse(getFormattedMultiSelectedText())
-            addNoteDialog!!.show(myFragmentManager, "Add Note Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
+            addVerseNoteDialog = AddVerseNoteDialog(this)
+            addVerseNoteDialog!!.setVerse(multiSelectedTextsList[0], getFormattedMultiSelectedText())
+            addVerseNoteDialog!!.show(myFragmentManager, "Add Note Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
         }
 
         btnHighlight.setOnClickListener {
@@ -412,28 +437,80 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         isMenuOpen = !isMenuOpen
         btnFAB.animate().setInterpolator(interpolator).rotation(45f).setDuration(300).start()
 
-        btnFABFullScreen.animate().translationY(0f).alpha(1f).setInterpolator(interpolator).setDuration(300).start()
+        //Обнуляем обработчики анимации здесь, чтобы у кнопок не срабатывали обработчики при повторном вызове этого метода, установленные этим же кнопкам в методе closeMenu()
+        btnFABChangeFontSize
+                .animate()
+                .setListener(null)
+                .start()
+        btnFABFullScreen
+                .animate()
+                .setListener(null)
+                .start()
+
+        btnFABChangeFontSize.visibility = View.VISIBLE
+        btnFABFullScreen.visibility = View.VISIBLE
+
         btnFABChangeFontSize.animate().translationY(0f).alpha(1f).setInterpolator(interpolator).setDuration(300).start()
+        btnFABFullScreen.animate().translationY(0f).alpha(1f).setInterpolator(interpolator).setDuration(300).start()
     }
 
     private fun closeMenu() {
         isMenuOpen = !isMenuOpen
         btnFAB.animate().setInterpolator(interpolator).rotation(0f).setDuration(300).start()
 
-        btnFABFullScreen.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start()
-        btnFABChangeFontSize.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start()
+        btnFABChangeFontSize
+                .animate()
+                .translationY(translationY)
+                .alpha(0f)
+                .setInterpolator(interpolator)
+                .setDuration(300)
+                .setListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator?) {}
+                    override fun onAnimationEnd(animation: Animator?) {
+                        btnFABChangeFontSize.visibility = View.INVISIBLE
+                        btnFABChangeFontSize.clearAnimation()
+                    }
 
-        if (btnFABFontSizePlus.visibility != View.INVISIBLE && btnFABFontSizeMinus.visibility != View.INVISIBLE) {
-            val animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
-            btnFABFontSizePlus.visibility = View.INVISIBLE
-            btnFABFontSizePlus.startAnimation(animation)
-            clearAnimation(animation, btnFABFontSizePlus)
+                    override fun onAnimationCancel(animation: Animator?) {}
+                    override fun onAnimationRepeat(animation: Animator?) {}
+                }).start()
 
-            btnFABFontSizeMinus.visibility = View.INVISIBLE
-            btnFABFontSizeMinus.startAnimation(animation)
-            clearAnimation(animation, btnFABFontSizeMinus)
+        btnFABFullScreen
+                .animate()
+                .translationY(translationY)
+                .alpha(0f)
+                .setInterpolator(interpolator)
+                .setDuration(300)
+                .setListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator?) {}
+                    override fun onAnimationEnd(animation: Animator?) {
+                        btnFABFullScreen.visibility = View.INVISIBLE
+                        btnFABFullScreen.clearAnimation()
+                    }
+
+                    override fun onAnimationCancel(animation: Animator?) {}
+                    override fun onAnimationRepeat(animation: Animator?) {}
+                }).start()
+
+        if (btnFABTextSizePlus.visibility != View.INVISIBLE && btnFABTextSizeMinus.visibility != View.INVISIBLE) {
+            //На каждую View нужно использовать отдельный объект анимации в случае, когда потом нужно очищать анимацию,
+            //поскольку при очищении анимации если будет очищаться один и тот же объект анимации, то в первой ситуации она очистится,
+            //а во второй метод очищения анимации не сработает, потому что она уже будет очищена в первом случае
+            val animation1 = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+            val animation2 = AnimationUtils.loadAnimation(this, R.anim.zoom_out)
+            btnFABTextSizePlus.visibility = View.INVISIBLE
+            btnFABTextSizePlus.startAnimation(animation1)
+            clearAnimation(animation1, btnFABTextSizePlus)
+
+            btnFABTextSizeMinus.visibility = View.INVISIBLE
+            btnFABTextSizeMinus.startAnimation(animation2)
+            clearAnimation(animation2, btnFABTextSizeMinus)
             isChangeFontSizeEnabled = false
         }
+    }
+
+    fun closeMenuFromBibleTextFragment() {
+        if (isMenuOpen) closeMenu()
     }
 
     override fun disableMultiSelection() {
@@ -1109,15 +1186,31 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         //приложение будет открыто в начальном экране SelectTestamentFragment
         isBackButtonClicked = true
 
-        //Если открыт таб "Библия" и включён режим множественного выбора, то при нажатии кнопки "Назад" сначала а выключается режим множественного выбора,
+        //Если открыт таб "Библия" и включён режим множественного выбора, то при нажатии кнопки "Назад" сначала выключается режим множественного выбора,
         //и только после этого можно как обычно вернуться на предыдущий фрагмент тем же нажатием кнопки "Назад"
         if (myFragmentManagerName.contains("BibleRootFragment") && isMultiSelectionEnabled) {
             disableMultiSelection()
             return
         }
 
+        //Если открыт таб "Библия" и включён режим множественного полного экрана, то при нажатии кнопки "Назад" сначала выключается режим полного экрана,
+        //и только после этого можно как обычно вернуться на предыдущий фрагмент тем же нажатием кнопки "Назад"
+        if (isFullScreenEnabled && isBibleTextFragmentOpened) {
+            disableFullScreenMode()
+            return
+        }
+
         if (isBackStackNotEmpty) myFragmentManager.popBackStack()
         else super.onBackPressed()
+    }
+
+    private fun disableFullScreenMode() {
+        btnFABFullScreen.setImageResource(R.drawable.ic_full_screen)
+
+        //Открываем statusBar и tabLayout
+        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        tabLayout.visibility = View.VISIBLE
+        isFullScreenEnabled = false
     }
 
     override fun changeLanguage(languageCode: String) {
@@ -1186,7 +1279,7 @@ class MainActivity : AppCompatActivity(), BibleTextFragment.OnViewPagerSwipeStat
         //Этот код реализован таким образом для того, чтобы не писать для каждого диалога свой обработчик.
         articlesInfoDialog?.dismiss()
 
-        addNoteDialog?.dismiss()
+        addVerseNoteDialog?.dismiss()
         //Отключаем режим множественного выбора после добавления заметки
         if (isMultiSelectionEnabled) disableMultiSelection()
     }

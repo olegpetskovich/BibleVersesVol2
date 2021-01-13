@@ -6,11 +6,11 @@ import android.content.SharedPreferences
 class SaveLoadData(context: Context) {
     private val preferences: SharedPreferences = context.getSharedPreferences("preferences", Context.MODE_PRIVATE)
 
-    fun saveInt(key: String, positionOnCoordinate: Int) {
+    fun saveInt(key: String, value: Int) {
         // Извлеките редактор, чтобы изменить Общие настройки.
 
         val prefEditor = preferences.edit()
-        prefEditor.putInt(key, positionOnCoordinate)
+        prefEditor.putInt(key, value)
 
         prefEditor.apply()
     }

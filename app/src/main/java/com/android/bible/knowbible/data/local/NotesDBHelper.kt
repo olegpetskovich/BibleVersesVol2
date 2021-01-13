@@ -31,7 +31,14 @@ class NotesDBHelper(context: Context) {
                 val text = c.getString(c.getColumnIndex("text"))
                 val id = c.getInt(c.getColumnIndex("id"))
 
-                val note = NoteModel(id, isNoteForVerse, verse, text)
+                val note: NoteModel
+                //Если это заметка к стиху, то получаем данные стиха, что при нажатии на него, можно было к нему перейти
+                note = (if (isNoteForVerse) {
+                    val bookNumber = c.getInt(c.getColumnIndex("book_number"))
+                    val chapterNumber = c.getInt(c.getColumnIndex("chapter_number"))
+                    val verseNumber = c.getInt(c.getColumnIndex("verse_number"))
+                    NoteModel(id, isNoteForVerse, bookNumber, chapterNumber, verseNumber, verse, text)
+                } else NoteModel(id, isNoteForVerse, -1, -1, -1, verse, text))
 
                 collection.add(note)
 
@@ -43,6 +50,9 @@ class NotesDBHelper(context: Context) {
 
     fun addNote(note: NoteModel) {
         cv.put("is_note_for_verse", note.isNoteForVerse)
+        cv.put("book_number", note.bookNumber)
+        cv.put("chapter_number", note.chapterNumber)
+        cv.put("verse_number", note.verseNumber)
         cv.put("verse", note.verseText)
         cv.put("text", note.text)
 
@@ -51,6 +61,9 @@ class NotesDBHelper(context: Context) {
 
     fun updateNote(note: NoteModel) {
         cv.put("is_note_for_verse", note.isNoteForVerse)
+        cv.put("book_number", note.bookNumber)
+        cv.put("chapter_number", note.chapterNumber)
+        cv.put("verse_number", note.verseNumber)
         cv.put("verse", note.verseText)
         cv.put("text", note.text)
 
@@ -75,6 +88,9 @@ class NotesDBHelper(context: Context) {
             db.execSQL("create table my_notes_table ("
                     + "id integer primary key autoincrement,"
                     + "is_note_for_verse integer,"
+                    + "book_number integer,"
+                    + "chapter_number integer,"
+                    + "verse_number integer,"
                     + "verse text,"
                     + "text text" + ");")
         }

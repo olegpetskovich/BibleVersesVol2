@@ -85,6 +85,7 @@
     <string name="night_theme">Тёмная тема</string>
     <string name="book_theme">Книжная тема</string>
     <string name="telegram_channel_link">https://t.me/joinchat/AAAAAEWfJPa6j-1nW5wiTg</string>
+    <string name="instagram_channel_link">https://www.instagram.com/invites/contact/?i=1s35vkib0rz8g&amp;utm_content=fiolcem</string>
     <string name="verse_copied">Стих скопирован</string>
     <string name="toast_no_verses_in_daily_verse">Вы не добавили ни одного стиха в «Стих дня»</string>
     <string name="tv_empty_daily_verses_list">Список стихов пока что пуст</string>
@@ -94,4 +95,7 @@
     <string name="toast_at_least_three_letters">В поле поиска должно быть минимум три буквы</string>
     <string name="btn_home">Домой</string>
     <string name="btn_interpretation">Толкование</string>
+    <string name="tab_first_interpretation">Толкование Далласской Семинарии</string>
+    <string name="tab_second_interpretation">Толкование Уильяма МакДональда</string>
+    <string name="tab_third_interpretation">Толкование Мэтью Генри</string>
 </resources>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="46f13362-0f4d-41c3-9e39-79c240383f63" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/adapter/InterpretationsVPAdapter.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/bible_section/interpretations/FirstInterpretationFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/bible_section/interpretations/SecondInterpretationFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/bible_section/interpretations/ThirdInterpretationFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fragment_first_interpretation.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fragment_second_interpretation.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fragment_third_interpretation.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/activity/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/activity/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/adapter/BibleTextRVAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/adapter/BibleTextRVAdapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/articles_section/ArticleFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/articles_section/ArticleFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/bible_section/BibleInterpretationFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/bible_section/interpretations/BibleInterpretationFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/bible_section/BibleTextFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/bible_section/BibleTextFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/bible_section/notes_subsection/AddEditNoteFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/mvvm/view/fragment/bible_section/notes_subsection/AddEditNoteFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/utility/SaveLoadData.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/com/android/bible/knowbible/utility/SaveLoadData.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/activity_main.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fragment_bible_interpretation.xml" beforeDir="false" afterPath="$PROJECT_DIR$/fragment_bible_interpretation.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fragment_bible_text.xml" beforeDir="false" afterPath="$PROJECT_DIR$/fragment_bible_text.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../values-en/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../values-en/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../values-uk/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../values-uk/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../values/strings.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../../../.." />
+  </component>
+  <component name="ProjectId" id="1i8E2ufjEttnO0ac2XI1s1pz6Ig" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="46f13362-0f4d-41c3-9e39-79c240383f63" name="Default Changelist" comment="" />
+      <created>1601280614501</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1601280614501</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="346" y="49" width="672" height="678" key="search.everywhere.popup" timestamp="1601280651083">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="346" y="49" width="672" height="678" key="search.everywhere.popup/0.0.1366.728@0.0.1366.728" timestamp="1601280651083" />
+  </component>
+</project>

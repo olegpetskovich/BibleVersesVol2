@@ -1,12 +1,15 @@
 package com.android.bible.knowbible.mvvm.view.dialog
 
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.android.bible.knowbible.R
@@ -27,7 +30,7 @@ class ArticlesInfoDialog(private val listener: DialogListener) : AppCompatDialog
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder: AlertDialog.Builder = context?.let { AlertDialog.Builder(it) }!!
         val inflater = LayoutInflater.from(context)
-        val view: View = inflater.inflate(R.layout.dialog_articles_info, null)
+        val myView: View = inflater.inflate(R.layout.dialog_articles_info, null)
 
         //По непонятной причине в диалогах тема не меняется, поэтому приходится менять их в каждом диалоге
         when (SaveLoadData(context!!).loadString(ThemeModeFragment.THEME_NAME_KEY)) {
@@ -36,10 +39,16 @@ class ArticlesInfoDialog(private val listener: DialogListener) : AppCompatDialog
             ThemeModeFragment.BOOK_THEME -> ThemeManager.theme = ThemeManager.Theme.BOOK
         }
 
-        val btnDismissDialog: MaterialButton = view.findViewById(R.id.btnDismissDialog)
+        val btnTelegramChannel: ImageView = myView.findViewById(R.id.btnTelegramChannel)
+        btnTelegramChannel.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.telegram_channel_link)))) }
+
+        val btnInstagramChannel: ImageView = myView.findViewById(R.id.btnInstagramChannel)
+        btnInstagramChannel.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.instagram_channel_link)))) }
+
+        val btnDismissDialog: MaterialButton = myView.findViewById(R.id.btnDismissDialog)
         btnDismissDialog.setOnClickListener { listener.dismissDialog() }
 
-        builder.setView(view)
+        builder.setView(myView)
         return builder.create()
     }
 

@@ -143,7 +143,7 @@ class SearchFragment : Fragment(), IChangeFragment, ISelectBibleText {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val animation: Animation?
-                if (count > 0) {
+                if (etSearch.length() > 0) {
                     animation = AnimationUtils.loadAnimation(context, R.anim.zoom_in_slow)
                     //Делаем проверку на видимость, чтобы кнопка не анимировалось при печатании каждой буквы
                     if (btnCleanText.visibility == View.VISIBLE) return

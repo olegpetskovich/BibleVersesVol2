@@ -49,7 +49,7 @@ class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFr
     private lateinit var myFragmentManager: FragmentManager
 
     private lateinit var colorPickerDialog: ColorPickerDialog
-    private lateinit var addNoteDialog: AddNoteDialog
+    private lateinit var addVerseNoteDialog: AddVerseNoteDialog
 
     private lateinit var tvVerse: TextView
 
@@ -171,9 +171,9 @@ class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFr
 
         val tvAddToNotes: TextView = view.findViewById(R.id.tvAddToNotes)
         tvAddToNotes.setOnClickListener {
-            addNoteDialog = AddNoteDialog(this)
-            addNoteDialog.setVerse(tvVerse.text.toString())
-            addNoteDialog.show(myFragmentManager, "Add Note Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
+//            addVerseNoteDialog = AddVerseNoteDialog(this)
+//            addVerseNoteDialog.setVerse(multiSelectedTextsList[0], tvVerse.text.toString())
+//            addVerseNoteDialog.show(myFragmentManager, "Add Note Dialog") //По непонятной причине открыть диалог вызываемым здесь childFragmentManager-ом не получается, поэтому приходится использовать переданный объект fragmentManager из другого класса
         }
 
         val tvShare: TextView = view.findViewById(R.id.tvShare)
@@ -218,7 +218,7 @@ class VerseDialog(private val listener: VerseDialogListener) : AppCompatDialogFr
     }
 
     override fun dismissDialog() {
-        addNoteDialog.dismiss()
+        addVerseNoteDialog.dismiss()
         listener.dismissDialog()
     }
 
